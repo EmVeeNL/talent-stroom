@@ -1,0 +1,25 @@
+flowchart TD
+    A(["Visitor registers"])
+    B["Verify email or provider identity"]
+    C{"Account verified?"}
+    D["Retry verification / revoke expired invite"]
+    E["Create personal identity"]
+    F["Create organization and membership OWNER"]
+    G["Initialize settings and audit event"]
+    H(["Select organization and enter app"])
+    A --> B
+    B --> C
+    C -->|No| D
+    D -->|Retry| B
+    C -->|Yes| E
+    E --> F
+    F --> G
+    G --> H
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class H end
+    class D error
+    class C decision

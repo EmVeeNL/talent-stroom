@@ -1,0 +1,263 @@
+[
+  {
+    "domain": "01_identity",
+    "id": "01_signup_workspace",
+    "title": "Signup and first workspace",
+    "mermaid": "01_identity/mermaid/01_signup_workspace.mmd",
+    "svg": "01_identity/images/01_signup_workspace.svg",
+    "png": "01_identity/images/01_signup_workspace.png",
+    "documentation": "01_identity/docs/01_signup_workspace.md"
+  },
+  {
+    "domain": "01_identity",
+    "id": "02_login_org_selection",
+    "title": "Login and organization selection",
+    "mermaid": "01_identity/mermaid/02_login_org_selection.mmd",
+    "svg": "01_identity/images/02_login_org_selection.svg",
+    "png": "01_identity/images/02_login_org_selection.png",
+    "documentation": "01_identity/docs/02_login_org_selection.md"
+  },
+  {
+    "domain": "01_identity",
+    "id": "03_sso_oidc",
+    "title": "Social login and enterprise OIDC",
+    "mermaid": "01_identity/mermaid/03_sso_oidc.mmd",
+    "svg": "01_identity/images/03_sso_oidc.svg",
+    "png": "01_identity/images/03_sso_oidc.png",
+    "documentation": "01_identity/docs/03_sso_oidc.md"
+  },
+  {
+    "domain": "01_identity",
+    "id": "04_passkey_mfa",
+    "title": "Passkey enrollment and MFA recovery",
+    "mermaid": "01_identity/mermaid/04_passkey_mfa.mmd",
+    "svg": "01_identity/images/04_passkey_mfa.svg",
+    "png": "01_identity/images/04_passkey_mfa.png",
+    "documentation": "01_identity/docs/04_passkey_mfa.md"
+  },
+  {
+    "domain": "01_identity",
+    "id": "05_session_autolock",
+    "title": "Session expiry, inactivity lock, step-up",
+    "mermaid": "01_identity/mermaid/05_session_autolock.mmd",
+    "svg": "01_identity/images/05_session_autolock.svg",
+    "png": "01_identity/images/05_session_autolock.png",
+    "documentation": "01_identity/docs/05_session_autolock.md"
+  },
+  {
+    "domain": "01_identity",
+    "id": "06_invites_switching",
+    "title": "Invites, organization switching, removal",
+    "mermaid": "01_identity/mermaid/06_invites_switching.mmd",
+    "svg": "01_identity/images/06_invites_switching.svg",
+    "png": "01_identity/images/06_invites_switching.png",
+    "documentation": "01_identity/docs/06_invites_switching.md"
+  },
+  {
+    "domain": "02_recruitment",
+    "id": "07_client_vacancy",
+    "title": "Client contact and vacancy creation",
+    "mermaid": "02_recruitment/mermaid/07_client_vacancy.mmd",
+    "svg": "02_recruitment/images/07_client_vacancy.svg",
+    "png": "02_recruitment/images/07_client_vacancy.png",
+    "documentation": "02_recruitment/docs/07_client_vacancy.md"
+  },
+  {
+    "domain": "02_recruitment",
+    "id": "08_candidate_cv_import",
+    "title": "CV upload, extraction and human review",
+    "mermaid": "02_recruitment/mermaid/08_candidate_cv_import.mmd",
+    "svg": "02_recruitment/images/08_candidate_cv_import.svg",
+    "png": "02_recruitment/images/08_candidate_cv_import.png",
+    "documentation": "02_recruitment/docs/08_candidate_cv_import.md"
+  },
+  {
+    "domain": "02_recruitment",
+    "id": "09_candidate_dedup_merge",
+    "title": "Candidate deduplication and controlled merge",
+    "mermaid": "02_recruitment/mermaid/09_candidate_dedup_merge.mmd",
+    "svg": "02_recruitment/images/09_candidate_dedup_merge.svg",
+    "png": "02_recruitment/images/09_candidate_dedup_merge.png",
+    "documentation": "02_recruitment/docs/09_candidate_dedup_merge.md"
+  },
+  {
+    "domain": "02_recruitment",
+    "id": "10_application_pipeline",
+    "title": "Candidate-to-vacancy and Kanban stages",
+    "mermaid": "02_recruitment/mermaid/10_application_pipeline.mmd",
+    "svg": "02_recruitment/images/10_application_pipeline.svg",
+    "png": "02_recruitment/images/10_application_pipeline.png",
+    "documentation": "02_recruitment/docs/10_application_pipeline.md"
+  },
+  {
+    "domain": "02_recruitment",
+    "id": "11_interview_offer_placement",
+    "title": "Interview, offer, placement and reversal",
+    "mermaid": "02_recruitment/mermaid/11_interview_offer_placement.mmd",
+    "svg": "02_recruitment/images/11_interview_offer_placement.svg",
+    "png": "02_recruitment/images/11_interview_offer_placement.png",
+    "documentation": "02_recruitment/docs/11_interview_offer_placement.md"
+  },
+  {
+    "domain": "03_client_portal",
+    "id": "12_shortlist_share",
+    "title": "Client shortlist publication and link sharing",
+    "mermaid": "03_client_portal/mermaid/12_shortlist_share.mmd",
+    "svg": "03_client_portal/images/12_shortlist_share.svg",
+    "png": "03_client_portal/images/12_shortlist_share.png",
+    "documentation": "03_client_portal/docs/12_shortlist_share.md"
+  },
+  {
+    "domain": "03_client_portal",
+    "id": "13_portal_access_feedback",
+    "title": "Anonymous client review and feedback",
+    "mermaid": "03_client_portal/mermaid/13_portal_access_feedback.mmd",
+    "svg": "03_client_portal/images/13_portal_access_feedback.svg",
+    "png": "03_client_portal/images/13_portal_access_feedback.png",
+    "documentation": "03_client_portal/docs/13_portal_access_feedback.md"
+  },
+  {
+    "domain": "03_client_portal",
+    "id": "14_revoke_and_expire",
+    "title": "Share link expiration, revocation, CV denial",
+    "mermaid": "03_client_portal/mermaid/14_revoke_and_expire.mmd",
+    "svg": "03_client_portal/images/14_revoke_and_expire.svg",
+    "png": "03_client_portal/images/14_revoke_and_expire.png",
+    "documentation": "03_client_portal/docs/14_revoke_and_expire.md"
+  },
+  {
+    "domain": "04_modules_ai",
+    "id": "15_custom_module_builder",
+    "title": "Admin-defined recruitment module lifecycle",
+    "mermaid": "04_modules_ai/mermaid/15_custom_module_builder.mmd",
+    "svg": "04_modules_ai/images/15_custom_module_builder.svg",
+    "png": "04_modules_ai/images/15_custom_module_builder.png",
+    "documentation": "04_modules_ai/docs/15_custom_module_builder.md"
+  },
+  {
+    "domain": "04_modules_ai",
+    "id": "16_custom_record_access",
+    "title": "Custom module record edit and permissions",
+    "mermaid": "04_modules_ai/mermaid/16_custom_record_access.mmd",
+    "svg": "04_modules_ai/images/16_custom_record_access.svg",
+    "png": "04_modules_ai/images/16_custom_record_access.png",
+    "documentation": "04_modules_ai/docs/16_custom_record_access.md"
+  },
+  {
+    "domain": "04_modules_ai",
+    "id": "17_ai_assistant",
+    "title": "AI assistant with authorized retrieval and approval",
+    "mermaid": "04_modules_ai/mermaid/17_ai_assistant.mmd",
+    "svg": "04_modules_ai/images/17_ai_assistant.svg",
+    "png": "04_modules_ai/images/17_ai_assistant.png",
+    "documentation": "04_modules_ai/docs/17_ai_assistant.md"
+  },
+  {
+    "domain": "04_modules_ai",
+    "id": "18_translation",
+    "title": "Dutch-first translation request and review",
+    "mermaid": "04_modules_ai/mermaid/18_translation.mmd",
+    "svg": "04_modules_ai/images/18_translation.svg",
+    "png": "04_modules_ai/images/18_translation.png",
+    "documentation": "04_modules_ai/docs/18_translation.md"
+  },
+  {
+    "domain": "05_security_privacy",
+    "id": "19_envelope_encrypt_read",
+    "title": "Record-level envelope encryption and decrypt",
+    "mermaid": "05_security_privacy/mermaid/19_envelope_encrypt_read.mmd",
+    "svg": "05_security_privacy/images/19_envelope_encrypt_read.svg",
+    "png": "05_security_privacy/images/19_envelope_encrypt_read.png",
+    "documentation": "05_security_privacy/docs/19_envelope_encrypt_read.md"
+  },
+  {
+    "domain": "05_security_privacy",
+    "id": "20_encrypted_search",
+    "title": "Search encrypted candidate PII safely",
+    "mermaid": "05_security_privacy/mermaid/20_encrypted_search.mmd",
+    "svg": "05_security_privacy/images/20_encrypted_search.svg",
+    "png": "05_security_privacy/images/20_encrypted_search.png",
+    "documentation": "05_security_privacy/docs/20_encrypted_search.md"
+  },
+  {
+    "domain": "05_security_privacy",
+    "id": "21_gdpr_export_delete",
+    "title": "GDPR access/export, erasure and retention",
+    "mermaid": "05_security_privacy/mermaid/21_gdpr_export_delete.mmd",
+    "svg": "05_security_privacy/images/21_gdpr_export_delete.svg",
+    "png": "05_security_privacy/images/21_gdpr_export_delete.png",
+    "documentation": "05_security_privacy/docs/21_gdpr_export_delete.md"
+  },
+  {
+    "domain": "05_security_privacy",
+    "id": "22_key_rotation_breach",
+    "title": "KMS key rotation and database exposure",
+    "mermaid": "05_security_privacy/mermaid/22_key_rotation_breach.mmd",
+    "svg": "05_security_privacy/images/22_key_rotation_breach.svg",
+    "png": "05_security_privacy/images/22_key_rotation_breach.png",
+    "documentation": "05_security_privacy/docs/22_key_rotation_breach.md"
+  },
+  {
+    "domain": "06_platform",
+    "id": "23_api_request_tenancy",
+    "title": "Hono API request, tenant isolation, RLS",
+    "mermaid": "06_platform/mermaid/23_api_request_tenancy.mmd",
+    "svg": "06_platform/images/23_api_request_tenancy.svg",
+    "png": "06_platform/images/23_api_request_tenancy.png",
+    "documentation": "06_platform/docs/23_api_request_tenancy.md"
+  },
+  {
+    "domain": "06_platform",
+    "id": "24_outbox_jobs_reminders",
+    "title": "Transactional outbox, workers, tasks and reminders",
+    "mermaid": "06_platform/mermaid/24_outbox_jobs_reminders.mmd",
+    "svg": "06_platform/images/24_outbox_jobs_reminders.svg",
+    "png": "06_platform/images/24_outbox_jobs_reminders.png",
+    "documentation": "06_platform/docs/24_outbox_jobs_reminders.md"
+  },
+  {
+    "domain": "06_platform",
+    "id": "25_neon_branch_migrations",
+    "title": "Database migrations, CI/CD and Neon branching",
+    "mermaid": "06_platform/mermaid/25_neon_branch_migrations.mmd",
+    "svg": "06_platform/images/25_neon_branch_migrations.svg",
+    "png": "06_platform/images/25_neon_branch_migrations.png",
+    "documentation": "06_platform/docs/25_neon_branch_migrations.md"
+  },
+  {
+    "domain": "06_platform",
+    "id": "26_cache_org_switch",
+    "title": "Cache, invalidation and organization switching",
+    "mermaid": "06_platform/mermaid/26_cache_org_switch.mmd",
+    "svg": "06_platform/images/26_cache_org_switch.svg",
+    "png": "06_platform/images/26_cache_org_switch.png",
+    "documentation": "06_platform/docs/26_cache_org_switch.md"
+  },
+  {
+    "domain": "06_platform",
+    "id": "27_subscription_billing",
+    "title": "Plans, Stripe webhooks and entitlements",
+    "mermaid": "06_platform/mermaid/27_subscription_billing.mmd",
+    "svg": "06_platform/images/27_subscription_billing.svg",
+    "png": "06_platform/images/27_subscription_billing.png",
+    "documentation": "06_platform/docs/27_subscription_billing.md"
+  },
+  {
+    "domain": "06_platform",
+    "id": "28_desktop_tauri_v2",
+    "title": "Tauri v2 desktop client security and sync",
+    "mermaid": "06_platform/mermaid/28_desktop_tauri_v2.mmd",
+    "svg": "06_platform/images/28_desktop_tauri_v2.svg",
+    "png": "06_platform/images/28_desktop_tauri_v2.png",
+    "documentation": "06_platform/docs/28_desktop_tauri_v2.md"
+  },
+  {
+    "domain": "06_platform",
+    "id": "29_backup_restore_incident",
+    "title": "Backup, PITR recovery and incident operations",
+    "mermaid": "06_platform/mermaid/29_backup_restore_incident.mmd",
+    "svg": "06_platform/images/29_backup_restore_incident.svg",
+    "png": "06_platform/images/29_backup_restore_incident.png",
+    "documentation": "06_platform/docs/29_backup_restore_incident.md"
+  }
+]

@@ -1,0 +1,27 @@
+flowchart TD
+    A(["Domain event occurs in transaction"])
+    B["Persist business row and outbox event"]
+    C["Dispatcher claims event with lease"]
+    D{"Consumer checks idempotency key"}
+    E(["Mark previously completed and ack"])
+    F["Execute task / notification / AI work"]
+    G{"Succeeded?"}
+    H["Exponential retry then dead-letter + alert"]
+    I(["Mark delivered and store receipt"])
+    A --> B
+    B --> C
+    C --> D
+    D -->|Already done| E
+    D -->|New| F
+    F --> G
+    G -->|No| H
+    H -->|Retry| C
+    G -->|Yes| I
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class E,I end
+    class H error
+    class D,G decision

@@ -1,0 +1,26 @@
+flowchart TD
+    A(["Launch signed desktop shell"])
+    B["Use system browser OIDC with PKCE/passkeys"]
+    C["Verify callback and active organization"]
+    D["Store session in platform secure store"]
+    E{"Fetch minimal encrypted local data?"}
+    F["Keep online-only session"]
+    G["Encrypt optional offline cache with device key"]
+    H["Sync via versioned API; detect conflicts"]
+    I(["Lock on inactivity / remote revoke"])
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E -->|No| F
+    E -->|Yes| G
+    F --> H
+    G --> H
+    H --> I
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class I end
+    class E decision

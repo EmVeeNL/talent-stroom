@@ -1,0 +1,101 @@
+name: Epic
+description: A large outcome grouping stories, tasks and spikes (one roadmap capability).
+title: "[Epic] "
+labels: ["type:epic"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        An epic describes **one user or business outcome**. Break it down into sub-issues (stories, tasks, spikes).
+        Set milestone (= roadmap phase), Priority and Size on the project board after creation.
+
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Roadmap phase
+      options:
+        - "Phase 0 — Discovery & security decisions"
+        - "Phase 1 — API & contracts first"
+        - "Phase 2 — Encryption foundation"
+        - "Phase 3 — Core backend"
+        - "Phase 4 — Frontend & i18n"
+        - "Phase 5 — AI, translation & custom modules"
+        - "Phase 6 — Client collaboration & billing"
+        - "Phase 7 — Private alpha"
+        - "Phase 8 — Closed beta & public website"
+        - "Phase 9 — Public v1"
+        - "Phase 10 — v1.x"
+        - "Phase 11 — v2 desktop exploration"
+    validations:
+      required: true
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: What is true for users or the business when this epic is done?
+      placeholder: Recruiters can turn a PDF/DOCX CV into a verified, encrypted candidate profile in under 30 seconds of interaction.
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: In scope
+      placeholder: |
+        - ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      placeholder: |
+        - ...
+
+  - type: input
+    id: requirements
+    attributes:
+      label: Requirement IDs
+      description: From docs/architecture/prd/03-functional-requirements.md (e.g. CAND-01, CAND-02)
+      placeholder: CAND-01, CAND-02
+
+  - type: textarea
+    id: references
+    attributes:
+      label: Spec references
+      description: PRD, architecture, flow diagrams, SQL files, ADRs.
+      placeholder: |
+        - docs/architecture/prd/...
+        - docs/flows/.../docs/...md
+        - docs/database/sql/...sql
+
+  - type: textarea
+    id: exit-criteria
+    attributes:
+      label: Exit criteria
+      description: Measurable criteria for closing the epic (roadmap exit gate, metrics, reviews).
+      placeholder: |
+        - [ ] All P0 BDD scenarios green
+        - [ ] Tenant-isolation suite green
+        - [ ] ...
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: reviews
+    attributes:
+      label: Required reviews
+      options:
+        - label: Security / threat model update
+        - label: Privacy / DPIA impact
+        - label: EU AI Act assessment
+        - label: Accessibility (WCAG 2.2 AA)
+        - label: Dutch copy review by native speaker
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks & open questions
+      description: Link open decisions (D01–D15) where relevant.

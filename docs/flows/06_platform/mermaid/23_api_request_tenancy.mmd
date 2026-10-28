@@ -1,0 +1,24 @@
+flowchart TD
+    A(["Browser / desktop / developer API request"])
+    B["Cloudflare WAF and rate limit"]
+    C{"Authenticate and verify selected membership"}
+    D["Return 401 or 403, audit"]
+    E["Validate Zod/OpenAPI request and permissions"]
+    F["Begin Neon transaction; set scoped tenant context"]
+    G["Apply RLS plus composite tenant FK constraints"]
+    H(["Commit and emit outbox; redact response"])
+    A --> B
+    B --> C
+    C -->|Denied| D
+    C -->|Granted| E
+    E --> F
+    F --> G
+    G --> H
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class H end
+    class D error
+    class C decision

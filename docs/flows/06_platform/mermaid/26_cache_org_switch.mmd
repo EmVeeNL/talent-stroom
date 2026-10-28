@@ -1,0 +1,25 @@
+flowchart TD
+    A(["Authenticated read"])
+    B["Compute cache key tenant/user/role/version"]
+    C{"Sensitive or revoked content?"}
+    D["Bypass shared cache; fetch private source"]
+    E["Check bounded tenant-scoped cache"]
+    F{"Hit?"}
+    G["Read Neon and cache safe projection"]
+    H(["Return result with proper Cache-Control"])
+    A --> B
+    B --> C
+    C -->|Yes| D
+    D --> H
+    C -->|No| E
+    E --> F
+    F -->|Miss| G
+    G --> H
+    F -->|Hit| H
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class H end
+    class C,F decision

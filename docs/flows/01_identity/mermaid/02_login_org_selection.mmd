@@ -1,0 +1,27 @@
+flowchart TD
+    A(["Begin login"])
+    B["Authenticate passkey / password / OIDC"]
+    C{"Risk check and required MFA"}
+    D["Challenge / deny with audit"]
+    E["List active memberships"]
+    F{"One active organization?"}
+    G["Show organization picker"]
+    H["Bind session to selected organization"]
+    I(["Open workspace"])
+    A --> B
+    B --> C
+    C -->|Fail| D
+    C -->|Pass| E
+    E --> F
+    F -->|No| G
+    F -->|Yes| H
+    G -->|Select| H
+    H --> I
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class I end
+    class D error
+    class C,F decision

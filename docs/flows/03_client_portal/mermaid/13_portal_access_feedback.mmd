@@ -1,0 +1,28 @@
+flowchart TD
+    A(["Client opens shortlist link"])
+    B{"Hash token; validate expiry revocation scope"}
+    C["Return generic unavailable response"]
+    D["Rate-limit; retrieve approved snapshot"]
+    E["View authorized CV through short-lived access"]
+    F["Submit rating / decision / comment"]
+    G{"Validate CSRF / abuse / scope / payload"}
+    H["Reject with safe response"]
+    I["Store feedback, idempotency and event"]
+    J(["Notify owning recruiter"])
+    A --> B
+    B -->|Invalid| C
+    B -->|Valid| D
+    D --> E
+    E --> F
+    F --> G
+    G -->|Fail| H
+    G -->|Pass| I
+    I --> J
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class J end
+    class C,H error
+    class B,G decision

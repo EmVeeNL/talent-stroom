@@ -1,0 +1,27 @@
+flowchart TD
+    A(["Authenticated user opens security settings"])
+    B{"Recent authentication required"}
+    C["Reauthenticate"]
+    D["Register WebAuthn passkey"]
+    E{"Verify attestation / challenge / origin"}
+    F["Discard credential and alert"]
+    G["Store public key and credential metadata"]
+    H["Offer TOTP + recovery codes"]
+    I(["Log enrollment and notify user"])
+    A --> B
+    B -->|No| C
+    C --> D
+    B -->|Yes| D
+    D --> E
+    E -->|Fail| F
+    E -->|Pass| G
+    G --> H
+    H --> I
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class I end
+    class F error
+    class B,E decision

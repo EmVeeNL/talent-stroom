@@ -1,0 +1,74 @@
+name: Bug report
+description: Something does not work as specified. NOT for security vulnerabilities.
+title: "[Bug] "
+labels: ["type:bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Security vulnerabilities must not be reported here.** Use private vulnerability reporting instead.
+        Never paste real candidate data, CVs, tokens or share links. Use synthetic data only.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. ...
+        2. ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - Local
+        - PR preview
+        - Staging
+        - Production
+    validations:
+      required: true
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Surface
+      options:
+        - Web app
+        - Client portal
+        - API
+        - Background jobs
+        - Public website
+        - Developer docs
+        - Desktop app
+
+  - type: input
+    id: request-id
+    attributes:
+      label: Request / correlation ID
+      description: From the error screen or problem response, if available.
+
+  - type: checkboxes
+    id: severity-flags
+    attributes:
+      label: Impact flags
+      options:
+        - label: Data from another organization was visible (escalate immediately as security incident)
+        - label: Data loss or corruption
+        - label: Blocks a core journey (CV → vacancy → pipeline → shortlist → feedback → placement)

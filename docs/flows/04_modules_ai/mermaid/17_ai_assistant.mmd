@@ -1,0 +1,29 @@
+flowchart TD
+    A(["User asks AI to assist"])
+    B{"Authorize organization and permitted records"}
+    C["Deny or minimize requested access"]
+    D["Retrieve minimum required plaintext in worker"]
+    E["Redact/minimize and enforce provider policy"]
+    F["Invoke model with structured outputs"]
+    G{"Validate hallucinations, safety and provenance"}
+    H["Show warning and request revision"]
+    I["User previews and approves changes"]
+    J(["Write authorized changes with audit"])
+    A --> B
+    B -->|Denied| C
+    B -->|Allowed| D
+    D --> E
+    E --> F
+    F --> G
+    G -->|Fail| H
+    H --> I
+    G -->|Pass| I
+    I --> J
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class J end
+    class C error
+    class B,G decision

@@ -1,0 +1,26 @@
+flowchart TD
+    A(["Authorized write or read request"])
+    B{"Verify identity membership purpose and scope"}
+    C["Deny and record security event"]
+    D["Write: random DEK + AEAD nonce"]
+    E["Encrypt record with bound AAD (tenant/id/version)"]
+    F(["Wrap DEK via external KMS; store ciphertext"])
+    G["Read: fetch ciphertext + wrapped DEK"]
+    H["Unwrap using scoped KMS grant and decrypt"]
+    I(["Check AEAD integrity and return minimum fields"])
+    A --> B
+    B -->|Denied| C
+    B -->|Write| D
+    D --> E
+    E --> F
+    B -->|Read| G
+    G --> H
+    H --> I
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class F,I end
+    class C error
+    class B decision

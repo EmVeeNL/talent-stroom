@@ -1,0 +1,26 @@
+flowchart TD
+    A(["PR with migration and BDD scenarios"])
+    B["CI creates isolated Neon branch"]
+    C["Run migrations, constraints and seed fixtures"]
+    D{"Run unit, integration, RLS and security tests"}
+    E["Block PR; repair migration"]
+    F["Review backward-compatible rollout"]
+    G["Deploy Cloudflare Worker behind flags"]
+    H["Apply production migration via controlled job"]
+    I(["Smoke test / monitor / rollback application"])
+    A --> B
+    B --> C
+    C --> D
+    D -->|Failed| E
+    D -->|Passed| F
+    F --> G
+    G --> H
+    H --> I
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class I end
+    class E error
+    class D decision

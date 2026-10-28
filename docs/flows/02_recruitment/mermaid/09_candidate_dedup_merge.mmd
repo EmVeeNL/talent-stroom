@@ -1,0 +1,25 @@
+flowchart TD
+    A(["Search or create candidate"])
+    B["Compare tenant-scoped blind indexes"]
+    C{"Likely duplicate?"}
+    D(["Save as new candidate"])
+    E["Show privileged comparison"]
+    F{"User confirms merge?"}
+    G(["Keep distinct records"])
+    H["Move verified references transactionally"]
+    I(["Retain merge audit and privacy lineage"])
+    A --> B
+    B --> C
+    C -->|No| D
+    C -->|Yes| E
+    E --> F
+    F -->|No| G
+    F -->|Yes| H
+    H --> I
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class D,G,I end
+    class C,F decision

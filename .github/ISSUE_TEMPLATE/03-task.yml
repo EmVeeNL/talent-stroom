@@ -1,0 +1,57 @@
+name: Technical task
+description: Engineering work without direct user-facing behaviour (infra, schema, tooling, hardening).
+title: "[Task] "
+labels: ["type:task"]
+body:
+  - type: input
+    id: parent
+    attributes:
+      label: Parent epic
+      placeholder: "#12"
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What must exist or change, and why.
+    validations:
+      required: true
+
+  - type: textarea
+    id: approach
+    attributes:
+      label: Approach / implementation notes
+      description: Affected packages and paths (keep the working set to ~5–15 files), relevant ADRs.
+      placeholder: |
+        Affected paths:
+        - packages/...
+        - apps/api/...
+
+  - type: textarea
+    id: done
+    attributes:
+      label: Acceptance checklist
+      placeholder: |
+        - [ ] ...
+        - [ ] Tests added
+        - [ ] Docs updated
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: Sensitive areas touched (requires ADR or explicit review)
+      options:
+        - label: Encryption / KMS / blind indexes
+        - label: Authentication / sessions / memberships
+        - label: Tenant scoping / RLS
+        - label: Database migrations
+        - label: CI/CD / secrets
+        - label: Public (unauthenticated) endpoints
+
+  - type: input
+    id: test-commands
+    attributes:
+      label: Test commands
+      placeholder: pnpm lint && pnpm typecheck && pnpm test

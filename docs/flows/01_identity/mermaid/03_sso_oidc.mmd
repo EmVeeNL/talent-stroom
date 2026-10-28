@@ -1,0 +1,29 @@
+flowchart TD
+    A(["User chooses Google / Apple / OIDC"])
+    B["Create state nonce PKCE"]
+    C["Redirect to identity provider"]
+    D{"Validate callback signature state nonce"}
+    E["Reject login and record security event"]
+    F["Resolve verified identity to user"]
+    G{"Check invitation and membership"}
+    H["Request authorized onboarding"]
+    I["Risk step-up MFA if applicable"]
+    J(["Continue to organization selection"])
+    A --> B
+    B --> C
+    C --> D
+    D -->|Invalid| E
+    D -->|Valid| F
+    F --> G
+    G -->|Missing| H
+    G -->|Found| I
+    H -->|Approved| I
+    I --> J
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class J end
+    class E error
+    class D,G decision

@@ -1,0 +1,25 @@
+flowchart TD
+    A(["Scheduled rotation or security incident"])
+    B{"Classify KMS vs database vs runtime exposure"}
+    C["DB-only: revoke credentials, investigate"]
+    D["Runtime/KMS: contain sessions and key grants"]
+    E["Rotate KEK and rewrap record DEKs"]
+    F{"Verify integrity and exhaustive coverage"}
+    G["Retry failed records; preserve old version safely"]
+    H(["Finalize rotation, audit and incident response"])
+    A --> B
+    B -->|DB only| C
+    B -->|Runtime/KMS| D
+    C --> E
+    D --> E
+    E --> F
+    F -->|Incomplete| G
+    G -->|Retry| F
+    F -->|Complete| H
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class H end
+    class B,F decision

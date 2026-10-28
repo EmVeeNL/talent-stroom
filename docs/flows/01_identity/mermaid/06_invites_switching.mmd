@@ -1,0 +1,27 @@
+flowchart TD
+    A(["Admin issues scoped invitation"])
+    B{"Validate role and seat entitlement"}
+    C["Reject unauthorized invitation"]
+    D["Email expiring one-time invitation"]
+    E["Recipient verifies identity and accepts"]
+    F["Create membership transactionally"]
+    G{"Switch active organization?"}
+    H["Clear tenant cache and rotate scoped token"]
+    I(["Log membership changes"])
+    A --> B
+    B -->|Fail| C
+    B -->|Pass| D
+    D --> E
+    E --> F
+    F --> G
+    G -->|Yes| H
+    G -->|No| I
+    H --> I
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class I end
+    class C error
+    class B,G decision

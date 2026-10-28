@@ -1,0 +1,28 @@
+flowchart TD
+    A(["Controller opens data request"])
+    B{"Verify identity, scope, legal hold"}
+    C["Escalate / reject unverified request"]
+    D["Locate records, versions, files and shares"]
+    E{"Export request?"}
+    F(["Create encrypted portable export and expire link"])
+    G["Revoke access tokens and portal shares"]
+    H["Delete/cryptoshred live PII and documents"]
+    I["Queue downstream deletion and backup tombstone"]
+    J(["Record privacy audit and completion evidence"])
+    A --> B
+    B -->|Fail| C
+    B -->|Pass| D
+    D --> E
+    E -->|Yes| F
+    E -->|Erasure| G
+    G --> H
+    H --> I
+    I --> J
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class F,J end
+    class C error
+    class B,E decision

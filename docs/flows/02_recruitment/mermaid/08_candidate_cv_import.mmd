@@ -1,0 +1,31 @@
+flowchart TD
+    A(["Recruiter uploads PDF or DOCX"])
+    B{"Validate size MIME signature and malware"}
+    C["Reject and quarantine"]
+    D["Encrypt and store CV in private R2"]
+    E["Enqueue extraction job"]
+    F["Extract and validate structured draft"]
+    G{"Parsing usable?"}
+    H["Manual-entry fallback"]
+    I["Review / correct / approve fields"]
+    J["Check duplicates and save encrypted PII"]
+    K(["Index safe searchable tokens; audit"])
+    A --> B
+    B -->|Invalid| C
+    B -->|Valid| D
+    D --> E
+    E --> F
+    F --> G
+    G -->|No| H
+    G -->|Yes| I
+    H --> I
+    I --> J
+    J --> K
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class K end
+    class C error
+    class B,G decision

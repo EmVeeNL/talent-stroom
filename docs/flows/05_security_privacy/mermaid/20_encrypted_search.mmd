@@ -1,0 +1,22 @@
+flowchart TD
+    A(["Recruiter searches within organization"])
+    B["Authorize query and allowed search fields"]
+    C["Normalize exact-match search input"]
+    D["Compute keyed blind index outside Neon"]
+    E["Query organization-scoped blind index"]
+    F["Fetch candidate ciphertext with row limits"]
+    G["Decrypt authorized match set; verify match"]
+    H(["Return minimal results and log metrics"])
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class H end

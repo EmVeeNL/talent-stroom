@@ -1,0 +1,26 @@
+flowchart TD
+    A(["User requests translation"])
+    B["Choose source, target locale, content scope"]
+    C{"Check rights and redact confidential fields"}
+    D["Block or request restricted approval"]
+    E["Queue translation with glossary and locale"]
+    F["Review text and sensitive terminology"]
+    G{"Human approves publication?"}
+    H(["Keep draft only"])
+    I(["Store locale variant and source revision"])
+    A --> B
+    B --> C
+    C -->|Fail| D
+    C -->|Pass| E
+    E --> F
+    F --> G
+    G -->|No| H
+    G -->|Yes| I
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class H,I end
+    class D error
+    class C,G decision

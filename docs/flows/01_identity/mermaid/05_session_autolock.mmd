@@ -1,0 +1,25 @@
+flowchart TD
+    A(["Authenticated session active"])
+    B["Track meaningful user activity"]
+    C{"Idle threshold exceeded?"}
+    D["Continue with sliding session limits"]
+    E["Lock sensitive workspace UI"]
+    F{"Require passkey / MFA unlock"}
+    G["Expire and clear organization caches"]
+    H(["Restore scoped session"])
+    A --> B
+    B --> C
+    C -->|No| D
+    D --> B
+    C -->|Yes| E
+    E --> F
+    F -->|Denied or timed out| G
+    F -->|Successful| H
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class H end
+    class G error
+    class C,F decision

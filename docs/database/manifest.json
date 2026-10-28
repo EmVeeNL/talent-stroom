@@ -1,0 +1,14 @@
+{
+  "product": "TalentStroom",
+  "database": "Neon PostgreSQL",
+  "canonical_format": "SQL",
+  "domains": [
+    "01_identity_tenancy",
+    "02_recruiting_core",
+    "03_data_protection",
+    "04_client_sharing",
+    "05_custom_modules",
+    "06_operations_ai"
+  ],
+  "status": "design-baseline"
+}

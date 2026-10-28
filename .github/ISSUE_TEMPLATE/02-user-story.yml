@@ -1,0 +1,102 @@
+name: User story
+description: User-facing behaviour with BDD acceptance criteria.
+title: "[Story] "
+labels: ["type:story"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Acceptance criteria are written as Gherkin **before** implementation (docs/architecture/engineering/02-bdd-testing.md).
+        Feature files are English; Dutch strings are asserted by UI/i18n tests.
+
+  - type: input
+    id: parent
+    attributes:
+      label: Parent epic
+      placeholder: "#12"
+
+  - type: dropdown
+    id: persona
+    attributes:
+      label: Persona
+      options:
+        - Recruiter / Consultant
+        - Bureau-eigenaar / Organisatiebeheerder
+        - Opdrachtgever / Hiring manager (portal guest)
+        - Platform operator
+        - Developer (API consumer)
+        - Website visitor / prospect
+    validations:
+      required: true
+
+  - type: textarea
+    id: story
+    attributes:
+      label: User story
+      value: |
+        **As a** ...
+        **I want** ...
+        **So that** ...
+    validations:
+      required: true
+
+  - type: input
+    id: requirements
+    attributes:
+      label: Requirement IDs
+      placeholder: PIPE-02
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria (Gherkin)
+      description: "Include unhappy paths: denied access, other organization, expiry, retry, conflict."
+      render: gherkin
+      value: |
+        Feature: ...
+
+          Scenario: ...
+            Given ...
+            When ...
+            Then ...
+
+          Scenario: A member of another organization cannot ...
+            Given ...
+            When ...
+            Then the API refuses access
+            And a security event is recorded without personal data
+    validations:
+      required: true
+
+  - type: textarea
+    id: ux
+    attributes:
+      label: UX & Dutch copy
+      description: Screens, NL/EN strings (i18n keys), empty/error/loading states, mockup references (docs/images/screens).
+
+  - type: textarea
+    id: api
+    attributes:
+      label: API contract
+      description: Endpoints, request/response schema changes, problem responses.
+      placeholder: "PATCH /v1/applications/{id}/stage — If-Match required, 409 on version conflict"
+
+  - type: textarea
+    id: data
+    attributes:
+      label: Data & privacy
+      description: Tables touched, PII classification, encryption, retention, export/erase coverage.
+
+  - type: checkboxes
+    id: dod
+    attributes:
+      label: Definition of done
+      options:
+        - label: BDD scenarios approved and green
+        - label: Implementation behind reviewed OpenAPI contract
+        - label: Unit, integration and tenant-isolation tests pass
+        - label: Accessibility (keyboard, WCAG 2.2 AA) and performance verified
+        - label: Structured audit events and telemetry added (no PII)
+        - label: NL + EN translations complete
+        - label: Data lifecycle documented; privacy/threat model updated where applicable
+        - label: Docs / release notes updated

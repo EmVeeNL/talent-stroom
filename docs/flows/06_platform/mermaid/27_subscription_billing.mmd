@@ -1,0 +1,26 @@
+flowchart TD
+    A(["Admin chooses plan or updates subscription"])
+    B["Hosted checkout / billing portal"]
+    C["Payment provider sends signed webhook"]
+    D{"Verify signature, timestamp and event id"}
+    E["Reject and alert"]
+    F["Deduplicate event and reconcile provider state"]
+    G["Update workspace entitlements transactionally"]
+    H["Apply grace/read-only policy without data loss"]
+    I(["Audit and notify account admin"])
+    A --> B
+    B --> C
+    C --> D
+    D -->|Invalid| E
+    D -->|Valid| F
+    F --> G
+    G --> H
+    H --> I
+    classDef start fill:#e4f3ff,stroke:#377ad6,color:#15243a
+    classDef end fill:#dcfce8,stroke:#16a34a,color:#12331e
+    classDef error fill:#fee2e2,stroke:#dc2626,color:#581b1b
+    classDef decision fill:#fff1cc,stroke:#b7791f,color:#493010
+    class A start
+    class I end
+    class E error
+    class D decision
