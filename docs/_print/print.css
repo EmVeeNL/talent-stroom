@@ -1,0 +1,184 @@
+/* Shared print stylesheet for TalentStroom documents (HTML -> PDF via headless Chrome). */
+@page {
+  size: A4;
+  margin: 18mm 18mm 20mm;
+}
+
+:root {
+  --ts-sidebar: #111827;
+  --ts-primary: #4f59f7;
+  --ts-mint: #5dddc1;
+  --ts-text: #172137;
+  --ts-muted: #68748a;
+  --ts-border: #e5e9f1;
+  --ts-bg: #f5f7fb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family:
+    "Asap Sharp",
+    "Asap",
+    -apple-system,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.5;
+  color: var(--ts-text);
+}
+
+body {
+  margin: 0;
+}
+
+header.doc {
+  border-bottom: 3px solid var(--ts-primary);
+  padding-bottom: 10px;
+  margin-bottom: 18px;
+}
+
+header.doc .brand {
+  font-weight: 700;
+  font-size: 11pt;
+  letter-spacing: 0.02em;
+}
+
+header.doc .brand span {
+  color: var(--ts-primary);
+}
+
+header.doc h1 {
+  margin: 6px 0 4px;
+  font-size: 22pt;
+  line-height: 1.15;
+}
+
+header.doc .meta {
+  color: var(--ts-muted);
+  font-size: 9pt;
+}
+
+h2 {
+  font-size: 14pt;
+  margin: 22px 0 8px;
+  padding-top: 4px;
+  border-top: 1px solid var(--ts-border);
+  break-after: avoid;
+}
+
+h3 {
+  font-size: 11.5pt;
+  margin: 14px 0 6px;
+  break-after: avoid;
+}
+
+p,
+li {
+  orphans: 3;
+  widows: 3;
+}
+
+ul,
+ol {
+  padding-left: 20px;
+  margin: 6px 0;
+}
+
+li {
+  margin: 2px 0;
+}
+
+.muted {
+  color: var(--ts-muted);
+}
+
+.box {
+  background: var(--ts-bg);
+  border-left: 4px solid var(--ts-primary);
+  padding: 8px 12px;
+  margin: 10px 0;
+  break-inside: avoid;
+}
+
+.box.mint {
+  border-left-color: var(--ts-mint);
+}
+
+.box.warn {
+  border-left-color: #bd7b20;
+}
+
+.script {
+  font-style: italic;
+}
+
+.time {
+  float: right;
+  font-weight: 600;
+  color: var(--ts-primary);
+  font-size: 9.5pt;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 12px;
+  font-size: 9.5pt;
+  break-inside: auto;
+}
+
+th,
+td {
+  border: 1px solid var(--ts-border);
+  padding: 5px 7px;
+  vertical-align: top;
+  text-align: left;
+}
+
+th {
+  background: var(--ts-bg);
+  font-weight: 600;
+}
+
+tr {
+  break-inside: avoid;
+}
+
+td.write {
+  height: 42px;
+}
+
+td.write.tall {
+  height: 90px;
+}
+
+.checkbox::before {
+  content: "☐ ";
+}
+
+.page-break {
+  break-before: page;
+}
+
+pre.template {
+  white-space: pre-wrap;
+  font-family: inherit;
+  background: var(--ts-bg);
+  border: 1px solid var(--ts-border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 8px 0 14px;
+  break-inside: avoid;
+}
+
+footer.doc {
+  margin-top: 24px;
+  padding-top: 8px;
+  border-top: 1px solid var(--ts-border);
+  color: var(--ts-muted);
+  font-size: 8.5pt;
+}
