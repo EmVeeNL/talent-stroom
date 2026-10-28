@@ -11,8 +11,8 @@ This is an ordered roadmap with indicative milestones, not guaranteed dates. Val
 | 4 | Frontend and i18n | Vite React, design system, NL copy, org chooser, autolock, accessible flows | User tests + a11y |
 | 5 | AI/translation + custom modules | CV parsing, translation, approvals, module builder, cost/quota control | Prompt-injection tests + scope guard |
 | 6 | Client collaboration and billing | Public portal, feedback, notifications, Stripe-like billing, consent/retention workflows | Security/privacy reviews |
-| 7 | Private alpha | 2–3 agencies, migration assistance, metrics, bug triage | Core journey completion |
-| 8 | Closed beta + public website | 5–10 agencies, Astro website, demos/tutorials, docs, onboarding forms | Reliability and trial conversion proof |
+| 7 | Private alpha + public website | 2–3 agencies, migration assistance, metrics, bug triage, Astro website with beta application form | Core journey completion |
+| 8 | Closed beta, guides & docs | 5–10 agencies, demos/tutorials, product guides, developer docs, onboarding | Reliability and trial conversion proof |
 | 9 | Public v1 | Production runbooks, support, pricing, incident playbook, launch | Release checklist signed |
 | 10 | v1.x | CSV import, mail/calendar integrations, enhanced module templates | Measured demand |
 | 11 | v2 desktop exploration | Rust/Tauri shell POC + device security posture | Separate go/no-go |
