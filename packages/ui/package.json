@@ -1,0 +1,17 @@
+{
+  "name": "@talentstroom/ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tokens.css": "./src/tokens.css"
+  },
+  "scripts": {
+    "typecheck": "tsc -p ."
+  },
+  "devDependencies": {
+    "@talentstroom/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
