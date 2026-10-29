@@ -63,6 +63,16 @@ cmd_remove() {
   local slug="${1:?slug}" dir="$BASE/$1" branch
   [[ -d "$dir" ]] || die "no worktree $dir"
   branch="$(branch_of "$slug")"
+  # Refuse while processes from this worktree still run (e.g. a forgotten `wrangler dev`):
+  # removing the files would orphan them and keep their ports busy.
+  local running
+  running="$(pgrep -fl -- "$dir/" || true)"
+  if [[ -n "$running" ]]; then
+    echo "error: processes still running from $dir:" >&2
+    echo "$running" >&2
+    echo "stop them first (kill <pid>), then rerun" >&2
+    return 1
+  fi
   git -C "$REPO" worktree remove --force "$dir"
   git -C "$REPO" branch -D "$branch" >/dev/null 2>&1 || true
   rm -f "$LOGS/$slug".*
@@ -77,7 +87,7 @@ cmd_clean() {
     local slug state
     slug="$(basename "$dir")"
     state="$(pr_state "$(branch_of "$slug")")"
-    if [[ "$state" == "MERGED" || "$state" == "CLOSED" ]]; then cmd_remove "$slug"; fi
+    if [[ "$state" == "MERGED" || "$state" == "CLOSED" ]]; then cmd_remove "$slug" || true; fi
   done
   rmdir "$LOGS" "$BASE" 2>/dev/null || true
 }

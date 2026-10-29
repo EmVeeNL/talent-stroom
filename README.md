@@ -24,9 +24,12 @@ The API talks to Postgres through a Hyperdrive binding; locally that is Postgres
 ```sh
 pnpm db:reset                          # Postgres 127.0.0.1:5432 + Mailpit (SMTP :1025, UI http://127.0.0.1:8025), migrated
 cp .env.example .env                   # local DATABASE_MIGRATION_URL / DATABASE_TEST_URL
-cp apps/api/.env.example apps/api/.env # wrangler dev needs the local Hyperdrive connection string
+cp apps/api/.env.example apps/api/.env # local Hyperdrive connection strings, Better Auth, MAIL_TRANSPORT=mailpit
+# then set BETTER_AUTH_SECRET in apps/api/.env to a random local value: openssl rand -base64 32
 pnpm dev
 ```
+
+Sign-up and sign-in run through the app origin: open http://localhost:5173, which proxies `/api/auth/*` (Better Auth) and `/api/v1/*` to the API Worker. Verification, password-reset and invitation emails land in Mailpit at http://localhost:8025. Details: "Authentication" in [`apps/api/README.md`](apps/api/README.md#authentication).
 
 `pnpm db:up` / `db:down` start and stop the containers, `pnpm db:migrate` applies new migrations. All credentials in these files are throwaway values for the local container only. Details, role model and running against Neon: [`packages/database/README.md`](packages/database/README.md).
 

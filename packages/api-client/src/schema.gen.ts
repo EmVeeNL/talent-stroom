@@ -20,6 +20,77 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/me/organizations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Active memberships of the signed-in user (Kies je organisatie) */
+    get: operations["listMyOrganizations"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/organizations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Create an organization; the creator becomes owner and the session rotates into it */
+    post: operations["createOrganization"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/organizations/{orgId}/switch": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Make an organization active; revokes the current session and issues a new one
+     * @description Verifies an active membership, deletes the current session and sets a new session cookie bound to the organization. Clients must abort in-flight requests and drop all cached data of the previous organization.
+     */
+    post: operations["switchOrganization"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/organizations/current": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** The session's verified organization context */
+    get: operations["getCurrentOrganization"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -54,6 +125,17 @@ export interface components {
     };
   };
   responses: {
+    /** @description Email not verified, account banned, cross-origin request, or no active membership */
+    Forbidden: {
+      headers: {
+        /** @description Request correlation ID */
+        "X-Request-Id"?: string;
+        [name: string]: unknown;
+      };
+      content: {
+        "application/problem+json": components["schemas"]["ProblemDetails"];
+      };
+    };
     /** @description Unexpected server error */
     InternalError: {
       headers: {
@@ -87,6 +169,17 @@ export interface components {
         "application/problem+json": components["schemas"]["ProblemDetails"];
       };
     };
+    /** @description X-Organization-Id differs from the session's active organization */
+    OrganizationMismatch: {
+      headers: {
+        /** @description Request correlation ID */
+        "X-Request-Id"?: string;
+        [name: string]: unknown;
+      };
+      content: {
+        "application/problem+json": components["schemas"]["ProblemDetails"];
+      };
+    };
     /** @description Request body exceeds 1 MiB */
     PayloadTooLarge: {
       headers: {
@@ -100,6 +193,17 @@ export interface components {
     };
     /** @description Rate limit exceeded; see Retry-After */
     TooManyRequests: {
+      headers: {
+        /** @description Request correlation ID */
+        "X-Request-Id"?: string;
+        [name: string]: unknown;
+      };
+      content: {
+        "application/problem+json": components["schemas"]["ProblemDetails"];
+      };
+    };
+    /** @description No valid session */
+    Unauthorized: {
       headers: {
         /** @description Request correlation ID */
         "X-Request-Id"?: string;
@@ -147,6 +251,160 @@ export interface operations {
           "application/json": components["schemas"]["HealthResponse"];
         };
       };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  listMyOrganizations: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Active memberships in active organizations */
+      200: {
+        headers: {
+          "X-Request-Id": string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** Format: uuid */
+            activeOrganizationId: string | null;
+            organizations: {
+              /** Format: uuid */
+              membershipId: string;
+              name: string;
+              /** Format: uuid */
+              organizationId: string;
+              /** @enum {string} */
+              role: "owner" | "admin" | "recruiter" | "viewer";
+              slug: string;
+            }[];
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["Forbidden"];
+      429: components["responses"]["TooManyRequests"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  createOrganization: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          name: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Created. The response sets a new session cookie bound to the organization. */
+      201: {
+        headers: {
+          /** @description The rotated session cookie (HttpOnly, SameSite=Lax) */
+          "Set-Cookie": string;
+          "X-Request-Id": string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** Format: uuid */
+            membershipId: string;
+            name: string;
+            /** Format: uuid */
+            organizationId: string;
+            /** @enum {string} */
+            role: "owner" | "admin" | "recruiter" | "viewer";
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["Forbidden"];
+      422: components["responses"]["ValidationError"];
+      429: components["responses"]["TooManyRequests"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  switchOrganization: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        orgId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Switched. The response sets a new session cookie; the previous one is revoked. */
+      200: {
+        headers: {
+          /** @description The rotated session cookie (HttpOnly, SameSite=Lax) */
+          "Set-Cookie": string;
+          "X-Request-Id": string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** Format: uuid */
+            membershipId: string;
+            name: string;
+            /** Format: uuid */
+            organizationId: string;
+            /** @enum {string} */
+            role: "owner" | "admin" | "recruiter" | "viewer";
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["Forbidden"];
+      422: components["responses"]["ValidationError"];
+      429: components["responses"]["TooManyRequests"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getCurrentOrganization: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-Organization-Id"?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Active organization and the caller's membership */
+      200: {
+        headers: {
+          "X-Request-Id": string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** Format: uuid */
+            membershipId: string;
+            name: string;
+            /** Format: uuid */
+            organizationId: string;
+            /** @enum {string} */
+            role: "owner" | "admin" | "recruiter" | "viewer";
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["Forbidden"];
+      409: components["responses"]["OrganizationMismatch"];
+      429: components["responses"]["TooManyRequests"];
       500: components["responses"]["InternalError"];
     };
   };

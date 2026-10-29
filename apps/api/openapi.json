@@ -2,6 +2,24 @@
   "components": {
     "parameters": {},
     "responses": {
+      "Forbidden": {
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            }
+          }
+        },
+        "description": "Email not verified, account banned, cross-origin request, or no active membership",
+        "headers": {
+          "X-Request-Id": {
+            "description": "Request correlation ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "InternalError": {
         "content": {
           "application/problem+json": {
@@ -56,6 +74,24 @@
           }
         }
       },
+      "OrganizationMismatch": {
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            }
+          }
+        },
+        "description": "X-Organization-Id differs from the session's active organization",
+        "headers": {
+          "X-Request-Id": {
+            "description": "Request correlation ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "PayloadTooLarge": {
         "content": {
           "application/problem+json": {
@@ -83,6 +119,24 @@
           }
         },
         "description": "Rate limit exceeded; see Retry-After",
+        "headers": {
+          "X-Request-Id": {
+            "description": "Request correlation ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            }
+          }
+        },
+        "description": "No valid session",
         "headers": {
           "X-Request-Id": {
             "description": "Request correlation ID",
@@ -196,6 +250,14 @@
         "required": ["type", "title", "status", "requestId", "errors"],
         "type": "object"
       }
+    },
+    "securitySchemes": {
+      "sessionCookie": {
+        "description": "Better Auth session cookie, set by /api/auth/sign-in/*. Named __Secure-ts.session_token on HTTPS origins.",
+        "in": "cookie",
+        "name": "ts.session_token",
+        "type": "apiKey"
+      }
     }
   },
   "info": {
@@ -230,6 +292,332 @@
             "$ref": "#/components/responses/InternalError"
           }
         }
+      }
+    },
+    "/v1/me/organizations": {
+      "get": {
+        "operationId": "listMyOrganizations",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "activeOrganizationId": {
+                      "format": "uuid",
+                      "type": ["string", "null"]
+                    },
+                    "organizations": {
+                      "items": {
+                        "properties": {
+                          "membershipId": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "organizationId": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "role": {
+                            "enum": ["owner", "admin", "recruiter", "viewer"],
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["organizationId", "membershipId", "name", "slug", "role"],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": ["activeOrganizationId", "organizations"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Active memberships in active organizations",
+            "headers": {
+              "X-Request-Id": {
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Active memberships of the signed-in user (Kies je organisatie)"
+      }
+    },
+    "/v1/organizations": {
+      "post": {
+        "operationId": "createOrganization",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "maxLength": 100,
+                    "minLength": 2,
+                    "type": "string"
+                  }
+                },
+                "required": ["name"],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "membershipId": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "organizationId": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "role": {
+                      "enum": ["owner", "admin", "recruiter", "viewer"],
+                      "type": "string"
+                    }
+                  },
+                  "required": ["organizationId", "membershipId", "name", "role"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Created. The response sets a new session cookie bound to the organization.",
+            "headers": {
+              "Set-Cookie": {
+                "description": "The rotated session cookie (HttpOnly, SameSite=Lax)",
+                "required": true,
+                "schema": {
+                  "description": "The rotated session cookie (HttpOnly, SameSite=Lax)",
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Create an organization; the creator becomes owner and the session rotates into it"
+      }
+    },
+    "/v1/organizations/{orgId}/switch": {
+      "post": {
+        "description": "Verifies an active membership, deletes the current session and sets a new session cookie bound to the organization. Clients must abort in-flight requests and drop all cached data of the previous organization.",
+        "operationId": "switchOrganization",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "membershipId": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "organizationId": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "role": {
+                      "enum": ["owner", "admin", "recruiter", "viewer"],
+                      "type": "string"
+                    }
+                  },
+                  "required": ["organizationId", "membershipId", "name", "role"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Switched. The response sets a new session cookie; the previous one is revoked.",
+            "headers": {
+              "Set-Cookie": {
+                "description": "The rotated session cookie (HttpOnly, SameSite=Lax)",
+                "required": true,
+                "schema": {
+                  "description": "The rotated session cookie (HttpOnly, SameSite=Lax)",
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Make an organization active; revokes the current session and issues a new one"
+      }
+    },
+    "/v1/organizations/current": {
+      "get": {
+        "operationId": "getCurrentOrganization",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Organization-Id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "membershipId": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "organizationId": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "role": {
+                      "enum": ["owner", "admin", "recruiter", "viewer"],
+                      "type": "string"
+                    }
+                  },
+                  "required": ["organizationId", "membershipId", "name", "role"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Active organization and the caller's membership",
+            "headers": {
+              "X-Request-Id": {
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/OrganizationMismatch"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "The session's verified organization context"
       }
     }
   },

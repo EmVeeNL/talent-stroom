@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "predev": "[ -f .env ] || cp .env.example .env",
+    "predev": "node scripts/sync-env.ts",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "cf-typegen": "wrangler types --env-file=/dev/null",
@@ -15,12 +15,18 @@
   "dependencies": {
     "@hono/zod-openapi": "catalog:",
     "@talentstroom/contracts": "workspace:*",
+    "@talentstroom/database": "workspace:*",
     "@talentstroom/i18n": "workspace:*",
+    "better-auth": "catalog:",
     "hono": "catalog:",
+    "kysely": "catalog:",
+    "pg": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@talentstroom/config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/pg": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:",
     "wrangler": "catalog:"

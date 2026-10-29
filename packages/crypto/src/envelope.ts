@@ -326,7 +326,7 @@ export async function decryptRecord(
   }
   try {
     if (kind !== KIND_JSON) throw new CryptoIntegrityError();
-    const text = new TextDecoder("utf-8", { fatal: true }).decode(payload.subarray(1));
+    const text = new TextDecoder("utf-8", { fatal: true, ignoreBOM: false }).decode(payload.subarray(1));
     return { kind: "json", value: JSON.parse(text) as unknown };
   } catch {
     throw new CryptoIntegrityError();

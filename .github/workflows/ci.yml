@@ -139,3 +139,9 @@ jobs:
 
       - name: Database integration tests
         run: pnpm --filter @talentstroom/database test
+
+      # Identity BDD scenarios against Postgres as ts_auth/ts_app, plus the Better Auth runtime
+      # schema check (validateSchema: true) against the migrated database (ADR 0012: never
+      # `auth generate` for drift detection).
+      - name: API integration tests and Better Auth schema check
+        run: pnpm --filter @talentstroom/api test

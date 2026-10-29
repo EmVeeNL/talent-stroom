@@ -20,7 +20,8 @@ export function wipe(buffer: Uint8Array | undefined): void {
 }
 
 export function utf8Encode(value: string): Bytes {
-  return utf8.encode(value);
+  // Copy: some runtimes type encode() as Uint8Array<ArrayBufferLike> (Workers types).
+  return copyBytes(utf8.encode(value));
 }
 
 /**
