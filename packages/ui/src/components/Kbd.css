@@ -3,7 +3,7 @@
   padding: var(--ts-space-1) var(--ts-space-2);
   font: inherit;
   font-size: var(--ts-font-size-xs);
-  border: 1px solid var(--ts-border-strong);
+  border: var(--ts-border-width) solid var(--ts-border-strong);
   border-radius: var(--ts-radius-sm);
   background: var(--ts-surface-muted);
   color: var(--ts-text);

@@ -24,7 +24,7 @@
 .ts-skeleton--card {
   padding: var(--ts-space-5);
   box-sizing: border-box;
-  border: 1px solid var(--ts-border);
+  border: var(--ts-border-width) solid var(--ts-border);
   border-radius: var(--ts-radius-lg);
 }
 .ts-skeleton--card span:first-child {

@@ -4,7 +4,7 @@
   align-items: center;
   gap: var(--ts-space-2);
   padding: var(--ts-space-6);
-  border: 1px dashed var(--ts-border-strong);
+  border: var(--ts-border-width) dashed var(--ts-border-strong);
   border-radius: var(--ts-radius-md);
   background: var(--ts-surface);
   text-align: center;
@@ -17,8 +17,8 @@
 }
 .ts-upload button,
 .ts-upload__list button {
-  min-height: 32px;
-  border: 1px solid var(--ts-border-strong);
+  min-height: var(--ts-control-height-sm);
+  border: var(--ts-border-width) solid var(--ts-border-strong);
   border-radius: var(--ts-radius-sm);
   background: var(--ts-surface);
   color: var(--ts-text);

@@ -12,7 +12,7 @@
   justify-content: center;
   gap: var(--ts-space-2);
   min-height: 36px;
-  border: 1px solid transparent;
+  border: var(--ts-border-width) solid transparent;
   border-radius: var(--ts-radius-sm);
   background: transparent;
   color: var(--ts-text-muted);

@@ -15,8 +15,9 @@
 }
 .ts-stat-card__value {
   font-size: var(--ts-font-size-2xl);
+  font-weight: var(--ts-font-weight-bold);
   font-variant-numeric: tabular-nums;
-  line-height: var(--ts-line-height-heading);
+  line-height: var(--ts-line-height-2xl);
 }
 .ts-stat-card__description {
   font-size: var(--ts-font-size-sm);

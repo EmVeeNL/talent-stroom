@@ -1,6 +1,6 @@
 .ts-donut-chart__total {
   fill: var(--ts-text);
-  font: var(--ts-font-weight-semibold) var(--ts-font-size-xl) var(--font-ui);
+  font: var(--ts-font-weight-semibold) var(--ts-font-size-2xl) var(--font-ui);
   font-variant-numeric: tabular-nums;
 }
 .ts-donut-chart .ts-chart__mark:focus-visible circle {

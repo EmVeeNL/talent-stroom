@@ -10,5 +10,5 @@
   color: var(--ts-surface);
   border-radius: var(--ts-radius-sm);
   font-size: var(--ts-font-size-sm);
-  box-shadow: var(--ts-shadow-md);
+  box-shadow: var(--ts-shadow-popover);
 }

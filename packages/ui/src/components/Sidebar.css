@@ -1,6 +1,6 @@
 .ts-sidebar {
   box-sizing: border-box;
-  width: 240px;
+  width: var(--ts-sidebar-width);
   flex-shrink: 0;
   padding: var(--ts-space-3);
   background: var(--ts-sidebar-bg);
@@ -8,7 +8,7 @@
   border-radius: var(--ts-radius-md);
 }
 .ts-sidebar--collapsed {
-  width: 72px;
+  width: var(--ts-sidebar-width-collapsed);
 }
 .ts-sidebar ul {
   list-style: none;
@@ -23,7 +23,7 @@
 }
 .ts-sidebar__workspace {
   padding-bottom: var(--ts-space-4);
-  border-bottom: 1px solid var(--ts-sidebar-border);
+  border-bottom: var(--ts-border-width) solid var(--ts-sidebar-border);
   margin-bottom: var(--ts-space-3);
 }
 .ts-sidebar__item {
@@ -65,7 +65,7 @@
   padding: var(--ts-space-2);
   background: var(--ts-sidebar-bg);
   color: var(--ts-sidebar-text);
-  border: 1px solid var(--ts-sidebar-border);
+  border: var(--ts-border-width) solid var(--ts-sidebar-border);
   border-radius: var(--ts-radius-sm);
   white-space: nowrap;
 }
