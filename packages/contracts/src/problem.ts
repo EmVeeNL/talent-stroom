@@ -8,6 +8,11 @@ export const PROBLEMS = {
     status: 422,
     titleKey: "api.problem.validationError",
   },
+  payloadTooLarge: {
+    type: `${PROBLEM_BASE_URI}/payload-too-large`,
+    status: 413,
+    titleKey: "api.problem.payloadTooLarge",
+  },
   malformedJson: { type: `${PROBLEM_BASE_URI}/malformed-json`, status: 400, titleKey: "api.problem.malformedJson" },
   notFound: { type: `${PROBLEM_BASE_URI}/not-found`, status: 404, titleKey: "api.problem.notFound" },
   internalError: { type: `${PROBLEM_BASE_URI}/internal-error`, status: 500, titleKey: "api.problem.internalError" },

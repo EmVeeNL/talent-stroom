@@ -5,6 +5,7 @@ import { HTTPException } from "hono/http-exception";
 import { requestId } from "hono/request-id";
 import apiPackage from "../package.json" with { type: "json" };
 import { problem, type AppEnv } from "./problem.ts";
+import { cachePolicy, requestBodyLimit, securityHeaders } from "./security.ts";
 
 export const openapiConfig = {
   openapi: "3.1.0",
@@ -30,6 +31,7 @@ export function createApp() {
     },
   });
   app.use(requestId());
+  app.use(securityHeaders, cachePolicy, requestBodyLimit);
   app.notFound((c) => problem(c, "notFound"));
   app.onError((err, c) => {
     // Hono's JSON validator wraps JSON parse failures before the Zod hook runs.
@@ -43,6 +45,7 @@ export function createApp() {
   app.openAPIRegistry.register("ProblemDetails", ProblemDetails);
   app.openAPIRegistry.register("ValidationProblem", ValidationProblem);
   for (const [name, schema, description] of [
+    ["PayloadTooLarge", "ProblemDetails", "Request body exceeds 1 MiB"],
     ["MalformedJson", "ProblemDetails", "Malformed JSON request body"],
     ["NotFound", "ProblemDetails", "Resource not found"],
     ["InternalError", "ProblemDetails", "Unexpected server error"],
