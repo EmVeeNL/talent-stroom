@@ -1,5 +1,18 @@
 # TalentStroom — Neon PostgreSQL database model
 
+> **Reference only:** `docs/database/sql/*.sql` are the original design baseline. The real schema is built by `packages/database` migrations. The naming differences below follow the [Better Auth identity mapping](../architecture/architecture/04-identity-better-auth.md#5-schema-reconciliation-52).
+>
+> | Baseline name | Decided name | Schema |
+> |---|---|---|
+> | `users` | `users` | `auth` (Better Auth) |
+> | `auth_identities` | `auth_accounts` | `auth` |
+> | — | `sessions`, `auth_verifications`, `auth_passkeys`, `auth_two_factors`, `auth_rate_limits` | `auth` |
+> | `organizations` | `organizations` | Better Auth model; `auth` or `app`, decided in #55 |
+> | `memberships` | `memberships` | Better Auth model; `auth` or `app`, decided in #55 |
+> | — (spec: `organization_invitations`) | `organization_invitations` | Better Auth model; decided in #55 |
+> | `auth_security_events` | `auth_security_events` | ours; decided in #55 |
+> | `module_revisions` (spec) | `module_versions` (SQL baseline) | to be decided in #55 |
+
 **Format:** executable PostgreSQL SQL (canonical), plus Markdown explanations. This is a strong **architecture baseline**, not a finished audited production deployment. SQL migrations must be reviewed and exercised in a disposable Neon branch before use.
 
 ## Directory
