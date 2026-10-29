@@ -12,10 +12,11 @@
     "openapi": "node scripts/openapi.ts && oxfmt openapi.json"
   },
   "dependencies": {
-    "@talentstroom/contracts": "workspace:*",
-    "hono": "catalog:",
     "@hono/zod-openapi": "catalog:",
-    "@talentstroom/i18n": "workspace:*"
+    "@talentstroom/contracts": "workspace:*",
+    "@talentstroom/i18n": "workspace:*",
+    "hono": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@talentstroom/config": "workspace:*",
