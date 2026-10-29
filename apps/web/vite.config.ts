@@ -1,8 +1,25 @@
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { fileURLToPath } from "node:url";
+import { defineConfig, normalizePath } from "vite";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: "icon-font-preload",
+      apply: "serve",
+      // The HTML URL is outside Vite's root. Match CSS's /@fs URL in dev;
+      // production keeps Vite's normal hashed asset handling.
+      transformIndexHtml: {
+        order: "pre",
+        handler(html) {
+          const font = "../../packages/ui/fonts/material-symbols/MaterialSymbolsRounded.woff2";
+          const path = normalizePath(fileURLToPath(new URL(font, import.meta.url)));
+          return html.replace(font, `/@fs/${path.replace(/^\//, "")}`);
+        },
+      },
+    },
+  ],
   server: {
     port: 5173,
     // Local API runs via `wrangler dev` on :8787. First match wins:

@@ -8,8 +8,14 @@ describe("Icon", () => {
     const { container } = render(<Icon name="search" />);
     const icon = container.querySelector(".ts-icon");
     expect(icon?.getAttribute("aria-hidden")).toBe("true");
+    expect(icon?.className).toContain("ts-icon--20");
     expect(icon?.textContent).toBe("search");
-    expect(icon?.className).toContain("material-symbols-outlined");
+    expect(icon?.className).toContain("material-symbols-rounded");
+  });
+
+  it.each([16, 20, 24, 32] as const)("supports a %ipx box", (size) => {
+    const { container } = render(<Icon name="search" size={size} filled />);
+    expect(container.querySelector(`.ts-icon--${size}.ts-icon--filled`)).toBeTruthy();
   });
 
   it("is exposed as an image with a name when labelled", () => {
@@ -29,3 +35,10 @@ describe("Icon", () => {
     expect(await axeViolations(container)).toEqual([]);
   });
 });
+
+// These negative assertions are checked by the package typecheck.
+function typeContract() {
+  // @ts-expect-error Unknown ligatures cannot be rendered.
+  return <Icon name="not_a_shipped_icon" />;
+}
+void typeContract;

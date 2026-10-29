@@ -1,11 +1,12 @@
-import type { ButtonHTMLAttributes, MouseEvent, Ref } from "react";
+import type { IconName } from "../icons.ts";
+import type { ButtonHTMLAttributes, MouseEvent, ReactNode, Ref } from "react";
 import { cx } from "../classnames.ts";
 import { Icon } from "./Icon.tsx";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonBaseProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   /** Shows a spinner, sets aria-busy and ignores clicks while keeping keyboard focus. */
@@ -13,10 +14,14 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** Visually hidden text announced while loading, e.g. "Bezig met opslaan". Pass a translated string. */
   loadingLabel?: string;
   /** Material Symbols ligature name rendered before (default) or after the label. */
-  icon?: string;
+  icon?: IconName;
   iconPosition?: "start" | "end";
   ref?: Ref<HTMLButtonElement>;
 }
+
+/** Icon-only buttons require a translated accessible name. */
+export type ButtonProps = ButtonBaseProps &
+  ({ children: ReactNode; "aria-label"?: string } | { children?: never; "aria-label": string });
 
 export function Button({
   variant = "primary",

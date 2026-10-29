@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Tabs, ThemeToggle } from "@talentstroom/ui";
+import { Tabs, ThemeToggle, setThemePreference } from "@talentstroom/ui";
 import { t, DEFAULT_LOCALE, LOCALES, isLocale } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
 import { pages } from "./pages/index.ts";
@@ -7,6 +7,11 @@ import { GalleryContext } from "./context.ts";
 import "./gallery.css";
 const readPage = () => pages.find((p) => p.id === window.location.hash.slice(1))?.id ?? "layout";
 export function Gallery() {
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    const theme = new URLSearchParams(window.location.search).get("theme");
+    if (theme === "light" || theme === "dark") setThemePreference(theme);
+  }, []);
   const [locale, setLocale] = useState<Locale>(DEFAULT_LOCALE);
   const [page, setPage] = useState<string>(readPage);
   const tr = (key: MessageKey) => t(locale, key);

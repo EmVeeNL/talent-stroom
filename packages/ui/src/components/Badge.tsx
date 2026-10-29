@@ -1,3 +1,4 @@
+import type { IconName } from "../icons.ts";
 import type { HTMLAttributes } from "react";
 import { cx } from "../classnames.ts";
 import { Icon } from "./Icon.tsx";
@@ -16,7 +17,7 @@ export function Badge({ tone = "neutral", className, children, ...rest }: BadgeP
   );
 }
 
-const toneIcons: Record<BadgeTone, string> = {
+const toneIcons: Record<BadgeTone, IconName> = {
   neutral: "circle",
   success: "check_circle",
   warning: "warning",
@@ -28,7 +29,7 @@ const toneIcons: Record<BadgeTone, string> = {
 export function StatusPill({ tone = "neutral", className, children, ...rest }: BadgeProps) {
   return (
     <Badge {...rest} tone={tone} className={cx("ts-badge--pill", className)}>
-      <Icon name={toneIcons[tone]} size={20} filled className="ts-badge__icon" />
+      <Icon name={toneIcons[tone]} size={16} filled />
       {children}
     </Badge>
   );

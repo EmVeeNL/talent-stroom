@@ -1,3 +1,4 @@
+import type { IconName } from "../icons.ts";
 import { useId, useRef, useState } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
 import { cx } from "../classnames.ts";
@@ -7,7 +8,7 @@ export interface TabItem {
   id: string;
   label: string;
   panel: ReactNode;
-  icon?: string;
+  icon?: IconName;
   disabled?: boolean;
 }
 

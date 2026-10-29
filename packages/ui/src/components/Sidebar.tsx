@@ -1,3 +1,4 @@
+import type { IconName } from "../icons.ts";
 import { useId, useState } from "react";
 import type { MouseEventHandler, ReactNode } from "react";
 import { cx } from "../classnames.ts";
@@ -5,7 +6,7 @@ import { Icon } from "./Icon.tsx";
 export interface SidebarItem {
   id: string;
   label: string;
-  icon?: string;
+  icon?: IconName;
   href?: string;
   children?: readonly SidebarItem[];
   onClick?: MouseEventHandler<HTMLAnchorElement>;

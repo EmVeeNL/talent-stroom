@@ -118,6 +118,8 @@ export const nlNL = {
   "gallery.tabs.notesPanel": "Gespreksnotities van de recruiter.",
   "gallery.tabs.documentsPanel": "Cv en bijlagen.",
   "gallery.tabs.archivedPanel": "Niet beschikbaar.",
+  "gallery.icons.intro": "Material Symbols Rounded · 16px inline, 20px standaard, 24px navigatie, 32px illustratief.",
+  "gallery.icons.filled": "Gevulde selectie",
   "gallery.icons": "Iconen",
   "gallery.icons.decorative": "Decoratief (verborgen voor schermlezers)",
   "gallery.icons.labelled": "Met label",
