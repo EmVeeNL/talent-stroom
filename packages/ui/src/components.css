@@ -1,0 +1,341 @@
+/* TalentStroom component styles. Plain CSS on top of tokens.css; no runtime. */
+
+.ts-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus ring (shared). Never remove without replacement. */
+.ts-button:focus-visible,
+.ts-field__input:focus-visible,
+.ts-tabs__tab:focus-visible,
+.ts-tabs__panel:focus-visible {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: var(--ts-focus-ring-offset);
+}
+
+/* Icon (Material Symbols Outlined; font is loaded by the app) */
+/* Base .material-symbols-outlined rules live in fonts.css (self-hosted font). */
+
+.ts-icon {
+  display: inline-block;
+  flex: none;
+  user-select: none;
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+}
+
+.ts-icon--20 {
+  font-size: 20px;
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 20;
+}
+
+.ts-icon--24 {
+  font-size: 24px;
+}
+
+.ts-icon--filled {
+  font-variation-settings:
+    "FILL" 1,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+}
+
+/* Button */
+.ts-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ts-space-2);
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  border-radius: var(--ts-radius-md);
+  font: inherit;
+  font-weight: var(--ts-font-weight-semibold);
+  line-height: var(--ts-line-height-heading);
+  cursor: pointer;
+  transition:
+    background-color var(--ts-duration-fast) ease,
+    border-color var(--ts-duration-fast) ease;
+}
+
+.ts-button--sm {
+  min-height: 32px;
+  padding: 0 var(--ts-space-3);
+  font-size: var(--ts-font-size-sm);
+}
+
+.ts-button--md {
+  min-height: 40px;
+  padding: 0 var(--ts-space-4);
+  font-size: var(--ts-font-size-sm);
+}
+
+.ts-button--lg {
+  min-height: 48px;
+  padding: 0 var(--ts-space-6);
+  font-size: var(--ts-font-size-md);
+}
+
+.ts-button--primary {
+  background: var(--ts-primary);
+  color: var(--ts-text-on-primary);
+}
+
+.ts-button--primary:hover {
+  background: var(--ts-primary-hover);
+}
+
+.ts-button--secondary {
+  background: var(--ts-surface);
+  border-color: var(--ts-border-strong);
+  color: var(--ts-text);
+}
+
+.ts-button--secondary:hover {
+  background: var(--ts-surface-muted);
+}
+
+.ts-button--ghost {
+  background: transparent;
+  color: var(--ts-primary-text);
+}
+
+.ts-button--ghost:hover {
+  background: var(--ts-primary-subtle);
+}
+
+.ts-button--danger {
+  background: var(--ts-danger);
+  color: var(--ts-text-on-danger);
+}
+
+.ts-button--danger:hover {
+  background: var(--ts-danger-hover);
+}
+
+.ts-button:disabled {
+  background: var(--ts-disabled-bg);
+  border-color: transparent;
+  color: var(--ts-disabled-text);
+  cursor: not-allowed;
+}
+
+.ts-button--loading {
+  cursor: progress;
+}
+
+.ts-spinner {
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border: 2px solid currentcolor;
+  border-inline-end-color: transparent;
+  border-radius: var(--ts-radius-full);
+  animation: ts-spin 700ms linear infinite;
+}
+
+@keyframes ts-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* TextField */
+.ts-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ts-space-1);
+}
+
+.ts-field__label {
+  font-size: var(--ts-font-size-sm);
+  font-weight: var(--ts-font-weight-medium);
+  color: var(--ts-text);
+}
+
+.ts-field__required {
+  color: var(--ts-danger-text);
+}
+
+.ts-field__hint {
+  margin: 0;
+  font-size: var(--ts-font-size-sm);
+  color: var(--ts-text-muted);
+}
+
+.ts-field__input {
+  box-sizing: border-box;
+  min-height: 40px;
+  padding: 0 var(--ts-space-3);
+  border: 1px solid var(--ts-border-strong);
+  border-radius: var(--ts-radius-md);
+  background: var(--ts-surface);
+  color: var(--ts-text);
+  font: inherit;
+  font-size: var(--ts-font-size-md);
+}
+
+.ts-field__input::placeholder {
+  color: var(--ts-text-muted);
+}
+
+.ts-field__input:disabled {
+  background: var(--ts-disabled-bg);
+  color: var(--ts-disabled-text);
+  cursor: not-allowed;
+}
+
+.ts-field--invalid .ts-field__input {
+  border-color: var(--ts-danger);
+  border-width: 2px;
+}
+
+.ts-field__error {
+  margin: 0;
+  font-size: var(--ts-font-size-sm);
+  font-weight: var(--ts-font-weight-medium);
+  color: var(--ts-danger-text);
+}
+
+/* Badge / StatusPill */
+.ts-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ts-space-1);
+  padding: 2px var(--ts-space-2);
+  border-radius: var(--ts-radius-sm);
+  font-size: var(--ts-font-size-xs);
+  font-weight: var(--ts-font-weight-semibold);
+  line-height: var(--ts-line-height-body);
+  white-space: nowrap;
+}
+
+.ts-badge--pill {
+  padding-inline: var(--ts-space-2);
+  border-radius: var(--ts-radius-full);
+}
+
+.ts-badge__icon {
+  font-size: 14px;
+}
+
+.ts-badge--neutral {
+  background: var(--ts-neutral-subtle);
+  color: var(--ts-neutral-text);
+}
+
+.ts-badge--success {
+  background: var(--ts-success-subtle);
+  color: var(--ts-success-text);
+}
+
+.ts-badge--warning {
+  background: var(--ts-warning-subtle);
+  color: var(--ts-warning-text);
+}
+
+.ts-badge--danger {
+  background: var(--ts-danger-subtle);
+  color: var(--ts-danger-text);
+}
+
+.ts-badge--info {
+  background: var(--ts-info-subtle);
+  color: var(--ts-info-text);
+}
+
+/* Card */
+.ts-card {
+  background: var(--ts-surface);
+  border: 1px solid var(--ts-border);
+  border-radius: var(--ts-radius-lg);
+  box-shadow: var(--ts-shadow-sm);
+}
+
+.ts-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ts-space-3);
+  padding: var(--ts-space-4) var(--ts-space-5) 0;
+}
+
+.ts-card__title {
+  margin: 0;
+  font-size: var(--ts-font-size-md);
+  font-weight: var(--ts-font-weight-semibold);
+  line-height: var(--ts-line-height-heading);
+}
+
+.ts-card__body {
+  padding: var(--ts-space-4) var(--ts-space-5) var(--ts-space-5);
+}
+
+/* Tabs */
+.ts-tabs__list {
+  display: flex;
+  gap: var(--ts-space-1);
+  border-bottom: 1px solid var(--ts-border);
+}
+
+.ts-tabs__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ts-space-2);
+  min-height: 40px;
+  margin-bottom: -1px;
+  padding: 0 var(--ts-space-4);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--ts-text-muted);
+  font: inherit;
+  font-size: var(--ts-font-size-sm);
+  font-weight: var(--ts-font-weight-medium);
+  cursor: pointer;
+}
+
+.ts-tabs__tab:hover {
+  color: var(--ts-text);
+}
+
+.ts-tabs__tab--selected {
+  border-bottom-color: var(--ts-primary);
+  color: var(--ts-primary-text);
+  font-weight: var(--ts-font-weight-semibold);
+}
+
+.ts-tabs__tab:disabled {
+  color: var(--ts-disabled-text);
+  cursor: not-allowed;
+}
+
+.ts-tabs__panel {
+  padding-top: var(--ts-space-4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-button {
+    transition: none;
+  }
+
+  .ts-spinner {
+    animation-duration: 3s;
+  }
+}

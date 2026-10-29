@@ -1,4 +1,5 @@
 {
-  "extends": "@talentstroom/config/tsconfig.base.json",
-  "include": ["src"]
+  "extends": "@talentstroom/config/tsconfig.react.json",
+  "compilerOptions": { "types": [] },
+  "include": ["src", "vitest.config.ts"]
 }
