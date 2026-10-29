@@ -40,7 +40,7 @@ Unchanged brand colours: primary `#4F59F7` (5.12:1 with white text), primary hov
 
 | Category               | Components                                                                                                                                   |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Foundations and layout | `Icon`, `Kbd`, `Card`, `Sidebar`, `Header`, `Breadcrumb`, `ThemeToggle`                                                                      |
+| Foundations and layout | `Logo`, `Icon`, `Kbd`, `Card`, `Sidebar`, `Header`, `Breadcrumb`, `ThemeToggle`                                                              |
 | Actions and navigation | `Button`, `Tabs`, `CommandPalette`                                                                                                           |
 | Forms                  | `FormField`, `TextField`, `Textarea`, `NumberInput`, `Select`, `Switch`, `Checkbox`, `CheckboxGroup`, `RadioGroup`, `Slider`, `FileUploader` |
 | Metrics and status     | `StatCard`, `TrendIndicator`, `Progress`, `Badge`, `StatusPill`                                                                              |
@@ -125,3 +125,9 @@ The `metrics`, `charts`, `tables` and `filters` gallery pages show these compone
 Import tokens before components once at the application entry point. Set `data-theme="light"` or `data-theme="dark"` on `document.documentElement` to force a theme; remove the attribute for system preference. Prefer `setThemePreference` / `ThemeToggle` to persist and synchronize that choice. Components inherit all colours from semantic CSS variables; do not override them with raw colours. Keep any new token synchronized in `tokens.css` and `tokens.ts`, define both themes and extend the contrast pairs in `tokens.test.ts`. No new tokens or runtime dependencies are needed by the data components.
 
 Automated tests cover semantics, keyboard interactions, meaningful empty/loading/selection states and axe checks. jsdom cannot verify rendered contrast, native browser layout or assistive-technology interoperability; retain the manual visual and screen-reader pass in the accessibility checklist above.
+
+## Brand
+
+`src/brand/talentstroom-mark.svg` is the vector person/wave mark (hand-authored Bézier paths and linear gradients, redrawn from `docs/logo/*.png`; no raster data). `Logo` renders it inline with `variant` `mark | full`, `tone` `auto | light | dark`, `size` `sm | md | lg | xl`; the full variant sets "Talent" + "Stroom" as live Asap Sharp 700 text (the PNG lettering is a placeholder font and is not reused). It has the accessible name "TalentStroom"; pass `decorative` when visible text sits next to it. `Logo.test.tsx` keeps the component paths identical to the SVG file.
+
+Favicons and app icons for `apps/web` and `apps/site` (`favicon.svg/.ico`, `apple-touch-icon.png`, `icon-192/512.png`, `site.webmanifest`) are generated with `pnpm --filter @talentstroom/ui brand-icons` (needs Node 22+ and `rsvg-convert`, `brew install librsvg`). Commit the output.

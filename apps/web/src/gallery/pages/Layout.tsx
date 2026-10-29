@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sidebar, Header, Breadcrumb, CommandPalette, Kbd, Button, Card, Icon, Tabs } from "@talentstroom/ui";
+import { Sidebar, Header, Breadcrumb, CommandPalette, Kbd, Button, Card, Icon, Logo, Tabs } from "@talentstroom/ui";
 import { Section } from "../Section.tsx";
 import { useGallery } from "../context.ts";
 export function Layout() {
@@ -39,8 +39,13 @@ export function Layout() {
             label={tr("gallery.navigation")}
             collapsed={collapsed}
             workspace={
-              <span>
-                {collapsed ? <Icon name="apartment" label={tr("gallery.workspace")} /> : tr("gallery.workspace")}
+              <span className="gallery-workspace">
+                <Logo variant={collapsed ? "mark" : "full"} tone="dark" size="sm" decorative />
+                {collapsed ? (
+                  <span className="ts-visually-hidden">{tr("gallery.workspace")}</span>
+                ) : (
+                  tr("gallery.workspace")
+                )}
               </span>
             }
             items={[
@@ -105,6 +110,33 @@ export function Layout() {
               </Button>
             </div>
           </div>
+        </div>
+      </Section>{" "}
+      <Section title={tr("gallery.brand")}>
+        <div className="gallery-brand">
+          {(
+            [
+              ["light", "gallery.brand.light"],
+              ["dark", "gallery.brand.dark"],
+              ["sidebar", "gallery.brand.sidebar"],
+            ] as const
+          ).map(([surface, title]) => (
+            <figure key={surface} className={`gallery-brand__panel gallery-brand__panel--${surface}`}>
+              <figcaption>{tr(title)}</figcaption>
+              <p>{tr("gallery.brand.mark")}</p>
+              <div className="gallery-brand__row">
+                {(["sm", "md", "lg", "xl"] as const).map((size) => (
+                  <Logo key={size} variant="mark" size={size} tone={surface === "light" ? "light" : "dark"} />
+                ))}
+              </div>
+              <p>{tr("gallery.brand.full")}</p>
+              <div className="gallery-brand__row">
+                {(["sm", "md", "lg", "xl"] as const).map((size) => (
+                  <Logo key={size} variant="full" size={size} tone={surface === "light" ? "light" : "dark"} />
+                ))}
+              </div>
+            </figure>
+          ))}
         </div>
       </Section>{" "}
       <Section title={tr("gallery.tabs")}>
