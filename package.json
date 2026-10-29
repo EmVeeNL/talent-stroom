@@ -14,7 +14,12 @@
     "lint": "oxlint --type-aware --deny-warnings",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test"
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test",
+    "db:up": "docker compose up --detach --wait",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down --volumes && docker compose up --detach --wait && node packages/database/src/cli.ts migrate --local && node packages/database/src/cli.ts dev-passwords --local",
+    "db:migrate": "node --env-file-if-exists=.env packages/database/src/cli.ts migrate",
+    "db:dev-passwords": "node --env-file-if-exists=.env packages/database/src/cli.ts dev-passwords"
   },
   "devDependencies": {
     "oxfmt": "catalog:",

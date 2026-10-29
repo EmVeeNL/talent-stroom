@@ -8,7 +8,9 @@
     "typecheck": {
       "dependsOn": ["^typecheck"]
     },
-    "test": {},
+    "test": {
+      "env": ["DATABASE_TEST_URL"]
+    },
     "dev": {
       "cache": false,
       "persistent": true

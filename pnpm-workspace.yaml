@@ -7,6 +7,8 @@ catalog:
   # TypeScript 7 (native compiler) builds and typechecks; see docs/adr/0003-typescript-7-toolchain.md
   typescript: 7.0.2
   "@astrojs/check": 0.9.12
+  "@types/node": 26.6.5
+  "@types/pg": 8.23.1
   "@types/react": 19.3.0
   "@types/react-dom": 19.3.0
   "@vitejs/plugin-react": 6.1.2
@@ -16,6 +18,8 @@ catalog:
   oxfmt: 0.74.0
   oxlint: 1.89.0
   oxlint-tsgolint: 7.0.2004
+  # Postgres driver (ADR 0007); Cloudflare Hyperdrive minimum is 8.16.3.
+  pg: 8.23.1
   react: 19.3.1
   react-dom: 19.3.1
   turbo: 2.11.10
