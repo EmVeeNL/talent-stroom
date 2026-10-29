@@ -12,6 +12,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "kysely": "catalog:",
     "pg": "catalog:"
   },
   "devDependencies": {
