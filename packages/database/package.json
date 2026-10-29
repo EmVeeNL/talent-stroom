@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "kysely": "catalog:",
-    "pg": "catalog:"
+    "pg": "catalog:",
+    "@talentstroom/crypto": "workspace:*"
   },
   "devDependencies": {
     "@talentstroom/config": "workspace:*",

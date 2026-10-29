@@ -11,6 +11,8 @@
 > | `memberships` | `memberships` | `app` (Better Auth model, ADR 0012) |
 > | — (spec: `organization_invitations`) | `organization_invitations` | `app` (Better Auth model, ADR 0012) |
 > | `auth_security_events` | `auth_security_events` | `auth` (ours, append-only, ADR 0012) |
+> | `candidates`, `candidate_private`, `candidate_blind_indexes` | same names (`0004_candidates.sql`) | `app` |
+> | `encryption_key_envelopes` | no separate table; whole envelope in `candidate_private.envelope` (`0004`, ADR 0011) | `app` |
 > | `module_revisions` (spec) | `module_versions` (SQL baseline) | to be decided in #55 |
 
 **Format:** executable PostgreSQL SQL (canonical), plus Markdown explanations. This is a strong **architecture baseline**, not a finished audited production deployment. SQL migrations must be reviewed and exercised in a disposable Neon branch before use.

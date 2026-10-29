@@ -111,7 +111,7 @@ describe.skipIf(TEST_URL === "")("identity schema (Postgres)", () => {
 
   describe("migrations", () => {
     it("apply cleanly from scratch and are a no-op on the second run", async () => {
-      expect(firstRun).toEqual(["0001_roles.sql", "0002_foundation.sql", "0003_identity.sql"]);
+      expect(firstRun).toEqual(["0001_roles.sql", "0002_foundation.sql", "0003_identity.sql", "0004_candidates.sql"]);
       expect((await runMigrations({ connectionString: db.url })).applied).toEqual([]);
     });
 
@@ -120,7 +120,7 @@ describe.skipIf(TEST_URL === "")("identity schema (Postgres)", () => {
         `SELECT n.nspname AS schema, array_agg(c.relname::text ORDER BY c.relname) AS tables,
                 array_agg(DISTINCT pg_get_userbyid(c.relowner)::text) AS owners
            FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
-          WHERE n.nspname IN ('app', 'auth') AND c.relkind = 'r' AND c.relname <> 'domain_probe'
+          WHERE n.nspname IN ('app', 'auth') AND c.relkind = 'r' AND c.relname <> 'domain_probe' AND c.relname NOT IN ('candidates', 'candidate_private', 'candidate_blind_indexes')
           GROUP BY n.nspname ORDER BY n.nspname`,
       );
       expect(rows).toEqual([
@@ -132,7 +132,7 @@ describe.skipIf(TEST_URL === "")("identity schema (Postgres)", () => {
     it("force RLS on every identity table", async () => {
       const { rows } = await admin(
         `SELECT count(*)::int AS n FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
-          WHERE n.nspname IN ('app', 'auth') AND c.relkind = 'r' AND c.relname <> 'domain_probe'
+          WHERE n.nspname IN ('app', 'auth') AND c.relkind = 'r' AND c.relname <> 'domain_probe' AND c.relname NOT IN ('candidates', 'candidate_private', 'candidate_blind_indexes')
             AND NOT (c.relrowsecurity AND c.relforcerowsecurity)`,
       );
       expect(rows[0]).toEqual({ n: 0 });
