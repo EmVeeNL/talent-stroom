@@ -1,6 +1,6 @@
 # @talentstroom/database
 
-Schema migrations, database roles and (later, #56) the tenant-scoped data layer. Decisions: [ADR 0007](../../docs/adr/0007-database-neon-hyperdrive.md) (Neon, Hyperdrive, roles) and [ADR 0010](../../docs/adr/0010-migration-runner.md) (migration runner).
+Schema migrations, database roles and the tenant-scoped Kysely data layer. Decisions: [ADR 0007](../../docs/adr/0007-database-neon-hyperdrive.md) (Neon, Hyperdrive, roles) and [ADR 0010](../../docs/adr/0010-migration-runner.md) (migration runner).
 
 ## Local setup
 
@@ -45,6 +45,68 @@ Mail: point local SMTP at `127.0.0.1:1025` (any credentials accepted) and read m
 - Role-level limits for both runtime roles: `statement_timeout 15s`, `lock_timeout 5s`, `idle_in_transaction_session_timeout 15s`.
 - Locally the container superuser `postgres` is the migrator. Never point the API at it: a superuser bypasses RLS.
 - Tenant context: `app.current_organization_id()` reads `app.organization_id` set with `set_config(..., true)` inside a transaction and returns NULL (fail closed) without it.
+
+## Tenant queries on Workers
+
+Create a handle **inside each request handler**, using the uncached `HYPERDRIVE.connectionString`
+(`ts_app`). The handle owns one `pg` Client and a private Kysely `PostgresDialect`, with a
+single-connection pool wrapper (`max: 1`). It connects lazily and serializes transactions
+on that handle. Never keep a handle or client in module scope or share one between requests.
+
+`TenantContext.fromVerifiedMembership(...)` must be called **only after server-side membership
+verification**. It validates UUID shape and produces an immutable opaque context; it does
+not verify membership itself. A request header alone is never sufficient. The optional
+`membershipId` is the verified membership's ID for audit context.
+
+```ts
+import { createDatabase, TenantContext, withTenant } from "@talentstroom/database";
+
+// Illustrative table/type; replace with the generated schema when domain tables land.
+interface DatabaseSchema {
+  "app.example": { id: string; organization_id: string };
+}
+
+// Called from the handler after the identity/membership checks have succeeded.
+// Env is the consuming Worker's generated type.
+async function readRecords(
+  env: Env,
+  ctx: ExecutionContext,
+  verifiedMembership: { organizationId: string; membershipId: string },
+) {
+  const tenant = TenantContext.fromVerifiedMembership(verifiedMembership);
+  const db = createDatabase<DatabaseSchema>(env.HYPERDRIVE.connectionString);
+  try {
+    return await withTenant(db, tenant, (trx) => trx.selectFrom("app.example").selectAll().execute());
+  } finally {
+    ctx.waitUntil(db.close()); // Or await db.close() in finally for synchronous cleanup.
+  }
+}
+```
+
+Every tenant query goes through `withTenant(db, tenant, fn)`. It begins a Kysely transaction,
+sets `app.organization_id` with a bound `set_config(..., true)` as the first statement after
+`BEGIN`, and sets `app.membership_id` when provided. The settings are transaction-local:
+success commits, failure rolls back, and neither identifier survives the boundary. There
+is no default tenant or public unrestricted Kysely/client accessor. Context errors do not
+include submitted values. Await all callback queries and return data, not a transaction or
+query builder; queries through a retained callback transaction are rejected after it ends.
+
+Keep transactions short: **never call KMS inside `withTenant`**, and keep HTTP/AI and other
+external calls outside it. Fetch encrypted records in the transaction, then unwrap/decrypt
+after commit. Do not nest `withTenant` on the same handle or call `close()` from its callback;
+these wait for the single occupied connection. Close after all request transactions finish;
+closing is idempotent and waits for an active transaction before ending the client.
+
+Identity/bootstrap is a separate narrow path, outside this helper's scope. In particular,
+Better Auth and membership verification use `HYPERDRIVE_AUTH` as `ts_auth`, which cannot
+access tenant tables; never point this tenant handle at that binding (ADR 0006).
+
+The real-Postgres tests in `test/tenant.integration.test.ts` exercise two handles and queued
+transactions for both organizations over 50 repetitions, same-connection cleanup after
+commit/rollback, audit context, RLS write rejection and callback write rollback. The runtime
+role restrictions (including no RLS bypass or `SET ROLE`) remain covered by
+`test/roles.integration.test.ts`. Local tests do not prove deployed Hyperdrive behavior;
+the Neon/Hyperdrive acceptance run from ADR 0007 remains a deployment/CI follow-up.
 
 ## Writing migrations
 

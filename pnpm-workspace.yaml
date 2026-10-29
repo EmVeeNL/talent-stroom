@@ -20,6 +20,7 @@ catalog:
   oxlint-tsgolint: 7.0.2004
   # Postgres driver (ADR 0007); Cloudflare Hyperdrive minimum is 8.16.3.
   pg: 8.23.1
+  kysely: 0.29.7
   react: 19.3.1
   react-dom: 19.3.1
   turbo: 2.11.10

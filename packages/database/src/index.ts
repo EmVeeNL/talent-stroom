@@ -9,3 +9,5 @@ export {
   runMigrations,
 } from "./migrator.ts";
 export type { MigrateOptions, MigrateResult, Migration } from "./migrator.ts";
+export { createDatabase, TenantContext, withTenant } from "./tenant.ts";
+export type { Database } from "./tenant.ts";
