@@ -74,13 +74,23 @@ Runtime and data rules:
 6. **Passkey `rpID` tied to the domain.** Moving from `workers.dev` to the final domain invalidates registered passkeys (D01/#9).
 7. **Supply chain.** Large dependency surface (`better-auth` pulls Kysely, jose, noble, SimpleWebAuthn); pinned via catalog and ADR 0005.
 
+## Owner decisions (2026-10-29)
+
+1. **Organization switch rotates the session token.** A custom `/v1` switch endpoint revokes the old session and issues a new one bound to the selected organization (flow 06), in addition to the client cache purge.
+2. **"Require MFA" accepts:** a passkey on its own (phishing-resistant), password + TOTP, and Google/Apple/Microsoft sign-in + TOTP. Password alone or social sign-in alone does not satisfy the policy.
+3. **Operators can only ban accounts and revoke sessions.** No impersonation, also not for support (D12). Support uses screen sharing with the customer.
+4. **Workers Paid plan approved** (required for scrypt CPU time).
+5. **No enterprise SSO/SAML in the MVP.** Google and Microsoft sign-in cover the target agencies; revisit in v1.x (open item 7).
+6. **Final domain is fixed before the closed beta**, so passkeys are registered on the final relying-party ID. Alpha users may need to re-register passkeys once. This makes trademark/domain clearance (#9) a beta prerequisite.
+7. **Email in development goes to Mailpit** (MailCatcher-compatible inbox with a web UI; runs next to local Postgres). The Worker uses a small mail transport interface: a Mailpit transport for local development (HTTP send API, to be verified in implementation) and a production provider chosen in spike #232. No email content is logged.
+
 ## Open items
 
 1. Spike: deploy a minimal Worker with Better Auth 1.7.12 + Hyperdrive (caching off); measure sign-in CPU and memory, per-request instance cost, abort-hang workaround.
-2. Decide whether an organization switch must also rotate the session token (custom endpoint), or whether server-side context change plus client cache purge is enough.
-3. Choose the email provider (EU processing, DPA) and the outbox/queue path for auth mail.
+2. ~~Organization switch token rotation~~: decided, rotate (owner decision 1).
+3. Choose the production email provider (EU processing, DPA) in #232 and the outbox/queue path for auth mail. Development uses Mailpit (owner decision 7).
 4. Confirm `accountLinking` behaviour per provider (Google only trusted; Microsoft and Apple never auto-linked by email).
-5. Define the require-MFA policy precisely (does Google sign-in plus TOTP count; do passkeys without user verification count).
+5. Require-MFA policy: decided (owner decision 2). Remaining detail: require user verification on passkeys used to satisfy it.
 6. Break-glass procedure for account recovery and user erasure (D12), including two-person approval.
 7. Enterprise SSO (SAML/OIDC per organization) and SCIM: post-MVP spike; `@better-auth/sso` depends on `samlify`, edge support unverified.
 8. Breached-password check (`haveIBeenPwned` plugin) after privacy review of the external call.
