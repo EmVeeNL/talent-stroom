@@ -5,7 +5,7 @@ import { lazy, Suspense } from "react";
 
 // Dev-only component showcase: `?gallery`. Tree-shaken from production builds.
 const ComponentGallery = import.meta.env.DEV
-  ? lazy(() => import("./ComponentGallery.tsx").then((m) => ({ default: m.ComponentGallery })))
+  ? lazy(() => import("./gallery/Gallery.tsx").then((m) => ({ default: m.Gallery })))
   : null;
 
 const apiClient = createApiClient();

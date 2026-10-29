@@ -1,3 +1,45 @@
+@import "./components/StatCard.css";
+@import "./components/TrendIndicator.css";
+@import "./components/Progress.css";
+@import "./components/LineChart.css";
+@import "./components/BarChart.css";
+@import "./components/DonutChart.css";
+@import "./components/ChartLegend.css";
+@import "./components/DataTable.css";
+@import "./components/Pagination.css";
+@import "./components/ActivityFeed.css";
+@import "./components/Avatar.css";
+@import "./components/SearchInput.css";
+@import "./components/Combobox.css";
+@import "./components/DateRangePicker.css";
+@import "./components/FacetedFilter.css";
+@import "./components/ViewSwitcher.css";
+@import "./components/Tooltip.css";
+@import "./components/HoverCard.css";
+@import "./components/Popover.css";
+@import "./components/Dialog.css";
+@import "./components/Sheet.css";
+@import "./components/AlertDialog.css";
+@import "./components/AlertBanner.css";
+@import "./components/Toast.css";
+@import "./components/Toaster.css";
+@import "./components/Skeleton.css";
+@import "./components/FormField.css";
+@import "./components/Textarea.css";
+@import "./components/NumberInput.css";
+@import "./components/Select.css";
+@import "./components/Switch.css";
+@import "./components/Checkbox.css";
+@import "./components/CheckboxGroup.css";
+@import "./components/RadioGroup.css";
+@import "./components/Slider.css";
+@import "./components/FileUploader.css";
+@import "./components/CommandPalette.css";
+@import "./components/Sidebar.css";
+@import "./components/Kbd.css";
+@import "./components/Breadcrumb.css";
+@import "./components/Header.css";
+@import "./components/ThemeToggle.css";
 /* TalentStroom component styles. Plain CSS on top of tokens.css; no runtime. */
 
 .ts-visually-hidden {
@@ -338,4 +380,10 @@
   .ts-spinner {
     animation-duration: 3s;
   }
+}
+
+.ts-theme-toggle input:focus-visible,
+.ts-breadcrumb a:focus-visible {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: var(--ts-focus-ring-offset);
 }

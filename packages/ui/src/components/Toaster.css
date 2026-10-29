@@ -1,0 +1,9 @@
+.ts-toaster {
+  position: fixed;
+  z-index: 50;
+  bottom: var(--ts-space-4);
+  right: var(--ts-space-4);
+  width: min(26rem, calc(100vw - var(--ts-space-8)));
+  display: grid;
+  gap: var(--ts-space-3);
+}

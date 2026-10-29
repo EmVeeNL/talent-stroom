@@ -1,0 +1,44 @@
+.ts-check {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--ts-space-2);
+  cursor: pointer;
+}
+.ts-check input {
+  position: absolute;
+  opacity: 0;
+  width: 24px;
+  height: 24px;
+}
+.ts-check__visual {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  margin-top: 2px;
+  border: 1px solid var(--ts-border-strong);
+  border-radius: var(--ts-radius-sm);
+  background: var(--ts-surface);
+}
+.ts-check input:checked + .ts-check__visual {
+  background: var(--ts-primary);
+  border-color: var(--ts-primary);
+}
+.ts-check input:checked + .ts-check__visual::after {
+  content: "✓";
+  display: block;
+  color: var(--ts-text-on-primary);
+  text-align: center;
+  line-height: 18px;
+  font-weight: 700;
+}
+.ts-check input:focus-visible + .ts-check__visual {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: var(--ts-focus-ring-offset);
+}
+.ts-check input:disabled + .ts-check__visual {
+  background: var(--ts-disabled-bg);
+}
+.ts-check__label {
+  display: block;
+  font-weight: var(--ts-font-weight-medium);
+}

@@ -103,6 +103,42 @@ export const cssVariables = {
   "--ts-duration-base": "200ms",
 } as const;
 
+/** Full resolved dark theme, including the shared typography and sidebar tokens. */
+export const darkCssVariables: Record<keyof typeof cssVariables, string> = {
+  ...cssVariables,
+  "--ts-surface": "#1c2535",
+  "--ts-bg": "#111827",
+  "--ts-surface-muted": "#263044",
+  "--ts-text": "#f3f5fb",
+  "--ts-text-muted": "#b4bfd2",
+  "--ts-border": "#38445a",
+  "--ts-border-strong": "#8491a8",
+  "--ts-primary": "#a0a7ff",
+  "--ts-primary-hover": "#bcc1ff",
+  "--ts-text-on-primary": "#111827",
+  "--ts-primary-subtle": "#262f5c",
+  "--ts-primary-text": "#bcc1ff",
+  "--ts-danger": "#f08095",
+  "--ts-danger-hover": "#ffa0af",
+  "--ts-text-on-danger": "#111827",
+  "--ts-danger-subtle": "#482535",
+  "--ts-danger-text": "#ffa0af",
+  "--ts-success": "#5dddc1",
+  "--ts-success-subtle": "#173e38",
+  "--ts-success-text": "#77e5ce",
+  "--ts-warning": "#edbd70",
+  "--ts-warning-subtle": "#42351f",
+  "--ts-warning-text": "#f4cc8b",
+  "--ts-info": "#a0a7ff",
+  "--ts-info-subtle": "#262f5c",
+  "--ts-info-text": "#bcc1ff",
+  "--ts-neutral-subtle": "#263044",
+  "--ts-neutral-text": "#d5deed",
+  "--ts-disabled-bg": "#263044",
+  "--ts-disabled-text": "#8491a8",
+  "--ts-focus-ring-color": "#a0a7ff",
+};
+
 export type CssVariableName = keyof typeof cssVariables;
 
 const v = cssVariables;

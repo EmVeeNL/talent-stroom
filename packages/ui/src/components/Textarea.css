@@ -1,0 +1,12 @@
+.ts-textarea {
+  min-height: 96px;
+  padding: var(--ts-space-3);
+  resize: vertical;
+}
+.ts-textarea--grow {
+  resize: none;
+  overflow: hidden;
+}
+.ts-textarea__count {
+  align-self: flex-end;
+}

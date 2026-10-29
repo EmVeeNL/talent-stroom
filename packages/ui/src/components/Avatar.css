@@ -1,0 +1,24 @@
+.ts-avatar {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  object-fit: cover;
+  border-radius: var(--ts-radius-full);
+  background: var(--ts-primary-subtle);
+  color: var(--ts-primary-text);
+  font-size: var(--ts-font-size-sm);
+  font-weight: var(--ts-font-weight-semibold);
+}
+.ts-avatar--sm {
+  width: 32px;
+  height: 32px;
+  font-size: var(--ts-font-size-xs);
+}
+.ts-avatar--lg {
+  width: 56px;
+  height: 56px;
+  font-size: var(--ts-font-size-lg);
+}

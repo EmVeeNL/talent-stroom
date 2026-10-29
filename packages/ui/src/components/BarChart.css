@@ -1,0 +1,5 @@
+.ts-bar-chart .ts-chart__mark:focus-visible rect {
+  stroke: var(--ts-focus-ring-color);
+  stroke-width: 3px;
+  stroke-dasharray: 2 2;
+}

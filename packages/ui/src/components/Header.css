@@ -1,0 +1,17 @@
+.ts-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--ts-space-4);
+  padding: var(--ts-space-4);
+  background: var(--ts-surface);
+  border-bottom: 1px solid var(--ts-border);
+}
+.ts-header__search {
+  flex: 1;
+}
+.ts-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ts-space-2);
+}

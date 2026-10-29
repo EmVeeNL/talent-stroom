@@ -1,0 +1,38 @@
+.ts-sheet {
+  height: 100dvh;
+  max-height: 100dvh;
+  width: min(30rem, 100%);
+  margin: 0 0 0 auto;
+  border-radius: var(--ts-radius-lg) 0 0 var(--ts-radius-lg);
+}
+.ts-sheet--left {
+  margin: 0 auto 0 0;
+  border-radius: 0 var(--ts-radius-lg) var(--ts-radius-lg) 0;
+}
+.ts-sheet[open] {
+  animation: ts-sheet-in var(--ts-duration-base) ease-out;
+}
+.ts-sheet--left[open] {
+  animation-name: ts-sheet-left-in;
+}
+@keyframes ts-sheet-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes ts-sheet-left-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ts-sheet[open] {
+    animation: none;
+  }
+}

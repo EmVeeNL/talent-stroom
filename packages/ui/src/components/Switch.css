@@ -1,0 +1,50 @@
+.ts-switch {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ts-space-1);
+}
+.ts-switch__control {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ts-space-3);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ts-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ts-switch__track {
+  width: 44px;
+  height: 26px;
+  border-radius: var(--ts-radius-full);
+  background: var(--ts-border-strong);
+  padding: 3px;
+  box-sizing: border-box;
+  transition: background-color var(--ts-duration-fast) ease;
+}
+.ts-switch__track span {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--ts-surface);
+  transition: transform var(--ts-duration-fast) ease;
+}
+.ts-switch__control[aria-checked="true"] .ts-switch__track {
+  background: var(--ts-primary);
+}
+.ts-switch__control[aria-checked="true"] .ts-switch__track span {
+  transform: translateX(18px);
+}
+.ts-switch__control:focus-visible {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: var(--ts-focus-ring-offset);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ts-switch__track,
+  .ts-switch__track span {
+    transition: none;
+  }
+}

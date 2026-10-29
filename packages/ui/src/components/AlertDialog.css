@@ -1,0 +1,3 @@
+.ts-dialog[role="alertdialog"] .ts-dialog__footer {
+  flex-wrap: wrap;
+}

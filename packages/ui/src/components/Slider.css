@@ -1,0 +1,17 @@
+.ts-slider {
+  width: 100%;
+  accent-color: var(--ts-primary);
+}
+.ts-slider__value {
+  font-weight: var(--ts-font-weight-semibold);
+}
+.ts-slider__limits {
+  display: flex;
+  justify-content: space-between;
+  color: var(--ts-text-muted);
+  font-size: var(--ts-font-size-sm);
+}
+.ts-slider:focus-visible {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: var(--ts-focus-ring-offset);
+}

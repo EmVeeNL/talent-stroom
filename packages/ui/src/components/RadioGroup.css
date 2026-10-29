@@ -1,0 +1,34 @@
+.ts-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ts-space-2);
+}
+.ts-radio-option {
+  display: flex;
+  gap: var(--ts-space-2);
+  align-items: flex-start;
+  cursor: pointer;
+}
+.ts-radio-option input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--ts-primary);
+}
+.ts-radio-option--card {
+  padding: var(--ts-space-3);
+  border: 1px solid var(--ts-border-strong);
+  border-radius: var(--ts-radius-md);
+  background: var(--ts-surface);
+}
+.ts-radio-option--card:has(input:checked) {
+  border-color: var(--ts-primary);
+  background: var(--ts-primary-subtle);
+}
+.ts-radio-option__content {
+  display: flex;
+  flex-direction: column;
+}
+.ts-radio-option--disabled {
+  color: var(--ts-disabled-text);
+  cursor: not-allowed;
+}

@@ -1,0 +1,19 @@
+.ts-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: end;
+  gap: var(--ts-space-4);
+  width: 100%;
+}
+.ts-pagination__pages,
+.ts-pagination__page {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ts-space-1);
+}
+.ts-pagination__pages .ts-button {
+  min-width: 36px;
+  padding-inline: var(--ts-space-2);
+}
