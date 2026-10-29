@@ -1,10 +1,11 @@
+import type { IconName } from "../icons.ts";
 import { useRef } from "react";
 import { cx } from "../classnames.ts";
 import { Icon } from "./Icon.tsx";
 export interface ViewOption {
   value: string;
   label: string;
-  icon?: string;
+  icon?: IconName;
   disabled?: boolean;
 }
 export interface ViewSwitcherProps {

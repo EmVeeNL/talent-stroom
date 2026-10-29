@@ -58,7 +58,7 @@ Unchanged brand colours: primary `#4F59F7` (5.12:1 with white text), primary hov
 | `Badge`, `StatusPill` | Tones neutral/success/warning/danger/info. `StatusPill` adds a per-tone icon so status is not colour-only.                                                                                           |
 | `Card`                | `as` div/section/article, optional `title` (heading level configurable) and `actions`; titled section/article is labelled by its heading.                                                            |
 | `Tabs`                | WAI-ARIA tabs (automatic activation): roving tabindex, Left/Right (wrapping), Home/End, disabled tabs skipped, panels focusable. Controlled or uncontrolled.                                         |
-| `Icon`                | Material Symbols Outlined ligature; `aria-hidden` by default, `label` gives `role="img"` + `aria-label`.                                                                                             |
+| `Icon`                | Typed Material Symbols Rounded ligature (16/20/24/32px; default 20px); `aria-hidden` by default, `label` gives `role="img"` + `aria-label`.                                                          |
 
 The Material Symbols font itself must be loaded by the app (self-host; see `docs/images/implementation/material-symbols.md`).
 

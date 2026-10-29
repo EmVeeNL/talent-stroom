@@ -1,5 +1,17 @@
 import { useState } from "react";
-import { Sidebar, Header, Breadcrumb, CommandPalette, Kbd, Button, Card, Icon, Logo, Tabs } from "@talentstroom/ui";
+import {
+  Sidebar,
+  Header,
+  Breadcrumb,
+  CommandPalette,
+  Kbd,
+  Button,
+  Card,
+  Icon,
+  Logo,
+  Tabs,
+  ICON_NAMES,
+} from "@talentstroom/ui";
 import { Section } from "../Section.tsx";
 import { useGallery } from "../context.ts";
 export function Layout() {
@@ -33,6 +45,35 @@ export function Layout() {
 
   return (
     <>
+      <Section title={tr("gallery.icons")}>
+        <p className="gallery-icons-intro">{tr("gallery.icons.intro")}</p>
+        <div className="gallery-icons-examples">
+          <span>
+            <Icon name="search" /> {tr("gallery.icons.decorative")}
+          </span>
+          <span>
+            <Icon name="warning" label={tr("gallery.icons.label")} /> {tr("gallery.icons.labelled")}
+          </span>
+          <span>
+            <Icon name="star" filled /> {tr("gallery.icons.filled")}
+          </span>
+        </div>
+        <ul className="gallery-icons-grid">
+          {ICON_NAMES.map((name) => (
+            <li key={name}>
+              <code>{name}</code>
+              <div className="gallery-icons-sizes">
+                {([16, 20, 24, 32] as const).map((size) => (
+                  <span key={size}>
+                    <Icon name={name} size={size} />
+                    <small>{size}px</small>
+                  </span>
+                ))}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </Section>
       <Section title={tr("gallery.frame")}>
         <div className="gallery-frame">
           <Sidebar
@@ -162,14 +203,6 @@ export function Layout() {
           />
         </div>
       </Section>{" "}
-      <Section title={tr("gallery.icons")}>
-        <span>
-          <Icon name="search" /> {tr("gallery.icons.decorative")}
-        </span>
-        <span>
-          <Icon name="warning" label={tr("gallery.icons.label")} /> {tr("gallery.icons.labelled")}
-        </span>
-      </Section>
     </>
   );
 }

@@ -12,6 +12,7 @@ describe("Badge and StatusPill", () => {
   it("StatusPill conveys status with text and a hidden icon, not colour alone", () => {
     render(<StatusPill tone="success">Actief</StatusPill>);
     const pill = screen.getByText(/Actief/);
+    expect(pill.querySelector(".ts-icon--16")).toBeTruthy();
     expect(pill.textContent).toContain("Actief");
     expect(pill.querySelector("[aria-hidden='true']")?.textContent).toBe("check_circle");
   });

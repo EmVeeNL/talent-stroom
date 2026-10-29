@@ -1,3 +1,4 @@
+import type { IconName } from "../icons.ts";
 import { Card } from "./Card.tsx";
 import { Icon } from "./Icon.tsx";
 import { TrendIndicator, trendText } from "./TrendIndicator.tsx";
@@ -8,7 +9,7 @@ export interface StatCardProps {
   value: number;
   locale?: string;
   formatOptions?: Intl.NumberFormatOptions;
-  icon?: string;
+  icon?: IconName;
   trend?: TrendIndicatorProps;
   description?: string;
   badge?: ReactNode;

@@ -1,5 +1,6 @@
 ---
 import "@talentstroom/ui/fonts.css";
+import iconFont from "@talentstroom/ui/fonts/material-symbols/MaterialSymbolsRounded.woff2?url";
 import "@talentstroom/ui/tokens.css";
 import { t, type Locale } from "@talentstroom/i18n";
 
@@ -15,6 +16,7 @@ const lang = locale.slice(0, 2);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preload" href={iconFont} as="font" type="font/woff2" crossorigin="anonymous" />
     <title>{t(locale, "app.name")} — {t(locale, "app.tagline")}</title>
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

@@ -3,7 +3,7 @@ import { cx } from "../classnames.ts";
 import { Icon } from "./Icon.tsx";
 import { Button } from "./Button.tsx";
 export type FeedbackTone = "info" | "success" | "warning" | "danger";
-export const feedbackIcons = { info: "info", success: "check_circle", warning: "warning", danger: "error" };
+export const feedbackIcons = { info: "info", success: "check_circle", warning: "warning", danger: "error" } as const;
 export interface AlertBannerProps {
   tone?: FeedbackTone;
   children: ReactNode;

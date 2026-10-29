@@ -120,6 +120,8 @@ export const enGB = {
   "gallery.tabs.notesPanel": "Interview notes from the recruiter.",
   "gallery.tabs.documentsPanel": "CV and attachments.",
   "gallery.tabs.archivedPanel": "Not available.",
+  "gallery.icons.intro": "Material Symbols Rounded · 16px inline, 20px default, 24px navigation, 32px illustrative.",
+  "gallery.icons.filled": "Filled selection",
   "gallery.icons": "Icons",
   "gallery.icons.decorative": "Decorative (hidden from screen readers)",
   "gallery.icons.labelled": "Labelled",

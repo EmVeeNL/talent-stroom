@@ -77,3 +77,9 @@ describe("Button", () => {
     expect(await axeViolations(container)).toEqual([]);
   });
 });
+
+function iconOnlyTypeContract() {
+  // @ts-expect-error Icon-only actions must have aria-label.
+  return <Button icon="add" />;
+}
+void iconOnlyTypeContract;

@@ -2,8 +2,9 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, it } from "vitest";
 import { axeViolations } from "../test-utils.ts";
+import type { SidebarItem } from "./Sidebar.tsx";
 import { Sidebar } from "./Sidebar.tsx";
-const items = [
+const items: SidebarItem[] = [
   {
     id: "jobs",
     label: "Werving",
