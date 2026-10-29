@@ -29,3 +29,18 @@ describe("StatCard", () => {
     expect(await axeViolations(container)).toEqual([]);
   });
 });
+
+it("gives the sparkline a text alternative and handles flat or invalid data", () => {
+  const { container, rerender } = render(
+    <StatCard
+      label="Kandidaten"
+      value={1248}
+      sparkline={{ values: [1, 3, 2, 4], label: "Stijging over vier weken" }}
+    />,
+  );
+  expect(container.querySelector('svg[role="img"]')?.getAttribute("aria-label")).toBe("Stijging over vier weken");
+  rerender(<StatCard label="Kandidaten" value={4} sparkline={{ values: [4, 4], label: "Gelijk gebleven" }} />);
+  expect(container.querySelector("polyline")?.getAttribute("points")).not.toContain("NaN");
+  rerender(<StatCard label="Kandidaten" value={4} sparkline={{ values: [NaN], label: "Onbekend" }} />);
+  expect(container.querySelector("svg")).toBeNull();
+});

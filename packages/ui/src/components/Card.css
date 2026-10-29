@@ -1,0 +1,48 @@
+/* Card */
+.ts-card {
+  background: var(--ts-surface);
+  border: var(--ts-border-width) solid var(--ts-border);
+  border-radius: var(--ts-radius-lg);
+  box-shadow: var(--ts-shadow-card);
+}
+
+.ts-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ts-space-3);
+  padding: var(--ts-space-4) var(--ts-space-5) 0;
+}
+
+.ts-card__heading {
+  min-width: 0;
+}
+.ts-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ts-space-2);
+  margin-left: auto;
+}
+.ts-card__subtitle {
+  margin: var(--ts-space-1) 0 0;
+  font: var(--ts-font-compact);
+  color: var(--ts-text-muted);
+}
+.ts-card:hover {
+  border-color: var(--ts-border-strong);
+}
+.ts-card[data-selected] {
+  border-color: var(--ts-primary-text);
+  box-shadow: 0 0 0 1px var(--ts-primary-text);
+}
+.ts-card--data .ts-card__body {
+  padding-inline: 0;
+}
+.ts-card__title {
+  margin: 0;
+  font: var(--ts-font-card-title);
+}
+
+.ts-card__body {
+  padding: var(--ts-space-4) var(--ts-space-5) var(--ts-space-5);
+}
