@@ -73,6 +73,14 @@ jobs:
             exit 1
           }
 
+      - name: Generated API client schema is up to date
+        run: |
+          pnpm --filter @talentstroom/api-client generate
+          git diff --exit-code -- packages/api-client/src/schema.gen.ts || {
+            echo "::error::packages/api-client/src/schema.gen.ts is stale. Run 'pnpm --filter @talentstroom/api-client generate' and commit."
+            exit 1
+          }
+
   database:
     name: database
     runs-on: ubuntu-latest

@@ -59,12 +59,12 @@ scripts/worktree.sh clean                            # remove worktrees whose PR
 
 Agents working in a worktree edit and test only; they do not commit, push or open PRs. The orchestrator reviews the diff, commits and opens the PR.
 
-| Task type                                                           | Agent and model     |
-| ------------------------------------------------------------------- | ------------------- |
-| Research, ADR spikes, implementation, reviews (default for Claude)  | Claude Sonnet       |
-| Cryptographic primitives, or work whose Sonnet result failed review | Claude Opus         |
-| Bounded implementation in a known module                            | Codex `gpt-6.1-sol` |
-| Small, mechanical changes (config, docs, i18n)                      | Codex `gpt-6-luna`  |
+| Complexity                                                                               | Claude | Codex         |
+| ---------------------------------------------------------------------------------------- | ------ | ------------- |
+| Normal: well-specified implementation, config, docs, tests                               | Sonnet | `gpt-6-luna`  |
+| Complex: security-critical design, crypto, tenancy, schema design, multi-package changes | Opus   | `gpt-6.1-sol` |
+
+Balance each batch across both providers.
 
 Prefer the cheaper model; escalate only when the result fails review. Security-sensitive diffs are always reviewed by the orchestrator regardless of model; record notable outcomes in `docs/architecture/engineering/model-evaluation-ledger.md`.
 

@@ -1,0 +1,14 @@
+{
+  "name": "@talentstroom/openapi-codegen",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Generates TypeScript types from apps/api/openapi.json. Isolated because openapi-typescript needs the TypeScript 6 JS API (ADR 0003).",
+  "scripts": {
+    "generate": "openapi-typescript ../../apps/api/openapi.json -o ../api-client/src/schema.gen.ts"
+  },
+  "devDependencies": {
+    "openapi-typescript": "catalog:",
+    "typescript": "catalog:typescript6"
+  }
+}

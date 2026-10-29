@@ -14,6 +14,8 @@ catalog:
   "@vitejs/plugin-react": 6.1.2
   astro: 7.4.2
   "@hono/zod-openapi": 1.6.3
+  openapi-fetch: 0.17.0
+  openapi-typescript: 7.13.0
   hono: 4.13.13
   oxfmt: 0.74.0
   oxlint: 1.89.0
@@ -33,6 +35,12 @@ catalog:
 catalogs:
   typescript6:
     typescript: 6.0.3
+
+# openapi-typescript declares typescript ^5 but works with 6 (output verified identical);
+# it only runs in packages/openapi-codegen (ADR 0003).
+peerDependencyRules:
+  allowedVersions:
+    openapi-typescript>typescript: "6"
 
 # Supply-chain policy: only install releases older than 7 days (minutes).
 minimumReleaseAge: 10080

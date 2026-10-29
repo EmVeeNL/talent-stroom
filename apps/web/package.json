@@ -10,6 +10,7 @@
     "typecheck": "tsc -p ."
   },
   "dependencies": {
+    "@talentstroom/api-client": "workspace:*",
     "@talentstroom/i18n": "workspace:*",
     "@talentstroom/ui": "workspace:*",
     "react": "catalog:",
