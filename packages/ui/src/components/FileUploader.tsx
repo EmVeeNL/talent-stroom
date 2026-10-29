@@ -1,8 +1,13 @@
 import { useId, useRef, useState } from "react";
 import type { ChangeEvent, DragEvent } from "react";
+import { Icon } from "./Icon.tsx";
 import { cx } from "../classnames.ts";
 export interface FileUploaderProps {
   label: string;
+  dropLabel?: string;
+  acceptedTypesLabel?: string;
+  disabled?: boolean;
+  readOnly?: boolean;
   hint?: string;
   accept?: string;
   maxSize?: number;
@@ -18,6 +23,10 @@ export interface FileUploaderProps {
 }
 export function FileUploader({
   label,
+  dropLabel,
+  acceptedTypesLabel,
+  disabled,
+  readOnly,
   hint,
   accept = ".pdf,.docx",
   maxSize = 10 * 1024 * 1024,
@@ -42,7 +51,7 @@ export function FileUploader({
     onFilesChange?.(next);
   };
   const add = (incoming: FileList | null) => {
-    if (!incoming) return;
+    if (!incoming || disabled || readOnly) return;
     const accepted = accept.split(",").map((x) => x.trim().toLowerCase());
     const next = [...selected];
     for (const file of Array.from(incoming)) {
@@ -72,7 +81,14 @@ export function FileUploader({
     add(e.dataTransfer.files);
   };
   return (
-    <div className={cx("ts-field", message && "ts-field--invalid")}>
+    <div
+      className={cx(
+        "ts-field",
+        disabled && "ts-field--disabled",
+        readOnly && "ts-field--readonly",
+        message && "ts-field--invalid",
+      )}
+    >
       <label className="ts-field__label" htmlFor={uid}>
         {label}
         {required && (
@@ -81,9 +97,21 @@ export function FileUploader({
           </span>
         )}
       </label>
-      {hint && <p className="ts-field__hint">{hint}</p>}
-      <div className="ts-upload" onDragOver={(e) => e.preventDefault()} onDrop={onDrop}>
+      {hint && (
+        <p className="ts-field__hint" id={`${uid}-hint`}>
+          {hint}
+        </p>
+      )}
+      <div
+        className="ts-upload"
+        aria-disabled={disabled || readOnly || undefined}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={onDrop}
+      >
+        <Icon name="cloud_upload" size={32} />
         <input
+          className="ts-visually-hidden"
+          disabled={disabled || readOnly}
           ref={input}
           id={uid}
           type="file"
@@ -92,14 +120,16 @@ export function FileUploader({
           required={required}
           onChange={onInput}
           aria-invalid={message ? true : undefined}
-          aria-describedby={message ? `${uid}-error` : undefined}
+          aria-describedby={[hint && `${uid}-hint`, `${uid}-types`, message && `${uid}-error`]
+            .filter(Boolean)
+            .join(" ")}
         />
-        <p>{label}</p>
-        <button type="button" onClick={() => input.current?.click()}>
+        <p>{dropLabel ?? label}</p>
+        <button type="button" disabled={disabled || readOnly} onClick={() => input.current?.click()}>
           {chooseLabel}
         </button>
-        <span className="ts-field__hint">
-          {accept.toUpperCase().replaceAll(", ", " of ").replaceAll(",", " of ")} · max. {maxSize / 1024 / 1024} MB
+        <span className="ts-field__hint" id={`${uid}-types`}>
+          {acceptedTypesLabel ?? `${accept.toUpperCase().replaceAll(",", " · ")} · ${maxSize / 1024 / 1024} MB`}
         </span>
       </div>
       {selected.length > 0 && (
@@ -111,6 +141,7 @@ export function FileUploader({
               </span>
               <button
                 type="button"
+                disabled={disabled || readOnly}
                 aria-label={removeLabel(file.name)}
                 onClick={() => update(selected.filter((_, i) => i !== index))}
               >

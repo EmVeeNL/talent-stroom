@@ -22,6 +22,7 @@ export const ICON_NAMES = [
   "chevron_right",
   "circle",
   "close",
+  "cloud_upload",
   "content_copy",
   "dark_mode",
   "dashboard",

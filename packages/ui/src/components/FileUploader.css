@@ -1,14 +1,3 @@
-.ts-upload {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--ts-space-2);
-  padding: var(--ts-space-6);
-  border: var(--ts-border-width) dashed var(--ts-border-strong);
-  border-radius: var(--ts-radius-md);
-  background: var(--ts-surface);
-  text-align: center;
-}
 .ts-upload input {
   width: 100%;
 }
@@ -35,10 +24,51 @@
   margin: 0;
   list-style: none;
 }
+
+.ts-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ts-space-2);
+  padding: var(--ts-space-6);
+  border: var(--ts-border-width) dashed var(--ts-border-strong);
+  border-radius: var(--ts-radius-md);
+  background: var(--ts-surface-muted);
+  text-align: center;
+  position: relative;
+}
+.ts-upload > .ts-icon {
+  color: var(--ts-text-muted);
+}
+.ts-upload > button {
+  border: 0;
+  color: var(--ts-primary-text);
+  background: transparent;
+}
+.ts-upload:is(:hover, [data-state="hover"] .ts-upload) {
+  border-color: var(--ts-primary-text);
+}
+.ts-upload:focus-within,
+[data-state="focus"] .ts-upload {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: var(--ts-focus-ring-offset);
+}
+.ts-field--invalid .ts-upload {
+  border-color: var(--ts-danger-text);
+}
+.ts-field--disabled .ts-upload,
+.ts-upload button:disabled {
+  color: var(--ts-disabled-text);
+  cursor: not-allowed;
+}
+.ts-field--disabled .ts-upload {
+  border-color: var(--ts-border);
+}
 .ts-upload__list li {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--ts-space-3);
   padding-block: var(--ts-space-2);
+  overflow-wrap: anywhere;
 }

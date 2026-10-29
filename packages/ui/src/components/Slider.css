@@ -1,17 +1,97 @@
+.ts-slider__control {
+  position: relative;
+  padding-top: var(--ts-space-10);
+  margin-inline: var(--ts-space-3);
+}
 .ts-slider {
+  appearance: none;
+  display: block;
   width: 100%;
-  accent-color: var(--ts-primary);
+  height: 24px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.ts-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: var(--ts-radius-full);
+  background: linear-gradient(
+    to right,
+    var(--ts-primary) var(--ts-slider-progress),
+    var(--ts-border-strong) var(--ts-slider-progress)
+  );
+}
+.ts-slider::-moz-range-track {
+  height: 6px;
+  border-radius: var(--ts-radius-full);
+  background: var(--ts-border-strong);
+}
+.ts-slider::-moz-range-progress {
+  height: 6px;
+  background: var(--ts-primary);
+  border-radius: var(--ts-radius-full);
+}
+.ts-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-top: -7px;
+  border: 0;
+  border-radius: var(--ts-radius-full);
+  background: var(--ts-primary);
+}
+.ts-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: var(--ts-radius-full);
+  background: var(--ts-primary);
 }
 .ts-slider__value {
-  font-weight: var(--ts-font-weight-semibold);
+  position: absolute;
+  left: clamp(0px, var(--ts-slider-progress), 100%);
+  top: var(--ts-space-1);
+  transform: translateX(-50%);
+  padding: var(--ts-space-1) var(--ts-space-2);
+  border-radius: var(--ts-radius-sm);
+  background: var(--ts-primary);
+  color: var(--ts-text-on-primary);
+  font: var(--ts-font-label);
+  white-space: nowrap;
+}
+.ts-slider__value::after {
+  content: "";
+  position: absolute;
+  left: calc(50% - 4px);
+  bottom: -4px;
+  width: 8px;
+  height: 8px;
+  background: inherit;
+  transform: rotate(45deg);
 }
 .ts-slider__limits {
   display: flex;
   justify-content: space-between;
   color: var(--ts-text-muted);
-  font-size: var(--ts-font-size-sm);
+  font: var(--ts-font-compact);
 }
-.ts-slider:focus-visible {
+.ts-slider:is(:focus-visible, [data-state="focus"] .ts-slider) {
   outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
   outline-offset: var(--ts-focus-ring-offset);
+}
+.ts-slider:is(:hover, [data-state="hover"] .ts-slider) {
+  filter: brightness(0.95);
+}
+.ts-slider:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.ts-slider__control:has(input:disabled) .ts-slider__value {
+  background: var(--ts-disabled-bg);
+  color: var(--ts-disabled-text);
+}
+.ts-field--invalid .ts-slider {
+  outline: 1px solid var(--ts-danger-text);
+  outline-offset: 2px;
+  border-radius: var(--ts-radius-sm);
 }

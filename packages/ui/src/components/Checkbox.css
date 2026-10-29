@@ -10,6 +10,21 @@
   width: 24px;
   height: 24px;
 }
+
+.ts-check input:checked + .ts-check__visual {
+  background: var(--ts-primary);
+  border-color: var(--ts-primary);
+}
+
+.ts-check input:focus-visible + .ts-check__visual {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: var(--ts-focus-ring-offset);
+}
+
+.ts-check__label {
+  display: block;
+  font-weight: var(--ts-font-weight-medium);
+}
 .ts-check__visual {
   width: 20px;
   height: 20px;
@@ -17,28 +32,52 @@
   margin-top: 2px;
   border: var(--ts-border-width) solid var(--ts-border-strong);
   border-radius: var(--ts-radius-sm);
-  background: var(--ts-surface);
+  background: var(--ts-surface-muted);
+  box-sizing: border-box;
 }
-.ts-check input:checked + .ts-check__visual {
+.ts-check input:checked + .ts-check__visual::after {
+  content: "";
+  display: block;
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid var(--ts-text-on-primary);
+  border-bottom: 2px solid var(--ts-text-on-primary);
+  transform: rotate(-45deg);
+  margin: 4px 3px;
+}
+.ts-check input:indeterminate + .ts-check__visual {
   background: var(--ts-primary);
   border-color: var(--ts-primary);
 }
-.ts-check input:checked + .ts-check__visual::after {
-  content: "✓";
+.ts-check input:indeterminate + .ts-check__visual::after {
+  content: "";
   display: block;
-  color: var(--ts-text-on-primary);
-  text-align: center;
-  line-height: 18px;
-  font-weight: 700;
+  width: 10px;
+  height: 2px;
+  margin: 8px 4px;
+  background: var(--ts-text-on-primary);
 }
-.ts-check input:focus-visible + .ts-check__visual {
+.ts-check:is(:hover, [data-state="hover"] .ts-check) input:not(:disabled) + .ts-check__visual {
+  border-color: var(--ts-primary-text);
+}
+[data-state="focus"] .ts-check__visual {
   outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
   outline-offset: var(--ts-focus-ring-offset);
 }
+.ts-check input[aria-invalid="true"] + .ts-check__visual {
+  border-color: var(--ts-danger-text);
+}
+.ts-check:has(input:disabled) {
+  color: var(--ts-disabled-text);
+  cursor: not-allowed;
+}
 .ts-check input:disabled + .ts-check__visual {
   background: var(--ts-disabled-bg);
+  border-color: var(--ts-border);
 }
-.ts-check__label {
-  display: block;
-  font-weight: var(--ts-font-weight-medium);
+.ts-check input:disabled + .ts-check__visual::after {
+  border-color: var(--ts-disabled-text);
+}
+.ts-check:has(input[aria-invalid="true"]) .ts-field__hint {
+  color: var(--ts-danger-text);
 }

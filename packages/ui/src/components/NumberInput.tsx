@@ -42,6 +42,7 @@ export function NumberInput({
   const hid = hint ? `${cid}-hint` : undefined,
     eid = error ? `${cid}-error` : undefined;
   const update = (n: number) => {
+    if (rest.readOnly || rest.disabled) return;
     const next = Math.min(numericMax, Math.max(numericMin, n));
     if (value === undefined) setInternal(next);
     onChange?.(next);
@@ -60,7 +61,7 @@ export function NumberInput({
         <button
           type="button"
           aria-label={decrementLabel}
-          disabled={rest.disabled || current <= numericMin}
+          disabled={rest.disabled || rest.readOnly || current <= numericMin}
           onClick={() => update(current - numericStep)}
         >
           −
@@ -96,7 +97,7 @@ export function NumberInput({
         <button
           type="button"
           aria-label={incrementLabel}
-          disabled={rest.disabled || current >= numericMax}
+          disabled={rest.disabled || rest.readOnly || current >= numericMax}
           onClick={() => update(current + numericStep)}
         >
           +

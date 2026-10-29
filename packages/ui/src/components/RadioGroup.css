@@ -9,11 +9,7 @@
   align-items: flex-start;
   cursor: pointer;
 }
-.ts-radio-option input {
-  width: 20px;
-  height: 20px;
-  accent-color: var(--ts-primary);
-}
+
 .ts-radio-option--card {
   padding: var(--ts-space-3);
   border: var(--ts-border-width) solid var(--ts-border-strong);
@@ -31,4 +27,35 @@
 .ts-radio-option--disabled {
   color: var(--ts-disabled-text);
   cursor: not-allowed;
+}
+.ts-radio-option input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--ts-primary);
+  appearance: none;
+  margin: 2px 0 0;
+  box-sizing: border-box;
+  flex: none;
+  border: 1px solid var(--ts-border-strong);
+  border-radius: var(--ts-radius-full);
+  background: var(--ts-surface-muted);
+}
+.ts-radio-option input:checked {
+  border: 6px solid var(--ts-primary);
+  background: var(--ts-text-on-primary);
+}
+.ts-radio-option:is(:hover, [data-state="hover"] .ts-radio-option) input:not(:disabled) {
+  outline: 1px solid var(--ts-primary-text);
+}
+.ts-radio-option input:focus-visible,
+[data-state="focus"] .ts-radio-option input {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: var(--ts-focus-ring-offset);
+}
+.ts-field--invalid .ts-radio-option input {
+  outline: 1px solid var(--ts-danger-text);
+}
+.ts-radio-option input:disabled {
+  border-color: var(--ts-border);
+  background: var(--ts-disabled-bg);
 }

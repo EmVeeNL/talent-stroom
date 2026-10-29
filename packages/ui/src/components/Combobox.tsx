@@ -10,6 +10,8 @@ export interface ComboboxOption {
 }
 export interface ComboboxProps {
   label: string;
+  error?: string;
+  readOnly?: boolean;
   options: ComboboxOption[];
   value: string[];
   onChange: (value: string[]) => void;
@@ -20,6 +22,8 @@ export interface ComboboxProps {
 }
 export function Combobox({
   label,
+  error,
+  readOnly,
   options,
   value,
   onChange,
@@ -55,7 +59,7 @@ export function Combobox({
   const selected = options.filter((o) => value.includes(o.value));
   return (
     <div
-      className="ts-combobox"
+      className={cx("ts-combobox", error && "ts-field--invalid")}
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget)) {
           setOpen(false);
@@ -66,76 +70,88 @@ export function Combobox({
       <label className="ts-field__label" htmlFor={id}>
         {label}
       </label>
-      {multiple && selected.length > 0 && (
-        <div className="ts-combobox__chips">
-          {selected.map((o) => (
-            <Badge key={o.value}>
-              {o.label}
-              <Button
-                variant="ghost"
-                size="sm"
-                icon="close"
-                disabled={disabled}
-                aria-label={removeLabel(o.label)}
-                onClick={() => {
-                  onChange(value.filter((v) => v !== o.value));
-                  input.current?.focus();
-                }}
-              />
-            </Badge>
-          ))}
-        </div>
-      )}
-      <div className="ts-combobox__input">
-        <input
-          id={id}
-          ref={input}
-          role="combobox"
-          aria-autocomplete="list"
-          aria-expanded={open}
-          aria-controls={open ? `${id}-list` : undefined}
-          aria-activedescendant={open && item ? `${id}-${encodeURIComponent(item.value)}` : undefined}
-          disabled={disabled}
-          className="ts-field__input"
-          value={open ? query : multiple ? "" : (selected[0]?.label ?? "")}
-          onClick={() => {
-            setOpen(true);
-            setActive(0);
-          }}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setActive(0);
-            setOpen(true);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-              e.preventDefault();
+      <div className="ts-combobox__control">
+        {multiple && selected.length > 0 && (
+          <div className="ts-combobox__chips">
+            {selected.map((o) => (
+              <Badge key={o.value}>
+                {o.label}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  icon="close"
+                  disabled={disabled || readOnly}
+                  aria-label={removeLabel(o.label)}
+                  onClick={() => {
+                    onChange(value.filter((v) => v !== o.value));
+                    input.current?.focus();
+                  }}
+                />
+              </Badge>
+            ))}
+          </div>
+        )}
+        <div className="ts-combobox__input">
+          <input
+            id={id}
+            ref={input}
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded={open}
+            aria-controls={open ? `${id}-list` : undefined}
+            aria-activedescendant={open && item ? `${id}-${encodeURIComponent(item.value)}` : undefined}
+            disabled={disabled}
+            readOnly={readOnly}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? `${id}-error` : undefined}
+            className="ts-field__input"
+            value={open ? query : multiple ? "" : (selected[0]?.label ?? "")}
+            onClick={() => {
+              if (readOnly) return;
               setOpen(true);
-              setActive(
-                open
-                  ? (active + (e.key === "ArrowDown" ? 1 : -1) + enabled.length) % Math.max(1, enabled.length)
-                  : e.key === "ArrowDown"
-                    ? 0
-                    : enabled.length - 1,
-              );
-            } else if (open && (e.key === "Home" || e.key === "End")) {
-              e.preventDefault();
-              setActive(e.key === "Home" ? 0 : enabled.length - 1);
-            } else if (open && e.key === "Enter") {
-              e.preventDefault();
-              if (item) select(item);
-            } else if (e.key === "Escape") {
-              e.preventDefault();
-              setOpen(false);
-              setQuery("");
-            } else if (e.key === "Tab") {
-              setOpen(false);
-              setQuery("");
-            }
-          }}
-        />
-        <Icon name="expand_more" size={20} />
+              setActive(0);
+            }}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setActive(0);
+              setOpen(true);
+            }}
+            onKeyDown={(e) => {
+              if (readOnly) return;
+              if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                e.preventDefault();
+                setOpen(true);
+                setActive(
+                  open
+                    ? (active + (e.key === "ArrowDown" ? 1 : -1) + enabled.length) % Math.max(1, enabled.length)
+                    : e.key === "ArrowDown"
+                      ? 0
+                      : enabled.length - 1,
+                );
+              } else if (open && (e.key === "Home" || e.key === "End")) {
+                e.preventDefault();
+                setActive(e.key === "Home" ? 0 : enabled.length - 1);
+              } else if (open && e.key === "Enter") {
+                e.preventDefault();
+                if (item) select(item);
+              } else if (e.key === "Escape") {
+                e.preventDefault();
+                setOpen(false);
+                setQuery("");
+              } else if (e.key === "Tab") {
+                setOpen(false);
+                setQuery("");
+              }
+            }}
+          />
+          <Icon name="expand_more" size={20} />
+        </div>
       </div>
+      {error && (
+        <p className="ts-field__error" id={`${id}-error`} role="alert">
+          {error}
+        </p>
+      )}
       {open && (
         <div className="ts-combobox__popup">
           <ul id={`${id}-list`} role="listbox" aria-label={label} aria-multiselectable={multiple || undefined}>

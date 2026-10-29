@@ -9,6 +9,8 @@ export interface RadioGroupProps {
   hint?: string;
   error?: string;
   card?: boolean;
+  readOnly?: boolean;
+  disabled?: boolean;
 }
 export interface RadioOption {
   value: string;
@@ -25,16 +27,9 @@ export function RadioGroup({
   hint,
   error,
   card = false,
-}: {
-  label: string;
-  options: RadioOption[];
-  value?: string;
-  onChange?: (value: string) => void;
-  name?: string;
-  hint?: string;
-  error?: string;
-  card?: boolean;
-}) {
+  readOnly,
+  disabled,
+}: RadioGroupProps) {
   const id = useId(),
     groupName = name ?? id;
   return (
@@ -43,6 +38,9 @@ export function RadioGroup({
       aria-describedby={
         [hint ? `${id}-hint` : undefined, error ? `${id}-error` : undefined].filter(Boolean).join(" ") || undefined
       }
+      role="radiogroup"
+      aria-readonly={readOnly || undefined}
+      disabled={disabled}
       aria-invalid={error ? true : undefined}
     >
       <legend className="ts-field__label">{label}</legend>
@@ -66,8 +64,16 @@ export function RadioGroup({
               name={groupName}
               value={o.value}
               checked={value === undefined ? undefined : value === o.value}
-              disabled={o.disabled}
-              onChange={() => onChange?.(o.value)}
+              disabled={disabled || o.disabled}
+              onClick={(e) => {
+                if (readOnly) e.preventDefault();
+              }}
+              onKeyDown={(e) => {
+                if (readOnly && e.key !== "Tab") e.preventDefault();
+              }}
+              onChange={() => {
+                if (!readOnly) onChange?.(o.value);
+              }}
             />
             <span className="ts-radio-option__content">
               <span>{o.label}</span>

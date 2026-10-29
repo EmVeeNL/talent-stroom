@@ -68,3 +68,24 @@
   border-top: var(--ts-border-width) solid var(--ts-border);
   padding-top: var(--ts-space-2);
 }
+
+.ts-date-range-trigger {
+  width: 100%;
+  justify-content: space-between;
+  text-align: left;
+  font-weight: var(--ts-font-weight-regular);
+}
+.ts-date-range-trigger .ts-button__label {
+  white-space: normal;
+}
+.ts-date-range-trigger[aria-invalid="true"] {
+  border-color: var(--ts-danger-text);
+}
+.ts-date-range-trigger[aria-disabled="true"] {
+  cursor: default;
+  border-style: dashed;
+}
+[data-state="focus"] .ts-date-range-trigger {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: var(--ts-focus-ring-offset);
+}

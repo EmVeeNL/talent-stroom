@@ -5,9 +5,10 @@ export interface SwitchProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
   label: string;
   description?: string;
   checked: boolean;
+  readOnly?: boolean;
   onChange: (checked: boolean) => void;
 }
-export function Switch({ label, description, checked, onChange, id, className, ...rest }: SwitchProps) {
+export function Switch({ label, description, checked, onChange, readOnly, id, className, ...rest }: SwitchProps) {
   const uid = useId(),
     cid = id ?? uid,
     did = description ? `${cid}-description` : undefined;
@@ -19,9 +20,12 @@ export function Switch({ label, description, checked, onChange, id, className, .
         type="button"
         role="switch"
         aria-checked={checked}
+        aria-readonly={readOnly || undefined}
         aria-describedby={did}
         className="ts-switch__control"
-        onClick={() => onChange(!checked)}
+        onClick={() => {
+          if (!readOnly) onChange(!checked);
+        }}
       >
         <span className="ts-switch__track" aria-hidden="true">
           <span />
