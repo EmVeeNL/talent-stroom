@@ -1,0 +1,175 @@
+{
+  "screens": [
+    {
+      "name": "login",
+      "original_size": [
+        1672,
+        941
+      ],
+      "export_size": [
+        3344,
+        1882
+      ],
+      "generated_mockup": true,
+      "retina_upscale": true
+    },
+    {
+      "name": "dashboard_light",
+      "original_size": [
+        1672,
+        941
+      ],
+      "export_size": [
+        3344,
+        1882
+      ],
+      "generated_mockup": true,
+      "retina_upscale": true
+    },
+    {
+      "name": "dashboard_dark",
+      "original_size": [
+        1536,
+        1024
+      ],
+      "export_size": [
+        3072,
+        2048
+      ],
+      "generated_mockup": true,
+      "retina_upscale": true
+    },
+    {
+      "name": "design_kit_dark_menu",
+      "original_size": [
+        1536,
+        1024
+      ],
+      "export_size": [
+        3072,
+        2048
+      ],
+      "generated_mockup": true,
+      "retina_upscale": true
+    },
+    {
+      "name": "design_kit_light",
+      "original_size": [
+        1536,
+        1024
+      ],
+      "export_size": [
+        3072,
+        2048
+      ],
+      "generated_mockup": true,
+      "retina_upscale": true
+    },
+    {
+      "name": "foundation_concept",
+      "original_size": [
+        1536,
+        1024
+      ],
+      "export_size": [
+        3072,
+        2048
+      ],
+      "generated_mockup": true,
+      "retina_upscale": true
+    },
+    {
+      "name": "candidate_list",
+      "original_size": [
+        1062,
+        666
+      ],
+      "export_size": [
+        2124,
+        1332
+      ],
+      "generated_mockup": true,
+      "retina_upscale": true
+    },
+    {
+      "name": "candidate_profile",
+      "original_size": [
+        972,
+        666
+      ],
+      "export_size": [
+        1944,
+        1332
+      ],
+      "generated_mockup": true,
+      "retina_upscale": true
+    },
+    {
+      "name": "vacancy_pipeline",
+      "original_size": [
+        1894,
+        792
+      ],
+      "export_size": [
+        3788,
+        1584
+      ],
+      "generated_mockup": true,
+      "retina_upscale": true
+    },
+    {
+      "name": "vacancy_detail",
+      "original_size": [
+        986,
+        666
+      ],
+      "export_size": [
+        1972,
+        1332
+      ],
+      "generated_mockup": true,
+      "retina_upscale": true
+    },
+    {
+      "name": "clients",
+      "original_size": [
+        1062,
+        544
+      ],
+      "export_size": [
+        2124,
+        1088
+      ],
+      "generated_mockup": true,
+      "retina_upscale": true
+    },
+    {
+      "name": "tasks",
+      "original_size": [
+        972,
+        544
+      ],
+      "export_size": [
+        1944,
+        1088
+      ],
+      "generated_mockup": true,
+      "retina_upscale": true
+    },
+    {
+      "name": "client_portal",
+      "original_size": [
+        986,
+        544
+      ],
+      "export_size": [
+        1972,
+        1088
+      ],
+      "generated_mockup": true,
+      "retina_upscale": true
+    }
+  ],
+  "component_boards": 8,
+  "image_notes": "component sheets generated as vector and rasterized 2x; screens are raster 2x upscaled reference mockups"
+}

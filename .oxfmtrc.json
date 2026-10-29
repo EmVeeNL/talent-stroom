@@ -5,7 +5,9 @@
   "astro": {},
   "associations": [
     {
-      "files": ["*.astro"],
+      "files": [
+        "*.astro"
+      ],
       "language": "astro"
     }
   ],
@@ -20,6 +22,7 @@
     "docs/flows",
     "docs/images",
     "docs/logo",
-    "docs/architecture"
+    "docs/architecture",
+    "docs/images/redesign"
   ]
 }
