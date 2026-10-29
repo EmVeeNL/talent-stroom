@@ -1,0 +1,63 @@
+{
+  "typography": {
+    "family": "Asap Sharp",
+    "weights": [
+      400,
+      500,
+      600,
+      700
+    ],
+    "fontSizePx": {
+      "xs": 12,
+      "sm": 14,
+      "base": 16,
+      "lg": 18,
+      "xl": 20,
+      "2xl": 24,
+      "3xl": 30,
+      "4xl": 36
+    }
+  },
+  "spacingPx": [
+    0,
+    2,
+    4,
+    8,
+    12,
+    16,
+    20,
+    24,
+    32,
+    40,
+    48,
+    64,
+    80
+  ],
+  "radiusPx": {
+    "sm": 6,
+    "md": 10,
+    "lg": 14,
+    "xl": 20,
+    "full": 9999
+  },
+  "iconography": {
+    "library": "Material Symbols Rounded",
+    "sizesPx": [
+      16,
+      20,
+      24,
+      32
+    ],
+    "defaultSizePx": 20
+  },
+  "borderPx": {
+    "default": 1,
+    "focus": 2
+  },
+  "breakpointsPx": {
+    "mobile": 390,
+    "tablet": 768,
+    "desktop": 1024,
+    "wide": 1440
+  }
+}

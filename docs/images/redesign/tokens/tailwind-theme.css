@@ -1,0 +1,48 @@
+@import "tailwindcss";
+/* Import Asap Sharp and Material Symbols from the application's installed font configuration. */
+@theme inline {
+  --font-sans: "Asap Sharp", sans-serif;
+  --color-canvas: var(--ts-background);
+  --color-panel: var(--ts-surface);
+  --color-panel-muted: var(--ts-surface-subtle);
+  --color-ink: var(--ts-text);
+  --color-ink-muted: var(--ts-text-muted);
+  --color-line: var(--ts-border);
+  --color-brand: var(--ts-primary);
+  --color-brand-contrast: var(--ts-primary-foreground);
+  --color-positive: var(--ts-success);
+  --color-caution: var(--ts-warning);
+  --color-negative: var(--ts-danger);
+  --radius-card: 0.875rem;
+}
+:root {
+  --ts-background: #F5F7FB;
+  --ts-surface: #FFFFFF;
+  --ts-surface-subtle: #EDF2F9;
+  --ts-text: #102038;
+  --ts-text-muted: #61718A;
+  --ts-border: #D8E2EF;
+  --ts-primary: #245BF4;
+  --ts-primary-foreground: #FFFFFF;
+  --ts-success: #22BE9C;
+  --ts-warning: #EBA43E;
+  --ts-danger: #DB3348;
+  --ts-focus: #245BF4;
+  color-scheme: light;
+}
+[data-theme="dark"] {
+  --ts-background: #081727;
+  --ts-surface: #10243B;
+  --ts-surface-subtle: #183049;
+  --ts-text: #F3F7FC;
+  --ts-text-muted: #A2B5CA;
+  --ts-border: #30475D;
+  --ts-primary: #4E82FF;
+  --ts-primary-foreground: #FFFFFF;
+  --ts-success: #43DDB6;
+  --ts-warning: #FFBB5A;
+  --ts-danger: #FF6575;
+  --ts-focus: #82AEFF;
+  color-scheme: dark;
+}
+.material-symbols-rounded { font-family: "Material Symbols Rounded"; font-weight: normal; font-style: normal; font-size: 20px; line-height: 1; font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 20; font-feature-settings: "liga"; -webkit-font-smoothing: antialiased; }
