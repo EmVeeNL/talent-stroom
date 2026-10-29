@@ -72,3 +72,62 @@ jobs:
             echo "::error::apps/api/openapi.json is stale. Run 'pnpm --filter @talentstroom/api openapi' and commit."
             exit 1
           }
+
+  database:
+    name: database
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        # Same image as compose.yaml. Throwaway password for this ephemeral container only.
+        image: postgres:18.6-alpine@sha256:a1d02e4bd40c94d3bf2bdd3678c137388e76d9efcd23c285e9429d336a834b44
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres_local_dev_only
+          POSTGRES_DB: talentstroom
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d talentstroom"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 30
+    env:
+      DATABASE_MIGRATION_URL: postgres://postgres:postgres_local_dev_only@127.0.0.1:5432/talentstroom
+      DATABASE_TEST_URL: postgres://postgres:postgres_local_dev_only@127.0.0.1:5432/talentstroom
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable pnpm via Corepack
+        run: corepack enable pnpm
+
+      - name: Locate pnpm store
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-store-${{ runner.os }}-
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Migrate
+        run: pnpm db:migrate
+
+      - name: Migrate again (must be a no-op)
+        run: pnpm db:migrate | tee migrate-again.log && grep -q "^0 migration(s) applied" migrate-again.log
+
+      - name: Set local throwaway passwords
+        run: pnpm db:dev-passwords
+
+      - name: Database integration tests
+        run: pnpm --filter @talentstroom/database test

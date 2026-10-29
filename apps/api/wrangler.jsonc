@@ -11,6 +11,15 @@
     "logs": { "enabled": true, "head_sampling_rate": 1 },
     "traces": { "enabled": true, "head_sampling_rate": 0.1 },
   },
+  // Neon Postgres via Hyperdrive, caching disabled (docs/adr/0007-database-neon-hyperdrive.md).
+  // Local dev: no localConnectionString here; set
+  // CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE (see apps/api/.env.example).
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "ecb0b75f1af74a0eb91784d7bea6ec39",
+    },
+  ],
   "vars": {
     "SERVICE_NAME": "api",
     "ENVIRONMENT": "development",

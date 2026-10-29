@@ -5,7 +5,35 @@ import { app, createApp, openapiConfig } from "./app.ts";
 import { version } from "../package.json";
 import committedDocument from "../openapi.json";
 
-const env: Env = { SERVICE_NAME: "api", ENVIRONMENT: "development" };
+// These routes never touch the database; any use of the binding fails the test loudly.
+const unavailable = (): never => {
+  throw new Error("HYPERDRIVE is not available in unit tests");
+};
+const hyperdrive: Hyperdrive = {
+  connect: unavailable,
+  get connectionString() {
+    return unavailable();
+  },
+  get host() {
+    return unavailable();
+  },
+  get ip() {
+    return unavailable();
+  },
+  get port() {
+    return unavailable();
+  },
+  get user() {
+    return unavailable();
+  },
+  get password() {
+    return unavailable();
+  },
+  get database() {
+    return unavailable();
+  },
+};
+const env: Env = { SERVICE_NAME: "api", ENVIRONMENT: "development", HYPERDRIVE: hyperdrive };
 
 function testApp() {
   const test = createApp();

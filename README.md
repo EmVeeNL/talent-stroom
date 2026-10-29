@@ -17,6 +17,19 @@ pnpm check   # format, lint, typecheck, test
 
 The API runs locally in the Workers runtime (workerd/Miniflare) via `wrangler dev`; no Cloudflare account is needed for local development.
 
+## Local development
+
+The API talks to Postgres through a Hyperdrive binding; locally that is Postgres 18 in Docker, plus Mailpit for development email. Requires Docker.
+
+```sh
+pnpm db:reset                          # Postgres 127.0.0.1:5432 + Mailpit (SMTP :1025, UI http://127.0.0.1:8025), migrated
+cp .env.example .env                   # local DATABASE_MIGRATION_URL / DATABASE_TEST_URL
+cp apps/api/.env.example apps/api/.env # wrangler dev needs the local Hyperdrive connection string
+pnpm dev
+```
+
+`pnpm db:up` / `db:down` start and stop the containers, `pnpm db:migrate` applies new migrations. All credentials in these files are throwaway values for the local container only. Details, role model and running against Neon: [`packages/database/README.md`](packages/database/README.md).
+
 ## Documentation
 
 - Product and architecture: [`docs/architecture/README.md`](docs/architecture/README.md)
