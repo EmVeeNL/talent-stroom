@@ -10,5 +10,3 @@ dist/
 .dev.vars
 *.log
 
-# Design kit PNG originals (36 MB): previews live in docs/images/redesign/previews
-docs/images/redesign/images/
