@@ -38,9 +38,9 @@ Mail: point local SMTP at `127.0.0.1:1025` (any credentials accepted) and read m
 | `ts_owner`    | no    | owns schemas `app`, `auth` and every object in them                                       | nobody; the migrator `SET ROLE`s to it         |
 | `ts_migrator` | yes   | `CREATEROLE`, `CREATE` on the database, `SET` membership in `ts_owner`                    | migrations on Neon (CI, direct endpoint)       |
 | `ts_app`      | yes   | `USAGE` on `app`; `SELECT/INSERT/UPDATE/DELETE` on its tables, `EXECUTE` on its functions | API Worker via Hyperdrive binding `HYPERDRIVE` |
-| `ts_auth`     | yes   | the same, on the `auth` schema only                                                       | Better Auth via `HYPERDRIVE_AUTH` (ADR 0006)   |
+| `ts_auth`     | yes   | the same on `auth`; on `app` only the three identity tables listed below                  | Better Auth via `HYPERDRIVE_AUTH` (ADR 0006)   |
 
-- `ts_app` and `ts_auth` are `NOSUPERUSER NOBYPASSRLS NOCREATEROLE NOCREATEDB NOINHERIT`, members of no role, own no relation, cannot `SET ROLE ts_owner`, cannot create objects, cannot `TRUNCATE`, and cannot disable or un-force RLS (only the owner can). `ts_app` has no access to `auth`; `ts_auth` none to `app`. Tests: `test/roles.integration.test.ts`.
+- `ts_app` and `ts_auth` are `NOSUPERUSER NOBYPASSRLS NOCREATEROLE NOCREATEDB NOINHERIT`, members of no role, own no relation, cannot `SET ROLE ts_owner`, cannot create objects, cannot `TRUNCATE`, and cannot disable or un-force RLS (only the owner can). `ts_app` has no access to `auth`; `ts_auth` none to `app` domain tables. Tests: `test/roles.integration.test.ts`, `test/identity.integration.test.ts`.
 - Grants come from default privileges set by `0001_roles.sql` for objects that `ts_owner` creates, so every new migration must start with `SET LOCAL ROLE ts_owner;`. `EXECUTE` on new functions is revoked from `PUBLIC`.
 - Role-level limits for both runtime roles: `statement_timeout 15s`, `lock_timeout 5s`, `idle_in_transaction_session_timeout 15s`.
 - Locally the container superuser `postgres` is the migrator. Never point the API at it: a superuser bypasses RLS.
@@ -107,6 +107,28 @@ commit/rollback, audit context, RLS write rejection and callback write rollback.
 role restrictions (including no RLS bypass or `SET ROLE`) remain covered by
 `test/roles.integration.test.ts`. Local tests do not prove deployed Hyperdrive behavior;
 the Neon/Hyperdrive acceptance run from ADR 0007 remains a deployment/CI follow-up.
+
+## Tables and access
+
+Identity and tenancy (`0003_identity.sql`, [ADR 0012](../../docs/adr/0012-identity-schema-placement.md)). Credentials and global identity live in `auth`; the tenant root and tenant-scoped identity rows that domain tables reference live in `app`. RLS is enabled and forced on every table below; a role without a policy sees no rows.
+
+| Schema | Table                      | Purpose                                                           | `ts_auth`                    | `ts_app`                        |
+| ------ | -------------------------- | ----------------------------------------------------------------- | ---------------------------- | ------------------------------- |
+| `auth` | `users`                    | people (Better Auth `user`); unique `lower(email)`                | DML                          | none                            |
+| `auth` | `sessions`                 | unique `token`, `active_organization_id`, idle-lock columns       | DML                          | none                            |
+| `auth` | `auth_accounts`            | password hash, OAuth accounts; unique `(provider_id, account_id)` | DML                          | none                            |
+| `auth` | `auth_verifications`       | email verification, reset, OAuth state (hashed identifier)        | DML                          | none                            |
+| `auth` | `auth_passkeys`            | WebAuthn credentials                                              | DML                          | none                            |
+| `auth` | `auth_two_factors`         | encrypted TOTP secret and backup codes                            | DML                          | none                            |
+| `auth` | `auth_rate_limits`         | Better Auth rate limiter                                          | DML                          | none                            |
+| `auth` | `auth_security_events`     | ours, append-only                                                 | `SELECT`, `INSERT`           | none                            |
+| `app`  | `organizations`            | tenant root (Better Auth `organization` + our columns)            | `SELECT`, `INSERT`, `UPDATE` | `SELECT` own organization (RLS) |
+| `app`  | `memberships`              | Better Auth `member`; suspended, never deleted                    | `SELECT`, `INSERT`, `UPDATE` | `SELECT` own organization (RLS) |
+| `app`  | `organization_invitations` | Better Auth `invitation`                                          | `SELECT`, `INSERT`, `UPDATE` | none                            |
+| `app`  | domain tables (later)      | tenant data                                                       | none                         | DML under tenant RLS            |
+
+- Domain tables reference the tenant as `organization_id REFERENCES app.organizations (id)` and people as `FOREIGN KEY (organization_id, <x>_membership_id) REFERENCES app.memberships (organization_id, id)`, never `auth.*`.
+- New `app` tables get `ts_app` DML from default privileges and nothing for `ts_auth`; new `auth` tables get `ts_auth` DML and nothing for `ts_app`. Narrow these in the migration when a table needs less (as `0003` does).
 
 ## Writing migrations
 

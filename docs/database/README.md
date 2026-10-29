@@ -7,10 +7,10 @@
 > | `users` | `users` | `auth` (Better Auth) |
 > | `auth_identities` | `auth_accounts` | `auth` |
 > | — | `sessions`, `auth_verifications`, `auth_passkeys`, `auth_two_factors`, `auth_rate_limits` | `auth` |
-> | `organizations` | `organizations` | Better Auth model; `auth` or `app`, decided in #55 |
-> | `memberships` | `memberships` | Better Auth model; `auth` or `app`, decided in #55 |
-> | — (spec: `organization_invitations`) | `organization_invitations` | Better Auth model; decided in #55 |
-> | `auth_security_events` | `auth_security_events` | ours; decided in #55 |
+> | `organizations` | `organizations` | `app` (Better Auth model via `modelName: "app.organizations"`, [ADR 0012](../adr/0012-identity-schema-placement.md)) |
+> | `memberships` | `memberships` | `app` (Better Auth model, ADR 0012) |
+> | — (spec: `organization_invitations`) | `organization_invitations` | `app` (Better Auth model, ADR 0012) |
+> | `auth_security_events` | `auth_security_events` | `auth` (ours, append-only, ADR 0012) |
 > | `module_revisions` (spec) | `module_versions` (SQL baseline) | to be decided in #55 |
 
 **Format:** executable PostgreSQL SQL (canonical), plus Markdown explanations. This is a strong **architecture baseline**, not a finished audited production deployment. SQL migrations must be reviewed and exercised in a disposable Neon branch before use.
