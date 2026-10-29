@@ -1,0 +1,47 @@
+.ts-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--ts-space-3);
+  padding: var(--ts-space-3);
+  border-radius: var(--ts-radius-md);
+  box-shadow: var(--ts-shadow-md);
+  animation: ts-toast-in var(--ts-duration-base) ease-out;
+}
+.ts-toast__message {
+  display: flex;
+  align-items: center;
+  gap: var(--ts-space-3);
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+@keyframes ts-toast-in {
+  from {
+    transform: translateY(var(--ts-space-2));
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ts-toast {
+    animation: none;
+  }
+}
+.ts-toast--info {
+  background: var(--ts-info-subtle);
+  color: var(--ts-info-text);
+}
+.ts-toast--success {
+  background: var(--ts-success-subtle);
+  color: var(--ts-success-text);
+}
+.ts-toast--warning {
+  background: var(--ts-warning-subtle);
+  color: var(--ts-warning-text);
+}
+.ts-toast--danger {
+  background: var(--ts-danger-subtle);
+  color: var(--ts-danger-text);
+}

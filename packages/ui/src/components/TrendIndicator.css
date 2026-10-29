@@ -1,0 +1,18 @@
+.ts-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ts-space-1);
+  font-size: var(--ts-font-size-sm);
+}
+.ts-trend--success {
+  color: var(--ts-success-text);
+  background: var(--ts-success-subtle);
+}
+.ts-trend--danger {
+  color: var(--ts-danger-text);
+  background: var(--ts-danger-subtle);
+}
+.ts-trend--neutral {
+  color: var(--ts-neutral-text);
+  background: var(--ts-neutral-subtle);
+}

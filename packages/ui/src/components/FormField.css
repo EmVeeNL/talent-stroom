@@ -1,0 +1,5 @@
+.ts-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ts-space-1);
+}

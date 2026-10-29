@@ -1,0 +1,31 @@
+.ts-activity-feed {
+  max-height: 24rem;
+  overflow: auto;
+  width: 100%;
+}
+.ts-activity-feed ol {
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--ts-space-1);
+}
+.ts-activity-feed li {
+  display: flex;
+  gap: var(--ts-space-3);
+  padding-block: var(--ts-space-4);
+  border-bottom: 1px solid var(--ts-border);
+}
+.ts-activity-feed li:last-child {
+  border: 0;
+}
+.ts-activity-feed p {
+  margin: 0 0 var(--ts-space-1);
+  font-size: var(--ts-font-size-sm);
+}
+.ts-activity-feed time {
+  color: var(--ts-text-muted);
+  font-size: var(--ts-font-size-xs);
+}
+.ts-activity-feed:focus-visible {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: calc(-1 * var(--ts-focus-ring-offset));
+}

@@ -1,0 +1,14 @@
+.ts-choice-group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ts-space-2);
+}
+.ts-choice-group__items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ts-space-3);
+}

@@ -1,0 +1,26 @@
+.ts-search {
+  min-width: 0;
+}
+.ts-search__control {
+  display: flex;
+  align-items: center;
+  gap: var(--ts-space-2);
+  position: relative;
+}
+.ts-search__control > .ts-icon {
+  position: absolute;
+  left: var(--ts-space-3);
+  color: var(--ts-text-muted);
+  pointer-events: none;
+}
+.ts-search__control > input {
+  padding-inline: var(--ts-space-10) var(--ts-space-12);
+  min-width: 0;
+}
+.ts-search__control > button {
+  position: absolute;
+  right: var(--ts-space-1);
+}
+.ts-search input::-webkit-search-cancel-button {
+  appearance: none;
+}

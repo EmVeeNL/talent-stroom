@@ -1,0 +1,42 @@
+import { useId, useRef, useEffect } from "react";
+import type { InputHTMLAttributes, Ref } from "react";
+import { cx } from "../classnames.ts";
+export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
+  label: string;
+  description?: string;
+  indeterminate?: boolean;
+  ref?: Ref<HTMLInputElement>;
+}
+export function Checkbox({ label, description, indeterminate, id, className, ref, ...rest }: CheckboxProps) {
+  const uid = useId(),
+    cid = id ?? uid,
+    did = description ? `${cid}-description` : undefined,
+    local = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (local.current) local.current.indeterminate = Boolean(indeterminate);
+  }, [indeterminate]);
+  return (
+    <label className={cx("ts-check", className)}>
+      <input
+        {...rest}
+        ref={(node) => {
+          local.current = node;
+          if (typeof ref === "function") ref(node);
+          else if (ref) ref.current = node;
+        }}
+        type="checkbox"
+        id={cid}
+        aria-describedby={[rest["aria-describedby"], did].filter(Boolean).join(" ") || undefined}
+      />
+      <span className="ts-check__visual" aria-hidden="true" />
+      <span>
+        <span className="ts-check__label">{label}</span>
+        {description && (
+          <span className="ts-field__hint" id={did}>
+            {description}
+          </span>
+        )}
+      </span>
+    </label>
+  );
+}

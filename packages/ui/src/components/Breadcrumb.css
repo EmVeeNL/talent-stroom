@@ -1,0 +1,22 @@
+.ts-breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ts-space-2);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.ts-breadcrumb li {
+  display: flex;
+  gap: var(--ts-space-2);
+  align-items: center;
+}
+.ts-breadcrumb a {
+  color: var(--ts-primary-text);
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+}
+.ts-breadcrumb [aria-current] {
+  color: var(--ts-text-muted);
+}

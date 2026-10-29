@@ -2,7 +2,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { contrastRatio } from "./contrast.ts";
-import { cssVariables } from "./tokens.ts";
+import { cssVariables, darkCssVariables } from "./tokens.ts";
 
 const css = readFileSync(new URL("./tokens.css", import.meta.url), "utf8");
 const rootBlock = /:root\s*\{([\s\S]*?)\n\}/.exec(css)?.[1] ?? "";
@@ -49,6 +49,8 @@ const pairs: [keyof typeof cssVariables, keyof typeof cssVariables, number][] = 
   ["--ts-sidebar-accent", "--ts-sidebar-bg", 3],
   // UI components and focus indicators (3:1)
   ["--ts-border-strong", "--ts-surface", 3],
+  ["--ts-border-strong", "--ts-surface-muted", 3],
+  ["--ts-border-strong", "--ts-bg", 3],
   ["--ts-danger", "--ts-surface", 3],
   ["--ts-success", "--ts-surface", 3],
   ["--ts-warning", "--ts-surface", 3],
@@ -58,8 +60,20 @@ const pairs: [keyof typeof cssVariables, keyof typeof cssVariables, number][] = 
 ];
 
 describe("WCAG 2.2 AA contrast", () => {
-  it.each(pairs)("%s on %s is at least %s:1", (foreground, background, minimum) => {
-    expect(contrastRatio(v(foreground), v(background))).toBeGreaterThanOrEqual(minimum);
+  for (const [theme, variables] of Object.entries({ light: cssVariables, dark: darkCssVariables })) {
+    it.each(pairs)(`${theme}: %s on %s is at least %s:1`, (foreground, background, minimum) => {
+      expect(contrastRatio(variables[foreground], variables[background])).toBeGreaterThanOrEqual(minimum);
+    });
+  }
+  it("mirrors dark overrides in both CSS selectors", () => {
+    const blocks = [...css.matchAll(/color-scheme: dark;([\s\S]*?)\}/g)];
+    expect(blocks).toHaveLength(2);
+    for (const block of blocks) {
+      const overrides = Object.fromEntries(
+        [...(block[1] ?? "").matchAll(/(--[\w-]+):\s*(.+);/g)].map((m) => [m[1], m[2]]),
+      );
+      expect({ ...cssVariables, ...overrides }).toEqual(darkCssVariables);
+    }
   });
 
   it("documents why the source muted text colour was darkened", () => {

@@ -1,0 +1,49 @@
+.ts-progress {
+  width: 100%;
+  min-width: min(100%, 12rem);
+  --ts-progress-color: var(--ts-primary);
+}
+.ts-progress--success {
+  --ts-progress-color: var(--ts-success);
+}
+.ts-progress--warning {
+  --ts-progress-color: var(--ts-warning);
+}
+.ts-progress--danger {
+  --ts-progress-color: var(--ts-danger);
+}
+.ts-progress--neutral {
+  --ts-progress-color: var(--ts-text-muted);
+}
+.ts-progress__label {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ts-space-3);
+  font-size: var(--ts-font-size-sm);
+  margin-bottom: var(--ts-space-2);
+  font-variant-numeric: tabular-nums;
+}
+.ts-progress__track {
+  overflow: hidden;
+  height: var(--ts-space-2);
+  border-radius: var(--ts-radius-full);
+  background: var(--ts-surface-muted);
+}
+.ts-progress__fill {
+  display: block;
+  height: 100%;
+  background: var(--ts-progress-color);
+}
+.ts-progress--indeterminate .ts-progress__fill {
+  animation: ts-progress-slide 1.8s ease-in-out infinite alternate;
+}
+@keyframes ts-progress-slide {
+  to {
+    transform: translateX(185%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ts-progress--indeterminate .ts-progress__fill {
+    animation: none;
+  }
+}

@@ -1,0 +1,12 @@
+.ts-hover-card {
+  position: fixed;
+  z-index: 30;
+  width: 20rem;
+  max-width: calc(100vw - 16px);
+  box-sizing: border-box;
+  padding: var(--ts-space-4);
+  border-radius: var(--ts-radius-md);
+  background: var(--ts-surface);
+  color: var(--ts-text);
+  box-shadow: var(--ts-shadow-lg);
+}

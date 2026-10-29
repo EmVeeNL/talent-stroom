@@ -1,0 +1,18 @@
+.ts-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ts-space-2);
+}
+.ts-chart-legend .ts-button__label {
+  display: flex;
+  align-items: center;
+  gap: var(--ts-space-2);
+}
+.ts-chart-legend [aria-pressed="false"] {
+  text-decoration: line-through;
+  border-color: var(--ts-border-strong);
+}
+.ts-chart-legend [aria-pressed="true"] {
+  background: var(--ts-primary-subtle);
+  color: var(--ts-primary-text);
+}

@@ -1,0 +1,29 @@
+.ts-alert-banner {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--ts-space-3);
+  width: 100%;
+  padding: var(--ts-space-4);
+  border-radius: var(--ts-radius-md);
+}
+.ts-alert-banner__text {
+  flex: 1;
+  min-width: 0;
+}
+.ts-alert-banner--info {
+  background: var(--ts-info-subtle);
+  color: var(--ts-info-text);
+}
+.ts-alert-banner--success {
+  background: var(--ts-success-subtle);
+  color: var(--ts-success-text);
+}
+.ts-alert-banner--warning {
+  background: var(--ts-warning-subtle);
+  color: var(--ts-warning-text);
+}
+.ts-alert-banner--danger {
+  background: var(--ts-danger-subtle);
+  color: var(--ts-danger-text);
+}

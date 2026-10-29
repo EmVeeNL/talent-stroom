@@ -1,0 +1,67 @@
+.ts-chart {
+  width: 100%;
+  min-width: 0;
+}
+.ts-chart__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.ts-chart__label,
+.ts-chart__grid text {
+  fill: var(--ts-text);
+  font: var(--ts-font-size-xs) var(--font-ui);
+}
+.ts-chart__grid line {
+  stroke: var(--ts-border-strong);
+  stroke-dasharray: 2 4;
+}
+.ts-chart__grid text {
+  fill: var(--ts-text-muted);
+}
+.ts-chart__mark {
+  cursor: help;
+  outline: none;
+}
+.ts-chart__mark:focus-visible > :last-child {
+  stroke: var(--ts-focus-ring-color);
+  stroke-width: 4px;
+  stroke-dasharray: 2 2;
+}
+.ts-chart__tooltip rect {
+  fill: var(--ts-surface);
+  stroke: var(--ts-border-strong);
+}
+.ts-chart__tooltip text {
+  fill: var(--ts-text);
+  font: var(--ts-font-size-xs) var(--font-ui);
+}
+.ts-chart__data {
+  font-size: var(--ts-font-size-sm);
+  margin-top: var(--ts-space-3);
+}
+.ts-chart__data summary {
+  min-height: 32px;
+  padding: var(--ts-space-2);
+  cursor: pointer;
+  color: var(--ts-primary-text);
+}
+.ts-chart__data summary:focus-visible {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: var(--ts-focus-ring-offset);
+}
+.ts-chart__table {
+  overflow: auto;
+}
+.ts-chart__table table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+.ts-chart__table th,
+.ts-chart__table td {
+  padding: var(--ts-space-2);
+  border-bottom: 1px solid var(--ts-border);
+}

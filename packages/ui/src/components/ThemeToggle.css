@@ -1,0 +1,19 @@
+.ts-theme-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ts-space-3);
+  border: 1px solid var(--ts-border-strong);
+  border-radius: var(--ts-radius-md);
+  padding: var(--ts-space-2) var(--ts-space-3);
+  font-size: var(--ts-font-size-sm);
+}
+.ts-theme-toggle label {
+  display: flex;
+  align-items: center;
+  gap: var(--ts-space-1);
+  min-height: 32px;
+  cursor: pointer;
+}
+.ts-theme-toggle input {
+  accent-color: var(--ts-primary);
+}

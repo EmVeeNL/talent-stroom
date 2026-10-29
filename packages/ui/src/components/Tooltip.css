@@ -1,0 +1,14 @@
+.ts-preview-anchor {
+  display: inline-flex;
+}
+.ts-tooltip {
+  position: fixed;
+  z-index: 30;
+  max-width: min(24rem, calc(100vw - 16px));
+  padding: var(--ts-space-2) var(--ts-space-3);
+  background: var(--ts-text);
+  color: var(--ts-surface);
+  border-radius: var(--ts-radius-sm);
+  font-size: var(--ts-font-size-sm);
+  box-shadow: var(--ts-shadow-md);
+}
