@@ -45,6 +45,28 @@ pnpm --filter @talentstroom/api cf-typegen   # after changing wrangler.jsonc
 9. Don't hand-write the Workers `Env` type; run `wrangler types`.
 10. Keep the working set small (≈5–15 files per task). Report uncertainty and security implications in the PR.
 
+## Parallel work with worktrees
+
+One task = one worktree = one branch = one PR. Worktrees live outside the repo in `../talentstroom-worktrees/`.
+
+```sh
+scripts/worktree.sh new <slug> <branch>              # from origin/main, deps installed
+scripts/worktree.sh codex <slug> <model> <prompt>    # run Codex inside the worktree
+scripts/worktree.sh list                             # worktrees with PR state
+scripts/worktree.sh clean                            # remove worktrees whose PR is merged/closed
+```
+
+Agents working in a worktree edit and test only; they do not commit, push or open PRs. The orchestrator reviews the diff, commits and opens the PR.
+
+| Task type                                                    | Agent and model     |
+| ------------------------------------------------------------ | ------------------- |
+| Security-critical design (auth, crypto, tenancy), ADR spikes | Claude Opus         |
+| Research or moderate-risk ADRs, reviews                      | Claude Sonnet       |
+| Bounded implementation in a known module                     | Codex `gpt-6.1-sol` |
+| Small, mechanical changes (config, docs, i18n)               | Codex `gpt-6-luna`  |
+
+Escalate to a stronger model only when the result fails review; record notable outcomes in `docs/architecture/engineering/model-evaluation-ledger.md`.
+
 ## Workflow
 
 - Issues use the forms in `.github/ISSUE_TEMPLATE/`; backlog: https://github.com/users/EmVeeNL/projects/10
