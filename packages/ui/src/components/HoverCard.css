@@ -6,7 +6,7 @@
   box-sizing: border-box;
   padding: var(--ts-space-4);
   border-radius: var(--ts-radius-md);
-  background: var(--ts-surface);
+  background: var(--ts-surface-raised);
   color: var(--ts-text);
-  box-shadow: var(--ts-shadow-lg);
+  box-shadow: var(--ts-shadow-popover);
 }

@@ -12,7 +12,7 @@
   display: flex;
   gap: var(--ts-space-3);
   padding-block: var(--ts-space-4);
-  border-bottom: 1px solid var(--ts-border);
+  border-bottom: var(--ts-border-width) solid var(--ts-border);
 }
 .ts-activity-feed li:last-child {
   border: 0;

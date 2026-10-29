@@ -4,7 +4,7 @@
   gap: var(--ts-space-3);
   padding: var(--ts-space-3);
   border-radius: var(--ts-radius-md);
-  box-shadow: var(--ts-shadow-md);
+  box-shadow: var(--ts-shadow-popover);
   animation: ts-toast-in var(--ts-duration-base) ease-out;
 }
 .ts-toast__message {

@@ -34,7 +34,7 @@
 .ts-date-range td button {
   width: 100%;
   min-height: 36px;
-  border: 1px solid transparent;
+  border: var(--ts-border-width) solid transparent;
   border-radius: var(--ts-radius-sm);
   background: transparent;
   color: var(--ts-text);
@@ -65,6 +65,6 @@
   flex-wrap: wrap;
   gap: var(--ts-space-1);
   margin-top: var(--ts-space-3);
-  border-top: 1px solid var(--ts-border);
+  border-top: var(--ts-border-width) solid var(--ts-border);
   padding-top: var(--ts-space-2);
 }

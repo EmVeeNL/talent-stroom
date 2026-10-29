@@ -16,55 +16,60 @@ describe("tokens.ts and tokens.css", () => {
   });
 });
 
-const v = (name: keyof typeof cssVariables): string => cssVariables[name];
+type Name = keyof typeof cssVariables;
+const v = (name: Name): string => cssVariables[name];
 
-/** [foreground, background, minimum ratio, description]. 4.5 = normal text, 3 = large text and UI components. */
-const pairs: [keyof typeof cssVariables, keyof typeof cssVariables, number][] = [
-  ["--ts-text", "--ts-bg", 4.5],
-  ["--ts-text", "--ts-surface", 4.5],
-  ["--ts-text", "--ts-surface-muted", 4.5],
-  ["--ts-text-muted", "--ts-bg", 4.5],
-  ["--ts-text-muted", "--ts-surface", 4.5],
-  ["--ts-text-muted", "--ts-surface-muted", 4.5],
-  ["--ts-text-on-primary", "--ts-primary", 4.5],
-  ["--ts-text-on-primary", "--ts-primary-hover", 4.5],
-  ["--ts-text-on-danger", "--ts-danger", 4.5],
-  ["--ts-text-on-danger", "--ts-danger-hover", 4.5],
-  ["--ts-primary-text", "--ts-surface", 4.5],
-  ["--ts-primary-text", "--ts-primary-subtle", 4.5],
-  ["--ts-primary", "--ts-surface", 4.5],
-  ["--ts-primary", "--ts-bg", 4.5],
-  ["--ts-danger-text", "--ts-surface", 4.5],
-  ["--ts-danger-text", "--ts-danger-subtle", 4.5],
-  ["--ts-success-text", "--ts-success-subtle", 4.5],
-  ["--ts-success-text", "--ts-surface", 4.5],
-  ["--ts-warning-text", "--ts-warning-subtle", 4.5],
-  ["--ts-warning-text", "--ts-surface", 4.5],
-  ["--ts-info-text", "--ts-info-subtle", 4.5],
-  ["--ts-neutral-text", "--ts-neutral-subtle", 4.5],
-  ["--ts-sidebar-text", "--ts-sidebar-bg", 4.5],
-  ["--ts-sidebar-text", "--ts-sidebar-hover-bg", 4.5],
-  ["--ts-sidebar-text-muted", "--ts-sidebar-bg", 4.5],
-  ["--ts-sidebar-text-active", "--ts-sidebar-active-bg", 4.5],
-  ["--ts-sidebar-accent", "--ts-sidebar-bg", 3],
-  // UI components and focus indicators (3:1)
-  ["--ts-border-strong", "--ts-surface", 3],
-  ["--ts-border-strong", "--ts-surface-muted", 3],
-  ["--ts-border-strong", "--ts-bg", 3],
-  ["--ts-danger", "--ts-surface", 3],
-  ["--ts-success", "--ts-surface", 3],
-  ["--ts-warning", "--ts-surface", 3],
-  ["--ts-focus-ring-color", "--ts-surface", 3],
-  ["--ts-focus-ring-color", "--ts-bg", 3],
-  ["--ts-focus-ring-color-on-dark", "--ts-sidebar-bg", 3],
+const TEXT = 4.5;
+const UI = 3;
+
+/** Every surface a semantic text colour can sit on in the app shell. */
+const surfaces: Name[] = ["--ts-bg", "--ts-surface", "--ts-surface-muted", "--ts-surface-raised"];
+const on = (foreground: Name, backgrounds: Name[], minimum: number): [Name, Name, number][] =>
+  backgrounds.map((background) => [foreground, background, minimum]);
+
+/** [foreground, background, minimum ratio]. 4.5 = normal text, 3 = large text, UI components and focus. */
+const pairs: [Name, Name, number][] = [
+  // Body text
+  ...on("--ts-text", surfaces, TEXT),
+  ...on("--ts-text-muted", surfaces, TEXT),
+  // Text on solid fills
+  ["--ts-text-on-primary", "--ts-primary", TEXT],
+  ["--ts-text-on-primary", "--ts-primary-hover", TEXT],
+  ["--ts-text-on-danger", "--ts-danger", TEXT],
+  ["--ts-text-on-danger", "--ts-danger-hover", TEXT],
+  // Coloured text: on every surface and on its own subtle (label) background
+  ...on("--ts-primary-text", [...surfaces, "--ts-primary-subtle"], TEXT),
+  ...on("--ts-accent-text", [...surfaces, "--ts-accent-subtle"], TEXT),
+  ...on("--ts-success-text", [...surfaces, "--ts-success-subtle"], TEXT),
+  ...on("--ts-warning-text", [...surfaces, "--ts-warning-subtle"], TEXT),
+  ...on("--ts-danger-text", [...surfaces, "--ts-danger-subtle"], TEXT),
+  ...on("--ts-info-text", [...surfaces, "--ts-info-subtle"], TEXT),
+  ...on("--ts-violet-text", [...surfaces, "--ts-violet-subtle"], TEXT),
+  ...on("--ts-neutral-text", [...surfaces, "--ts-neutral-subtle"], TEXT),
+  // Navy sidebar
+  ...on("--ts-sidebar-text", ["--ts-sidebar-bg", "--ts-sidebar-hover-bg"], TEXT),
+  ...on("--ts-sidebar-text-muted", ["--ts-sidebar-bg", "--ts-sidebar-hover-bg"], TEXT),
+  ...on("--ts-sidebar-text-active", ["--ts-sidebar-bg", "--ts-sidebar-active-bg"], TEXT),
+  ["--ts-sidebar-accent", "--ts-sidebar-bg", UI],
+  ...on("--ts-focus-ring-color-on-dark", ["--ts-sidebar-bg", "--ts-sidebar-hover-bg", "--ts-sidebar-active-bg"], UI),
+  // UI components (input boundaries, selected controls, invalid state) and focus indicators
+  ...on("--ts-border-strong", surfaces, UI),
+  // Solid fills as indicators sit on the page or a card; on muted/raised surfaces indicators use the
+  // -text colour, which passes 4.5:1 on every surface (asserted above).
+  ...on("--ts-primary", ["--ts-bg", "--ts-surface"], UI),
+  ...on("--ts-danger", ["--ts-bg", "--ts-surface"], UI),
+  ...on("--ts-focus-ring-color", surfaces, UI),
 ];
 
+const themes = { light: cssVariables, dark: darkCssVariables };
+
 describe("WCAG 2.2 AA contrast", () => {
-  for (const [theme, variables] of Object.entries({ light: cssVariables, dark: darkCssVariables })) {
+  for (const [theme, variables] of Object.entries(themes)) {
     it.each(pairs)(`${theme}: %s on %s is at least %s:1`, (foreground, background, minimum) => {
       expect(contrastRatio(variables[foreground], variables[background])).toBeGreaterThanOrEqual(minimum);
     });
   }
+
   it("mirrors dark overrides in both CSS selectors", () => {
     const blocks = [...css.matchAll(/color-scheme: dark;([\s\S]*?)\}/g)];
     expect(blocks).toHaveLength(2);
@@ -75,9 +80,30 @@ describe("WCAG 2.2 AA contrast", () => {
       expect({ ...cssVariables, ...overrides }).toEqual(darkCssVariables);
     }
   });
+});
 
-  it("documents why the source muted text colour was darkened", () => {
-    // Source token #68748A is 4.40:1 on the #F5F7FB page background, below 4.5:1.
-    expect(contrastRatio("#68748a", v("--ts-bg"))).toBeLessThan(4.5);
+/** Kit values that fail AA for the use the kit shows; each has a passing replacement (ADR 0013). */
+describe("documented deviations from the design kit", () => {
+  it("kit muted text #61718A is below 4.5:1 on the subtle surface, so muted text is darker", () => {
+    expect(contrastRatio("#61718a", v("--ts-surface-muted"))).toBeLessThan(TEXT);
+  });
+
+  it("kit light status fills cannot carry text or meaning on white; -text variants are used instead", () => {
+    for (const fill of ["--ts-success", "--ts-warning", "--ts-accent"] as const) {
+      expect(contrastRatio(v(fill), "#ffffff")).toBeLessThan(UI);
+    }
+  });
+
+  it("kit dark primary #4E82FF fails white button text, so the dark button fill is deeper", () => {
+    expect(contrastRatio("#ffffff", "#4e82ff")).toBeLessThan(TEXT);
+  });
+
+  it("kit dark danger #FF6575 fails white button text, so it is the dark danger text colour", () => {
+    expect(contrastRatio("#ffffff", "#ff6575")).toBeLessThan(TEXT);
+    expect(darkCssVariables["--ts-danger-text"]).toBe("#ff6575");
+  });
+
+  it("kit line colour #D8E2EF is decorative; input boundaries use --ts-border-strong", () => {
+    expect(contrastRatio(v("--ts-border"), v("--ts-surface"))).toBeLessThan(UI);
   });
 });

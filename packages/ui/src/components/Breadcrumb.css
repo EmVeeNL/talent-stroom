@@ -13,7 +13,7 @@
 }
 .ts-breadcrumb a {
   color: var(--ts-primary-text);
-  min-height: 32px;
+  min-height: var(--ts-control-height-sm);
   display: inline-flex;
   align-items: center;
 }

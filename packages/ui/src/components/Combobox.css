@@ -22,7 +22,7 @@
   margin-bottom: var(--ts-space-2);
 }
 .ts-combobox__chips .ts-button {
-  min-height: 32px;
+  min-height: var(--ts-control-height-sm);
   padding: var(--ts-space-1);
 }
 .ts-combobox__popup {
@@ -31,11 +31,11 @@
   width: 100%;
   max-height: 16rem;
   overflow: auto;
-  background: var(--ts-surface);
+  background: var(--ts-surface-raised);
   color: var(--ts-text);
-  border: 1px solid var(--ts-border-strong);
+  border: var(--ts-border-width) solid var(--ts-border-strong);
   border-radius: var(--ts-radius-md);
-  box-shadow: var(--ts-shadow-md);
+  box-shadow: var(--ts-shadow-popover);
 }
 .ts-combobox__popup ul {
   padding: var(--ts-space-1);
@@ -52,7 +52,7 @@
   min-height: 36px;
   align-items: center;
   padding: var(--ts-space-2) var(--ts-space-3);
-  border: 1px solid transparent;
+  border: var(--ts-border-width) solid transparent;
   cursor: pointer;
 }
 .ts-combobox__option--active {

@@ -42,7 +42,7 @@
   margin-top: var(--ts-space-3);
 }
 .ts-chart__data summary {
-  min-height: 32px;
+  min-height: var(--ts-control-height-sm);
   padding: var(--ts-space-2);
   cursor: pointer;
   color: var(--ts-primary-text);
@@ -63,5 +63,5 @@
 .ts-chart__table th,
 .ts-chart__table td {
   padding: var(--ts-space-2);
-  border-bottom: 1px solid var(--ts-border);
+  border-bottom: var(--ts-border-width) solid var(--ts-border);
 }

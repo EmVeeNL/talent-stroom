@@ -13,6 +13,7 @@ export function Gallery() {
   const [locale, setLocale] = useState<Locale>(DEFAULT_LOCALE);
   const [page, setPage] = useState<string>(readPage);
   const tr = (key: MessageKey) => t(locale, key);
+  // Dev-only `?gallery&theme=light|dark` forces a theme for screenshots without persisting it.
   useEffect(() => {
     if (!forcedTheme) return undefined;
     const root = document.documentElement;

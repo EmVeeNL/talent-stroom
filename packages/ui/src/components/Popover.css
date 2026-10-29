@@ -9,11 +9,11 @@
   overflow: auto;
   min-width: min(16rem, calc(100vw - 16px));
   padding: var(--ts-space-4);
-  border: 1px solid var(--ts-border);
+  border: var(--ts-border-width) solid var(--ts-border);
   border-radius: var(--ts-radius-md);
-  background: var(--ts-surface);
+  background: var(--ts-surface-raised);
   color: var(--ts-text);
-  box-shadow: var(--ts-shadow-lg);
+  box-shadow: var(--ts-shadow-popover);
 }
 .ts-popover:focus-visible {
   outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);

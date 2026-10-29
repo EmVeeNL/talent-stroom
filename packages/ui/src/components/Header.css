@@ -3,9 +3,11 @@
   align-items: center;
   flex-wrap: wrap;
   gap: var(--ts-space-4);
-  padding: var(--ts-space-4);
+  box-sizing: border-box;
+  min-height: var(--ts-navbar-height);
+  padding: var(--ts-space-2) var(--ts-space-6);
   background: var(--ts-surface);
-  border-bottom: 1px solid var(--ts-border);
+  border-bottom: var(--ts-border-width) solid var(--ts-border);
 }
 .ts-header__search {
   flex: 1;

@@ -1,4 +1,5 @@
 import type { MessageKey } from "@talentstroom/i18n";
+import { Tokens } from "./Tokens.tsx";
 import { Layout } from "./Layout.tsx";
 import { Metrics } from "./Metrics.tsx";
 import { Charts } from "./Charts.tsx";
@@ -8,6 +9,7 @@ import { Forms } from "./Forms.tsx";
 import { Overlays } from "./Overlays.tsx";
 import { Feedback } from "./Feedback.tsx";
 export const pages = [
+  { id: "tokens", titleKey: "gallery.page.tokens" satisfies MessageKey, Page: Tokens },
   { id: "layout", titleKey: "gallery.page.layout" satisfies MessageKey, Page: Layout },
   { id: "metrics", titleKey: "gallery.page.metrics" satisfies MessageKey, Page: Metrics },
   { id: "charts", titleKey: "gallery.page.charts" satisfies MessageKey, Page: Charts },

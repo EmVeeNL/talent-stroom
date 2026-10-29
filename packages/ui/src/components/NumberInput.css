@@ -3,8 +3,8 @@
 }
 .ts-number button {
   min-width: 40px;
-  min-height: 40px;
-  border: 1px solid var(--ts-border-strong);
+  min-height: var(--ts-control-height-md);
+  border: var(--ts-border-width) solid var(--ts-border-strong);
   background: var(--ts-surface-muted);
   color: var(--ts-text);
   font: inherit;

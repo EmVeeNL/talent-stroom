@@ -18,23 +18,17 @@ The default follows `prefers-color-scheme`. `data-theme="light"` / `"dark"` on t
 
 The dev-only, lazy-loaded gallery lives in `apps/web/src/gallery/`; its ordered page registry drives hash links such as `/?gallery#forms`. The header switches the gallery language and theme. Production builds exclude the gallery module.
 
-- Typography: `--ts-font-size-{xs,sm,md,lg,xl,2xl}` = 12/14/16/20/24/32 px, body line-height 1.5, heading 1.25, weights 400/500/600/700. Font: Asap Sharp (files and `@font-face` are handled separately in `fonts.css`).
-- Spacing: `--ts-space-{1,2,3,4,5,6,8,10,12,16}` on a 4 px base.
-- Radius, shadows (`--ts-shadow-{sm,md,lg}`), focus ring (`--ts-focus-ring-*`), motion durations.
-- Semantic colours: text, muted, border, surface, background, primary, success/warning/danger/info, each with a `-subtle` background and a `-text` colour for status pills.
-- Dark sidebar palette: `--ts-sidebar-*`.
+Values come from the redesign design kit (`docs/images/redesign/`); the kit-to-token mapping and every WCAG 2.2 AA deviation are recorded in [ADR 0013](../../docs/adr/0013-redesign-design-kit.md). The gallery's Tokens page (`/?gallery#tokens`) shows all swatches with hex values and contrast ratios for both themes; add `&theme=light` or `&theme=dark` to force a theme for screenshots (not persisted).
 
-### Changes versus `docs/images/tokens/design-tokens.json` (WCAG 2.2 AA)
+- Typography: Asap Sharp. Sizes `--ts-font-size-{xs,sm,md,lg,xl,2xl,3xl,4xl}` = 12/14/16/18/20/24/30/36 px with matching `--ts-line-height-*` (16…44 px). Role shorthands for `font:`: `--ts-font-{hero,page-title,section-title,card-title,body,compact,caption,label}`. `.ts-tabular-nums` for KPIs and amounts.
+- Palette (theme-independent): `--ts-primary-{50…900}`, `--ts-neutral-{0…900}`, `--ts-navy-*`, `--ts-accent-*`. Components use semantic tokens only.
+- Semantic colours: `bg`, `surface`, `surface-muted`, `surface-raised` (popovers/dialogs), `text`, `text-muted`, `border` (decorative), `border-strong` (input boundaries), `primary`, `accent`, `success`, `warning`, `danger`, `info`, `violet`, `neutral`. Solid = fill/icon, `-subtle` = label background, `-text` = readable text. In the light theme `success`, `warning` and `accent` are decorative fills only.
+- Navy sidebar: `--ts-sidebar-*` (same in both themes).
+- Spacing `--ts-space-{0-5,1,2,3,4,5,6,8,10,12,16,20}` (2–80 px); radius `sm/md/lg/xl/full` = 6/10/14/20/9999 (inputs and buttons `md`, cards `lg`, modals `xl`); `--ts-border-width` 1 px; focus ring 2 px with 2 px offset.
+- Shadows `--ts-shadow-{card,popover,modal}`; dark theme uses minimal shadows plus borders and `surface-raised`.
+- Layout: `--ts-sidebar-width` 252 / `-collapsed` 68, `--ts-navbar-height` 64, `--ts-content-max-width` 1600, `--ts-control-height-{sm,md,lg}` 32/40/48, breakpoints 390/768/1024/1440 (`--ts-breakpoint-*`, `breakpoints` in TS; media queries use literals). Motion durations.
 
-| Token             | Source                             | Now                                                 | Why                                                                         |
-| ----------------- | ---------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------- |
-| `--ts-text-muted` | `#68748A`                          | `#5B677D`                                           | 4.40:1 on page background `#F5F7FB`; now 5.32:1                             |
-| warning as text   | `#BD7B20` (3.49:1 on white)        | `--ts-warning-text` `#8A5410` (5.68:1 on `#FCF3E3`) | Source warning only passes as a UI colour (3:1); text uses the darker shade |
-| success as text   | `#158365` (4.21:1 on subtle green) | `--ts-success-text` `#0F6B52` (5.80:1)              | Pills on subtle background                                                  |
-| danger on subtle  | `#C63E55`                          | `--ts-danger-text` `#A82F45` (5.78:1)               | Pills, error messages                                                       |
-| input border      | `#E5E9F1` (decorative)             | `--ts-border-strong` `#7C879B` (3.62:1)             | Input boundaries are UI components (3:1)                                    |
-
-Unchanged brand colours: primary `#4F59F7` (5.12:1 with white text), primary hover, mint, danger/success/warning solids (used as fills and icons, 3:1 or better), sidebar `#111827`. Disabled controls are exempt from contrast requirements. `contrast.ts` plus `tokens.test.ts` assert every text/background pair (4.5:1) and UI/focus pair (3:1).
+`contrast.ts` (`contrastRatio`, exported) plus `tokens.test.ts` assert every text pair (4.5:1) and UI/focus pair (3:1) in both themes, and pin each documented deviation.
 
 ## Component index
 

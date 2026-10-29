@@ -15,7 +15,7 @@
   height: 20px;
   flex: none;
   margin-top: 2px;
-  border: 1px solid var(--ts-border-strong);
+  border: var(--ts-border-width) solid var(--ts-border-strong);
   border-radius: var(--ts-radius-sm);
   background: var(--ts-surface);
 }

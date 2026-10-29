@@ -5,11 +5,11 @@
   max-height: calc(100dvh - var(--ts-space-8));
   overflow: auto;
   padding: 0;
-  border: 1px solid var(--ts-border);
-  border-radius: var(--ts-radius-lg);
-  background: var(--ts-surface);
+  border: var(--ts-border-width) solid var(--ts-border);
+  border-radius: var(--ts-radius-xl);
+  background: var(--ts-surface-raised);
   color: var(--ts-text);
-  box-shadow: var(--ts-shadow-lg);
+  box-shadow: var(--ts-shadow-modal);
 }
 .ts-dialog::backdrop {
   background: var(--ts-sidebar-bg);
@@ -31,14 +31,14 @@
 }
 .ts-dialog__header h2 {
   margin: 0;
-  font-size: var(--ts-font-size-lg);
+  font: var(--ts-font-card-title);
 }
 .ts-dialog__body {
   padding: 0 var(--ts-space-5) var(--ts-space-5);
 }
 .ts-dialog__footer {
   justify-content: flex-end;
-  border-top: 1px solid var(--ts-border);
+  border-top: var(--ts-border-width) solid var(--ts-border);
 }
 .ts-dialog :focus-visible {
   outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);

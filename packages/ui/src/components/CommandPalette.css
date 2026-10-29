@@ -3,11 +3,11 @@
   width: min(560px, calc(100% - var(--ts-space-8)));
   max-height: 80dvh;
   padding: var(--ts-space-5);
-  border: 1px solid var(--ts-border-strong);
-  border-radius: var(--ts-radius-lg);
-  background: var(--ts-surface);
+  border: var(--ts-border-width) solid var(--ts-border-strong);
+  border-radius: var(--ts-radius-xl);
+  background: var(--ts-surface-raised);
   color: var(--ts-text);
-  box-shadow: var(--ts-shadow-lg);
+  box-shadow: var(--ts-shadow-modal);
 }
 .ts-command-palette::backdrop {
   background: var(--ts-sidebar-bg);
@@ -22,7 +22,7 @@
 }
 .ts-command-palette h2 {
   margin: 0;
-  font-size: var(--ts-font-size-lg);
+  font: var(--ts-font-card-title);
 }
 .ts-command-palette input {
   width: 100%;
