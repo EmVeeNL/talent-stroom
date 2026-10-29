@@ -56,6 +56,24 @@
           }
         }
       },
+      "PayloadTooLarge": {
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            }
+          }
+        },
+        "description": "Request body exceeds 1 MiB",
+        "headers": {
+          "X-Request-Id": {
+            "description": "Request correlation ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "ValidationError": {
         "content": {
           "application/problem+json": {

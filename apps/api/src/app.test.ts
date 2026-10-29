@@ -2,38 +2,9 @@ import { createRoute, z } from "@hono/zod-openapi";
 import { ProblemDetails, ValidationProblem, PROBLEM_BASE_URI } from "@talentstroom/contracts";
 import { describe, expect, it, vi } from "vitest";
 import { app, createApp, openapiConfig } from "./app.ts";
+import { testEnv as env } from "./test-env.ts";
 import { version } from "../package.json";
 import committedDocument from "../openapi.json";
-
-// These routes never touch the database; any use of the binding fails the test loudly.
-const unavailable = (): never => {
-  throw new Error("HYPERDRIVE is not available in unit tests");
-};
-const hyperdrive: Hyperdrive = {
-  connect: unavailable,
-  get connectionString() {
-    return unavailable();
-  },
-  get host() {
-    return unavailable();
-  },
-  get ip() {
-    return unavailable();
-  },
-  get port() {
-    return unavailable();
-  },
-  get user() {
-    return unavailable();
-  },
-  get password() {
-    return unavailable();
-  },
-  get database() {
-    return unavailable();
-  },
-};
-const env: Env = { SERVICE_NAME: "api", ENVIRONMENT: "development", HYPERDRIVE: hyperdrive };
 
 function testApp() {
   const test = createApp();
@@ -126,7 +97,7 @@ describe("api", () => {
     expect(doc.paths?.["/health"]?.get?.responses?.["200"]).toBeDefined();
     expect(doc.components?.schemas).toHaveProperty("ProblemDetails");
     expect(doc.components?.schemas).toHaveProperty("ValidationProblem");
-    for (const name of ["NotFound", "InternalError", "ValidationError", "MalformedJson"]) {
+    for (const name of ["NotFound", "InternalError", "ValidationError", "MalformedJson", "PayloadTooLarge"]) {
       expect(doc.components?.responses).toHaveProperty(name);
     }
     expect(doc.paths).not.toHaveProperty("/validate");

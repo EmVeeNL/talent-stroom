@@ -3,6 +3,7 @@ import type { MessageKey } from "./nl-NL.ts";
 // Typed against the Dutch source: a missing or extra key fails the typecheck.
 export const enGB = {
   "api.problem.validationError": "Validation error",
+  "api.problem.payloadTooLarge": "Payload Too Large",
   "api.problem.malformedJson": "Malformed JSON",
   "api.problem.notFound": "Not Found",
   "api.problem.internalError": "Internal Server Error",

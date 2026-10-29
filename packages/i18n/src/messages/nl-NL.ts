@@ -1,6 +1,7 @@
 /** Source catalog. Keys are stable identifiers; never store translated labels in the database. */
 export const nlNL = {
   "api.problem.validationError": "Validatiefout",
+  "api.problem.payloadTooLarge": "Verzoek te groot",
   "api.problem.malformedJson": "Ongeldige JSON",
   "api.problem.notFound": "Niet gevonden",
   "api.problem.internalError": "Interne serverfout",
