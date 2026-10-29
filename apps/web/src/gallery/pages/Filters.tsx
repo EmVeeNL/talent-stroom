@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SearchInput, Combobox, DateRangePicker, FacetedFilter, ViewSwitcher } from "@talentstroom/ui";
+import { SearchInput, Combobox, DateRangePicker, FacetedFilter, ViewSwitcher, FilterChip } from "@talentstroom/ui";
 import type { DateRange } from "@talentstroom/ui";
 import { Section } from "../Section.tsx";
 import { useGallery } from "../context.ts";
@@ -8,6 +8,8 @@ export function Filters() {
   const [single, setSingle] = useState<string[]>([]),
     [multi, setMulti] = useState<string[]>(["tech"]),
     [status, setStatus] = useState<string[]>(["new"]),
+    [allFilters, setAllFilters] = useState(true),
+    [visibleChips, setVisibleChips] = useState(["function", "location"]),
     [view, setView] = useState("table"),
     [range, setRange] = useState<DateRange>({ start: new Date(2026, 9, 1), end: new Date(2026, 9, 29) });
   const options = [
@@ -121,6 +123,35 @@ export function Filters() {
             { value: "kanban", label: tr("gallery.filters.kanban"), icon: "view_kanban" },
           ]}
         />
+      </Section>
+      <Section title={tr("gallery.filters.chips")}>
+        <FilterChip kind="toggle" pressed={allFilters} onPressedChange={setAllFilters}>
+          {tr("gallery.filters.allFilters")}
+        </FilterChip>
+        <FilterChip kind="dropdown" onClick={() => {}}>
+          {tr("gallery.filters.activeCount")}
+        </FilterChip>
+        {visibleChips.map((chip) => {
+          const label = tr(chip === "function" ? "gallery.filters.function" : "gallery.filters.location");
+          return (
+            <FilterChip
+              key={chip}
+              kind="removable"
+              removeLabel={tr("gallery.filters.removeFilter").replace("{name}", label)}
+              onRemove={() => setVisibleChips((current) => current.filter((value) => value !== chip))}
+            >
+              {label}
+            </FilterChip>
+          );
+        })}
+        <FilterChip
+          kind="add"
+          onClick={() =>
+            setVisibleChips((current) => (current.includes("function") ? current : [...current, "function"]))
+          }
+        >
+          {tr("gallery.filters.addFilter")}
+        </FilterChip>
       </Section>
     </>
   );

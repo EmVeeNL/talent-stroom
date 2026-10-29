@@ -1,4 +1,18 @@
-import { Badge, StatusPill, Card, StatCard, TrendIndicator, Progress, Button } from "@talentstroom/ui";
+import {
+  Badge,
+  StatusPill,
+  StageBadge,
+  FilterChip,
+  RECRUITMENT_STAGE_IDS,
+  RECRUITMENT_STAGES,
+  CUSTOM_LABEL_TONE,
+  Card,
+  StatCard,
+  TrendIndicator,
+  Progress,
+  Button,
+} from "@talentstroom/ui";
+import type { MessageKey } from "@talentstroom/i18n";
 import { Section } from "../Section.tsx";
 import { useGallery } from "../context.ts";
 const tones = ["neutral", "success", "warning", "danger", "info"] as const;
@@ -49,17 +63,26 @@ export function Metrics() {
           <Progress label={tr("gallery.metrics.loading")} />
         </div>
       </Section>
-      <Section title={tr("gallery.badges")}>
-        {tones.map((tone) => (
-          <Badge key={tone} tone={tone}>
-            {tr(`gallery.badges.${tone}`)}
-          </Badge>
-        ))}
-        {tones.map((tone) => (
-          <StatusPill key={tone} tone={tone}>
-            {tr(`gallery.badges.${tone}`)}
-          </StatusPill>
-        ))}
+      <Section title={tr("gallery.metrics.stageLabels")}>
+        {RECRUITMENT_STAGE_IDS.map((stage) => {
+          const definition = RECRUITMENT_STAGES[stage];
+          const labelKey = definition.labelKey[locale === "nl-NL" ? "nl" : "en"] as MessageKey;
+          return (
+            <StageBadge key={stage} stage={stage}>
+              {tr(labelKey)}
+            </StageBadge>
+          );
+        })}
+        <StatusPill tone={CUSTOM_LABEL_TONE}>{tr("gallery.metrics.customTone")}</StatusPill>
+        <FilterChip kind="add" onClick={() => {}}>
+          {tr("gallery.metrics.customLabel")}
+        </FilterChip>
+        <Badge tone="info" variant="solid" dot>
+          {tr("gallery.badges.info")}
+        </Badge>
+        <Badge tone="danger" variant="solid" dot>
+          {tr("gallery.badges.danger")}
+        </Badge>
       </Section>
       <Section title={tr("gallery.cards")}>
         <Card
