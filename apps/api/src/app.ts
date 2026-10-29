@@ -5,6 +5,7 @@ import { HTTPException } from "hono/http-exception";
 import { requestId } from "hono/request-id";
 import apiPackage from "../package.json" with { type: "json" };
 import { problem, type AppEnv } from "./problem.ts";
+import { ipKey, rateLimit } from "./rate-limit.ts";
 import { cachePolicy, requestBodyLimit, securityHeaders } from "./security.ts";
 
 export const openapiConfig = {
@@ -32,6 +33,15 @@ export function createApp() {
   });
   app.use(requestId());
   app.use(securityHeaders, cachePolicy, requestBodyLimit);
+  // Global per-IP limit; /health stays exempt so uptime probes never trip it.
+  app.use(
+    rateLimit("RATE_LIMIT_ANON", {
+      key: ipKey,
+      failOpen: true,
+      retryAfterSeconds: 60,
+      skip: (c) => c.req.path === "/health",
+    }),
+  );
   app.notFound((c) => problem(c, "notFound"));
   app.onError((err, c) => {
     // Hono's JSON validator wraps JSON parse failures before the Zod hook runs.
@@ -48,6 +58,7 @@ export function createApp() {
     ["PayloadTooLarge", "ProblemDetails", "Request body exceeds 1 MiB"],
     ["MalformedJson", "ProblemDetails", "Malformed JSON request body"],
     ["NotFound", "ProblemDetails", "Resource not found"],
+    ["TooManyRequests", "ProblemDetails", "Rate limit exceeded; see Retry-After"],
     ["InternalError", "ProblemDetails", "Unexpected server error"],
     ["ValidationError", "ValidationProblem", "Request validation failed"],
   ] as const) {

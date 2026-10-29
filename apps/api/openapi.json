@@ -74,6 +74,24 @@
           }
         }
       },
+      "TooManyRequests": {
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            }
+          }
+        },
+        "description": "Rate limit exceeded; see Retry-After",
+        "headers": {
+          "X-Request-Id": {
+            "description": "Request correlation ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "ValidationError": {
         "content": {
           "application/problem+json": {

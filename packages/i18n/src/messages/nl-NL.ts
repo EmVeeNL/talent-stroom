@@ -5,6 +5,7 @@ export const nlNL = {
   "api.problem.malformedJson": "Ongeldige JSON",
   "api.problem.notFound": "Niet gevonden",
   "api.problem.internalError": "Interne serverfout",
+  "api.problem.tooManyRequests": "Te veel verzoeken",
   "api.problem.invalidValue": "Ongeldige waarde",
   "app.name": "TalentStroom",
   "app.tagline": "Werven zonder gedoe.",
