@@ -1,0 +1,9 @@
+{
+  "extends": "@talentstroom/config/tsconfig.base.json",
+  "compilerOptions": {
+    // Web Crypto, TextEncoder and CryptoKey types; the package itself only uses APIs available on
+    // both Cloudflare Workers and Node 26.
+    "lib": ["es2024", "webworker"]
+  },
+  "include": ["src"]
+}
