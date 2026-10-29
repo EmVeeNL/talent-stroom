@@ -45,14 +45,14 @@ Values come from the redesign design kit (`docs/images/redesign/`); the kit-to-t
 
 ## Components
 
-| Component             | Notes                                                                                                                                                                                                |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Button`              | `variant` primary/secondary/ghost/danger, `size` sm/md/lg, `icon`, `loading` (+ `loadingLabel`). Loading sets `aria-busy`/`aria-disabled`, ignores clicks, keeps focus. `type` defaults to `button`. |
-| `TextField`           | `label`, `hint`, `error`, `required`. Label via `htmlFor`; hint and error joined in `aria-describedby`; `aria-invalid` and `role="alert"` on error.                                                  |
-| `Badge`, `StatusPill` | Tones neutral/success/warning/danger/info. `StatusPill` adds a per-tone icon so status is not colour-only.                                                                                           |
-| `Card`                | `as` div/section/article, optional `title` (heading level configurable) and `actions`; titled section/article is labelled by its heading.                                                            |
-| `Tabs`                | WAI-ARIA tabs (automatic activation): roving tabindex, Left/Right (wrapping), Home/End, disabled tabs skipped, panels focusable. Controlled or uncontrolled.                                         |
-| `Icon`                | Typed Material Symbols Rounded ligature (16/20/24/32px; default 20px); `aria-hidden` by default, `label` gives `role="img"` + `aria-label`.                                                          |
+| Component             | Notes                                                                                                                                                                                                                                                                                                                                              |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`              | `variant` primary/secondary/outline/ghost/danger/success/warning, `size` sm/md/lg, `icon` / `iconPosition` or `leadingIcon` / `trailingIcon`, `loading` (+ `loadingLabel`). Icon-only buttons are square and require `aria-label`. Loading sets `aria-busy`/`aria-disabled`, ignores clicks, keeps focus. `type` defaults to `button`.             |
+| `TextField`           | `label`, `hint`, `error`, `required`; native text/email/password/url/number/search/date types. Pass translated `visibilityLabels: { show, hide }` for the password toggle; `shortcut` accepts a search hint such as `<kbd>⌘K</kbd>`. Label via `htmlFor`; hint and error joined in `aria-describedby`; `aria-invalid` and `role="alert"` on error. |
+| `Badge`, `StatusPill` | Tones neutral/success/warning/danger/info. `StatusPill` adds a per-tone icon so status is not colour-only.                                                                                                                                                                                                                                         |
+| `Card`                | `as` div/section/article, optional `title` (heading level configurable) and `actions`; titled section/article is labelled by its heading.                                                                                                                                                                                                          |
+| `Tabs`                | WAI-ARIA tabs (automatic activation): roving tabindex, Left/Right (wrapping), Home/End, disabled tabs skipped, panels focusable. Controlled or uncontrolled.                                                                                                                                                                                       |
+| `Icon`                | Typed Material Symbols Rounded ligature (16/20/24/32px; default 20px); `aria-hidden` by default, `label` gives `role="img"` + `aria-label`.                                                                                                                                                                                                        |
 
 The Material Symbols font itself must be loaded by the app (self-host; see `docs/images/implementation/material-symbols.md`).
 
@@ -141,3 +141,14 @@ tokens and component specs win over mockup pixels, and WCAG 2.2 AA wins over the
 UI PRs receive a `visual` CI artifact (14-day retention); this job is not a required check.
 There are no pixel assertions yet. Auth screenshots await the missing auth screen
 implementation. See [the web README](../../apps/web/README.md) for scope and follow-ups.
+
+## Design-kit form controls (#376)
+
+The forms gallery (`/?gallery&theme=light#forms`, also `theme=dark`) presents each field in default, hover, focus, filled, error, disabled and readonly states, plus every button variant in default/hover/active/focus/disabled/loading. `data-state="hover"` and `data-state="focus"` wrappers preview the same styling as real pointer and keyboard states; these attributes do not simulate interaction or change ARIA state.
+
+- Controls keep their original APIs. `Select` remains native; use `Combobox multiple` for searchable chips inside the boundary. `Combobox` adds `error` and `readOnly`; `DateRangePicker` adds `error` and `readOnly`. Readonly selection controls reject value changes while remaining available to keyboard users.
+- `Textarea maxLength` shows a counter that also follows externally changed controlled values. `Slider` keeps native range keyboard semantics and renders a themed track, thumb, and value bubble; hints/errors join `aria-describedby`.
+- `FileUploader` adds `dropLabel` (for “Sleep bestanden hierheen”), `acceptedTypesLabel` (localized accepted formats and limit), `disabled`, and `readOnly`. Supply the translated upload link through `chooseLabel`. Disabled/readonly controls reject file drops and removal.
+- Radius is 10px; button sizes use 32/40/48px tokens. Subtle field fills keep the ≥3:1 strong border. Success/warning buttons use navy text; contrast and other deliberate deviations are recorded in ADR 0013. No new runtime dependency.
+
+Last successful Chrome screenshot artifacts for issue #376: `/tmp/rd-forms-{light,dark}-{1440,390}.png` (full page) and `/tmp/rd-forms-{light,dark}-{1440,390}-viewport.png`. These captures precede the final focus-ring cleanup, shorter button label, disabled-zone annotation and calendar icon overlay. A final screenshot refresh was attempted but Chrome and Chromium exited during macOS app/Mach-port registration with permission denied. Owner review and a refreshed capture on an unrestricted host are still required. Browser inspection covers Chromium; Firefox/WebKit and assistive-technology review remain follow-ups. This change does not touch authentication, encryption, tenancy, or data storage.

@@ -65,7 +65,7 @@ export function Textarea({
       />
       {maxLength !== undefined && (
         <span className="ts-field__hint ts-textarea__count" id={counter} aria-live="polite">
-          {count} / {maxLength}
+          {rest.value === undefined ? count : String(rest.value).length} / {maxLength}
         </span>
       )}
       {error && (

@@ -1,3 +1,22 @@
 .ts-select {
   min-height: var(--ts-control-height-md);
 }
+
+.ts-select__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.ts-select:not([multiple]) {
+  appearance: none;
+  padding-right: var(--ts-space-10);
+}
+.ts-select__control > .ts-icon {
+  position: absolute;
+  right: var(--ts-space-3);
+  color: var(--ts-text-muted);
+  pointer-events: none;
+}
+.ts-select[aria-readonly="true"] {
+  border-style: dashed;
+}

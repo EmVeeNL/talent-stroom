@@ -23,6 +23,8 @@ export interface DateRangePickerProps {
   locale?: string;
   today?: Date;
   disabled?: boolean;
+  readOnly?: boolean;
+  error?: string;
 }
 const day = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
 const addDays = (date: Date, amount: number) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + amount);
@@ -40,34 +42,56 @@ export function DateRangePicker({
   locale = "nl-NL",
   today = new Date(),
   disabled,
+  readOnly,
+  error,
 }: DateRangePickerProps) {
+  const id = useId();
   const trigger = useRef<HTMLButtonElement>(null);
   const format = new Intl.DateTimeFormat(locale, { dateStyle: "long" });
   const formatted = value
     ? `${format.format(value.start)}${value.end ? ` – ${format.format(value.end)}` : ""}`
     : labels.hint;
   return (
-    <Popover
-      initialFocus='.ts-date-range button[tabindex="0"]'
-      label={label}
-      trigger={
-        <Button ref={trigger} variant="secondary" icon="calendar_month" disabled={disabled}>
-          {label}: {formatted}
-        </Button>
-      }
-    >
-      <Calendar
-        {...(value ? { value } : {})}
-        onChange={onChange}
-        labels={labels}
-        locale={locale}
-        today={today}
-        close={() => {
-          trigger.current?.click();
-          trigger.current?.focus();
-        }}
-      />
-    </Popover>
+    <div className="ts-field">
+      <Popover
+        initialFocus='.ts-date-range button[tabindex="0"]'
+        label={label}
+        trigger={
+          <Button
+            className="ts-date-range-trigger"
+            ref={trigger}
+            variant="secondary"
+            trailingIcon="calendar_month"
+            disabled={disabled}
+            aria-disabled={readOnly || undefined}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? `${id}-error` : undefined}
+            onClick={(e) => {
+              if (readOnly) e.preventDefault();
+            }}
+          >
+            {label}: {formatted}
+          </Button>
+        }
+      >
+        <Calendar
+          {...(value ? { value } : {})}
+          onChange={onChange}
+          labels={labels}
+          locale={locale}
+          today={today}
+          close={() => {
+            trigger.current?.click();
+            trigger.current?.focus();
+          }}
+        />
+      </Popover>
+      {error && (
+        <p className="ts-field__error" id={`${id}-error`} role="alert">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }
 function Calendar({

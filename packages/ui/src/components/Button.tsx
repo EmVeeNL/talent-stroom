@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes, MouseEvent, ReactNode, Ref } from "react";
 import { cx } from "../classnames.ts";
 import { Icon } from "./Icon.tsx";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
+export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger" | "success" | "warning";
 export type ButtonSize = "sm" | "md" | "lg";
 
 interface ButtonBaseProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> {
@@ -16,6 +16,8 @@ interface ButtonBaseProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 
   /** Material Symbols ligature name rendered before (default) or after the label. */
   icon?: IconName;
   iconPosition?: "start" | "end";
+  leadingIcon?: IconName;
+  trailingIcon?: IconName;
   ref?: Ref<HTMLButtonElement>;
 }
 
@@ -30,6 +32,8 @@ export function Button({
   loadingLabel,
   icon,
   iconPosition = "start",
+  leadingIcon,
+  trailingIcon,
   type = "button",
   className,
   children,
@@ -44,7 +48,8 @@ export function Button({
     }
     onClick?.(event);
   };
-  const iconNode = icon ? <Icon name={icon} size={20} /> : null;
+  const startIcon = leadingIcon ?? (iconPosition === "start" ? icon : undefined);
+  const endIcon = trailingIcon ?? (iconPosition === "end" ? icon : undefined);
   return (
     <button
       {...rest}
@@ -55,15 +60,16 @@ export function Button({
         `ts-button--${variant}`,
         `ts-button--${size}`,
         loading && "ts-button--loading",
+        (children === null || children === undefined) && "ts-button--icon-only",
         className,
       )}
       aria-busy={loading || undefined}
-      aria-disabled={loading || undefined}
+      aria-disabled={loading || rest["aria-disabled"]}
       onClick={handleClick}
     >
-      {loading ? <span className="ts-spinner" aria-hidden="true" /> : iconPosition === "start" && iconNode}
+      {loading ? <span className="ts-spinner" aria-hidden="true" /> : startIcon && <Icon name={startIcon} size={20} />}
       <span className="ts-button__label">{children}</span>
-      {!loading && iconPosition === "end" && iconNode}
+      {!loading && endIcon && <Icon name={endIcon} size={20} />}
       {loading && loadingLabel ? <span className="ts-visually-hidden">{loadingLabel}</span> : null}
     </button>
   );

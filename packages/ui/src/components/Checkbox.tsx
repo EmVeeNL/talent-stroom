@@ -24,6 +24,14 @@ export function Checkbox({ label, description, indeterminate, id, className, ref
           if (typeof ref === "function") ref(node);
           else if (ref) ref.current = node;
         }}
+        aria-readonly={rest.readOnly || undefined}
+        onClick={(e) => {
+          if (rest.readOnly) e.preventDefault();
+          rest.onClick?.(e);
+        }}
+        onChange={(e) => {
+          if (!rest.readOnly) rest.onChange?.(e);
+        }}
         type="checkbox"
         id={cid}
         aria-describedby={[rest["aria-describedby"], did].filter(Boolean).join(" ") || undefined}

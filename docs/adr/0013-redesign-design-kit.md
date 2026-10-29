@@ -76,6 +76,13 @@ Renamed in this change (all usages updated): `--ts-shadow-sm/md/lg` → `--ts-sh
 
 Disabled controls are exempt (1.4.3) and keep the kit's low-contrast look.
 
+### Form controls (#376)
+
+- Success/warning buttons retain the kit fills but use fixed navy ink (`--ts-neutral-900`), rather than the mockup's white text. Text contrast on success/warning is **6.93:1 / 7.71:1 light** and **9.53:1 / 9.73:1 dark**, asserted in `tokens.test.ts`. A status-text border identifies the light fills against the canvas. The earlier restriction on decorative status fills does not prohibit this tested, labelled action treatment.
+- Fields and secondary buttons use the subtle surface and strong boundary. Outline buttons keep a transparent fill. Hover changes use existing semantic hover/text tokens; active buttons get an inset outline. The static boards do not distinguish all interaction states, so live focus follows the foundation's 2px ring with 2px offset.
+- Readonly fields remain focusable and use a dashed boundary where available. Native date inputs retain their picker and keyboard behaviour, with a Rounded calendar icon over Chromium's transparent native picker indicator. The existing date-range calendar and searchable multiselect retain their keyboard models; chips sit inside the multiselect boundary.
+- Radio, checkbox and range visuals are explicitly themed rather than depending on native white surfaces. Checkbox ticks and indeterminate marks use CSS geometry. The upload zone uses the self-hosted `cloud_upload` Rounded glyph.
+
 ## Consequences
 
 - No new dependency; components keep their structure. Visual parity with the kit becomes a matter of component restyles (#376 and later), which can rely on these tokens.

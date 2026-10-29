@@ -32,6 +32,9 @@ const pairs: [Name, Name, number][] = [
   // Body text
   ...on("--ts-text", surfaces, TEXT),
   ...on("--ts-text-muted", surfaces, TEXT),
+  // Status actions use fixed navy ink in both themes (ADR 0013).
+  ["--ts-neutral-900", "--ts-success", TEXT],
+  ["--ts-neutral-900", "--ts-warning", TEXT],
   // Text on solid fills
   ["--ts-text-on-primary", "--ts-primary", TEXT],
   ["--ts-text-on-primary", "--ts-primary-hover", TEXT],

@@ -1,42 +1,9 @@
-.ts-combobox {
-  position: relative;
-  min-width: min(100%, 16rem);
-}
-.ts-combobox__input {
-  display: flex;
-  align-items: center;
-  position: relative;
-}
 .ts-combobox__input > .ts-icon {
   position: absolute;
   right: var(--ts-space-3);
   pointer-events: none;
 }
-.ts-combobox__input input {
-  padding-right: var(--ts-space-10);
-}
-.ts-combobox__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ts-space-2);
-  margin-bottom: var(--ts-space-2);
-}
-.ts-combobox__chips .ts-button {
-  min-height: var(--ts-control-height-sm);
-  padding: var(--ts-space-1);
-}
-.ts-combobox__popup {
-  position: absolute;
-  z-index: 2;
-  width: 100%;
-  max-height: 16rem;
-  overflow: auto;
-  background: var(--ts-surface-raised);
-  color: var(--ts-text);
-  border: var(--ts-border-width) solid var(--ts-border-strong);
-  border-radius: var(--ts-radius-md);
-  box-shadow: var(--ts-shadow-popover);
-}
+
 .ts-combobox__popup ul {
   padding: var(--ts-space-1);
   margin: 0;
@@ -63,4 +30,95 @@
 .ts-combobox__option[aria-disabled="true"] {
   color: var(--ts-disabled-text);
   cursor: not-allowed;
+}
+.ts-combobox {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ts-space-1);
+}
+.ts-combobox__control {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  min-height: var(--ts-control-height-md);
+  gap: var(--ts-space-1);
+  padding: var(--ts-space-1) var(--ts-space-2);
+  box-sizing: border-box;
+  border: 1px solid var(--ts-border-strong);
+  border-radius: var(--ts-radius-md);
+  background: var(--ts-surface-muted);
+}
+.ts-combobox__chips {
+  display: contents;
+  flex-wrap: wrap;
+  gap: var(--ts-space-1);
+  margin-bottom: var(--ts-space-2);
+  margin: 0;
+}
+.ts-combobox__chips .ts-badge {
+  display: inline-flex;
+  background: var(--ts-primary-subtle);
+  color: var(--ts-primary-text);
+}
+.ts-combobox__chips .ts-button {
+  min-height: 24px;
+  padding: var(--ts-space-1);
+  width: 24px;
+}
+.ts-combobox__input {
+  display: flex;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  min-width: 60px;
+}
+.ts-combobox__input input {
+  padding-right: var(--ts-space-10);
+  width: 100%;
+  min-height: 28px;
+  padding-left: var(--ts-space-1);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.ts-combobox__input input:focus-visible {
+  outline: none;
+}
+.ts-combobox__control:is(:focus-within, [data-state="focus"] .ts-combobox__control) {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: var(--ts-focus-ring-offset);
+  border-color: var(--ts-focus-ring-color);
+}
+.ts-combobox__control:is(:hover, [data-state="hover"] .ts-combobox__control) {
+  border-color: var(--ts-text-muted);
+}
+.ts-field--invalid .ts-combobox__control {
+  border-color: var(--ts-danger-text);
+}
+.ts-combobox__control:has(input:disabled) {
+  border-color: var(--ts-border);
+  color: var(--ts-disabled-text);
+}
+.ts-combobox__control:has(input[readonly]) {
+  border-style: dashed;
+}
+.ts-combobox__popup {
+  position: absolute;
+  z-index: 2;
+  width: 100%;
+  max-height: 16rem;
+  overflow: auto;
+  background: var(--ts-surface-raised);
+  color: var(--ts-text);
+  border: var(--ts-border-width) solid var(--ts-border-strong);
+  border-radius: var(--ts-radius-md);
+  box-shadow: var(--ts-shadow-popover);
+  top: 100%;
+}
+/* Only the enclosing control gets a focus ring, including static gallery previews. */
+.ts-combobox__input .ts-field__input:is(:focus-visible, [data-state="focus"] .ts-field__input) {
+  outline: none;
+  border: 0;
 }
