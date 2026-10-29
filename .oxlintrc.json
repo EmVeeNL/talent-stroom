@@ -1,0 +1,86 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "import", "vitest"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "error"
+  },
+  "env": {
+    "es2024": true
+  },
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/.turbo/**",
+    "**/.wrangler/**",
+    "**/.astro/**",
+    "**/worker-configuration.d.ts",
+    "docs/**"
+  ],
+  "rules": {
+    "import/no-cycle": "error",
+    "import/no-self-import": "error",
+    "typescript/consistent-type-imports": "error",
+    "typescript/consistent-type-definitions": ["error", "interface"],
+    "typescript/no-explicit-any": "error",
+    "typescript/no-non-null-assertion": "error",
+    "eqeqeq": "error",
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": ["@talentstroom/*/src/*", "@talentstroom/*/src"],
+            "message": "Import workspace packages via their public entry point, not their source files."
+          }
+        ]
+      }
+    ],
+    "import/no-unassigned-import": [
+      "error",
+      {
+        "allow": ["**/*.css"]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["packages/**/*.ts", "packages/**/*.tsx"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@talentstroom/*/src/*", "@talentstroom/*/src"],
+                "message": "Import workspace packages via their public entry point, not their source files."
+              },
+              {
+                "group": ["@talentstroom/api", "@talentstroom/web", "@talentstroom/site", "**/apps/**"],
+                "message": "Packages must not import from apps."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/web/**/*.ts", "apps/web/**/*.tsx"],
+      "plugins": ["typescript", "unicorn", "oxc", "import", "react", "jsx-a11y"],
+      "env": {
+        "browser": true
+      },
+      "rules": {
+        "react/rules-of-hooks": "error",
+        "react/exhaustive-deps": "error",
+        "react/react-in-jsx-scope": "off"
+      }
+    },
+    {
+      "files": ["*.js", "*.cjs", "**/*.config.{js,mjs,ts}"],
+      "env": {
+        "node": true
+      }
+    }
+  ]
+}

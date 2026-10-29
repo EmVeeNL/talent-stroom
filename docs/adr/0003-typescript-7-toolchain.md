@@ -1,6 +1,6 @@
 # 0003 — TypeScript 7 toolchain with TypeScript 6 for API consumers
 
-- **Status:** Accepted
+- **Status:** Accepted; linting part superseded by [0009](0009-oxlint-and-oxfmt.md)
 - **Date:** 2026-10-28
 - **Issue:** #27
 

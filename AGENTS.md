@@ -28,7 +28,8 @@ packages/ui         design tokens and UI components
 ```sh
 pnpm install            # pnpm via Corepack, Node 26
 pnpm dev                # all dev servers (API :8787 via wrangler/workerd, web :5173, site :4321)
-pnpm check              # format:check + lint + typecheck + test (run before every PR)
+pnpm check              # oxfmt check + oxlint (type-aware) + typecheck + test (run before every PR)
+pnpm format             # oxfmt
 pnpm --filter @talentstroom/api cf-typegen   # after changing wrangler.jsonc
 ```
 
@@ -38,9 +39,9 @@ pnpm --filter @talentstroom/api cf-typegen   # after changing wrangler.jsonc
 2. Every organization-owned read/write verifies membership and organization scope server-side. Never trust `X-Organization-Id` alone.
 3. No personal data in logs, analytics, URLs, error messages, job payloads or shared caches. Use synthetic data in tests and fixtures.
 4. Write the failing test (BDD scenario from the issue) first, then the minimal implementation.
-5. Import workspace packages only via their public entry point; packages never import apps (enforced by ESLint).
+5. Import workspace packages only via their public entry point; packages never import apps (enforced by oxlint).
 6. User-facing strings go through `@talentstroom/i18n` keys; Dutch is the source language.
-7. TypeScript 7 compiles; tools needing the TS API get TypeScript 6 (`docs/adr/0003-typescript-7-toolchain.md`). Do not edit `.pnpmfile.cjs` casually.
+7. TypeScript 7 compiles and powers type-aware linting (oxlint + tsgolint). Only `apps/site` uses TypeScript 6, for `astro check` (`docs/adr/0003-typescript-7-toolchain.md`, `docs/adr/0009-oxlint-and-oxfmt.md`).
 8. Dependencies: versions live in the `catalog` of `pnpm-workspace.yaml`; releases younger than 7 days are blocked (`docs/adr/0005-dependency-supply-chain-policy.md`).
 9. Don't hand-write the Workers `Env` type; run `wrangler types`.
 10. Keep the working set small (≈5–15 files per task). Report uncertainty and security implications in the PR.
