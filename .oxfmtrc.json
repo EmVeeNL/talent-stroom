@@ -5,9 +5,7 @@
   "astro": {},
   "associations": [
     {
-      "files": [
-        "*.astro"
-      ],
+      "files": ["*.astro"],
       "language": "astro"
     }
   ],
