@@ -11,6 +11,8 @@ export const enGB = {
   "api.problem.invalidValue": "Invalid value",
   "app.name": "TalentStroom",
   "app.tagline": "Recruiting without the hassle.",
+  "app.apiStatus.loading": "Loading API status…",
+  "app.apiStatus.error": "API status unavailable",
   "app.welcome": "Welcome to {app}",
   "nav.dashboard": "Dashboard",
   "nav.vacancies": "Vacancies",

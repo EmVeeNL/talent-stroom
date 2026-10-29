@@ -1,0 +1,23 @@
+{
+  "name": "@talentstroom/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "pnpm --filter @talentstroom/openapi-codegen generate && oxfmt src/schema.gen.ts",
+    "typecheck": "tsc -p .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "openapi-fetch": "catalog:"
+  },
+  "devDependencies": {
+    "@talentstroom/config": "workspace:*",
+    "oxfmt": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

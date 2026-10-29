@@ -9,6 +9,8 @@ export const nlNL = {
   "api.problem.invalidValue": "Ongeldige waarde",
   "app.name": "TalentStroom",
   "app.tagline": "Werven zonder gedoe.",
+  "app.apiStatus.loading": "API-status laden…",
+  "app.apiStatus.error": "API-status niet beschikbaar",
   "app.welcome": "Welkom bij {app}",
   "nav.dashboard": "Dashboard",
   "nav.vacancies": "Vacatures",

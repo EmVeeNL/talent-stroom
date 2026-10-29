@@ -15,6 +15,7 @@
     "**/.wrangler/**",
     "**/.astro/**",
     "**/worker-configuration.d.ts",
+    "packages/api-client/src/schema.gen.ts",
     "docs/**"
   ],
   "rules": {
