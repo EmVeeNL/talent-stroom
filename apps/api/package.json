@@ -8,11 +8,14 @@
     "deploy": "wrangler deploy",
     "cf-typegen": "wrangler types",
     "typecheck": "tsc -p .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "openapi": "node scripts/openapi.ts && oxfmt openapi.json"
   },
   "dependencies": {
     "@talentstroom/contracts": "workspace:*",
-    "hono": "catalog:"
+    "hono": "catalog:",
+    "@hono/zod-openapi": "catalog:",
+    "@talentstroom/i18n": "workspace:*"
   },
   "devDependencies": {
     "@talentstroom/config": "workspace:*",
