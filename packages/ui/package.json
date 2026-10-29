@@ -8,11 +8,13 @@
     "./tokens.css": "./src/tokens.css",
     "./fonts.css": "./src/fonts.css",
     "./fonts/*": "./fonts/*",
-    "./components.css": "./src/components.css"
+    "./components.css": "./src/components.css",
+    "./brand/*": "./src/brand/*"
   },
   "scripts": {
     "typecheck": "tsc -p .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "brand-icons": "node scripts/brand-icons.mjs"
   },
   "peerDependencies": {
     "react": "catalog:"

@@ -6,7 +6,7 @@
 
 - `screens/`: eight individual PNG screen crops from earlier AI-generated concept boards (login, pipeline, candidates, candidate profile, job details, clients, tasks, client portal).
 - `overview/`: three original full overview screenshots/collages.
-- `brand/`: **new TalentStroom** SVG wordmarks (light/dark) and a vector brand mark, plus a PNG mark if available. These are provisional original concepts, not trademark-vetted.
+- Brand: the person/wave mark lives in `packages/ui/src/brand/talentstroom-mark.svg` (vector redraw of `docs/logo/`); the wordmark is the `Logo` component in `@talentstroom/ui`. The earlier node-mark concepts that lived in `brand/` were removed.
 - `tokens/`: brand color tokens in JSON and CSS.
 - `implementation/`: typography, Google Material Symbols, screen inventory.
 

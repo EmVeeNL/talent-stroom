@@ -1,0 +1,71 @@
+.ts-logo {
+  --ts-logo-height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--ts-logo-height) * 0.3);
+  flex: none;
+  line-height: 1;
+  vertical-align: middle;
+  --ts-logo-talent: var(--ts-text);
+  --ts-logo-stroom-from: #2f50ff;
+  --ts-logo-stroom-to: #25a9d0;
+}
+.ts-logo--sm {
+  --ts-logo-height: 1.5rem;
+}
+.ts-logo--md {
+  --ts-logo-height: 2rem;
+}
+.ts-logo--lg {
+  --ts-logo-height: 3rem;
+}
+.ts-logo--xl {
+  --ts-logo-height: 3.5rem;
+}
+.ts-logo[data-tone="light"] {
+  --ts-logo-talent: #0b0f19;
+}
+.ts-logo[data-tone="dark"] {
+  --ts-logo-talent: #ffffff;
+  --ts-logo-stroom-from: #7d96ff;
+  --ts-logo-stroom-to: #4cd0e6;
+}
+:root[data-theme="dark"] .ts-logo[data-tone="auto"] {
+  --ts-logo-stroom-from: #7d96ff;
+  --ts-logo-stroom-to: #4cd0e6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .ts-logo[data-tone="auto"] {
+    --ts-logo-stroom-from: #7d96ff;
+    --ts-logo-stroom-to: #4cd0e6;
+  }
+}
+.ts-logo__mark {
+  display: block;
+  height: var(--ts-logo-height);
+  width: auto;
+  aspect-ratio: 151 / 126;
+}
+.ts-logo__word {
+  font-family: "Asap Sharp", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: calc(var(--ts-logo-height) * 0.78);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.ts-logo__talent {
+  color: var(--ts-logo-talent);
+}
+.ts-logo__stroom {
+  color: var(--ts-logo-stroom-from);
+  background: linear-gradient(90deg, var(--ts-logo-stroom-from), var(--ts-logo-stroom-to));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+@media (forced-colors: active) {
+  .ts-logo__stroom {
+    -webkit-text-fill-color: currentColor;
+    background: none;
+  }
+}

@@ -5,6 +5,8 @@ export { Button } from "./components/Button.tsx";
 export type { ButtonProps, ButtonSize, ButtonVariant } from "./components/Button.tsx";
 export { Card } from "./components/Card.tsx";
 export type { CardProps } from "./components/Card.tsx";
+export { Logo } from "./components/Logo.tsx";
+export type { LogoProps, LogoSize, LogoTone, LogoVariant } from "./components/Logo.tsx";
 export { Icon } from "./components/Icon.tsx";
 export type { IconProps } from "./components/Icon.tsx";
 export { Tabs } from "./components/Tabs.tsx";
