@@ -7,6 +7,7 @@ export const enGB = {
   "api.problem.malformedJson": "Malformed JSON",
   "api.problem.notFound": "Not Found",
   "api.problem.internalError": "Internal Server Error",
+  "api.problem.tooManyRequests": "Too Many Requests",
   "api.problem.invalidValue": "Invalid value",
   "app.name": "TalentStroom",
   "app.tagline": "Recruiting without the hassle.",

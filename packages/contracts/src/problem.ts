@@ -15,6 +15,11 @@ export const PROBLEMS = {
   },
   malformedJson: { type: `${PROBLEM_BASE_URI}/malformed-json`, status: 400, titleKey: "api.problem.malformedJson" },
   notFound: { type: `${PROBLEM_BASE_URI}/not-found`, status: 404, titleKey: "api.problem.notFound" },
+  tooManyRequests: {
+    type: `${PROBLEM_BASE_URI}/too-many-requests`,
+    status: 429,
+    titleKey: "api.problem.tooManyRequests",
+  },
   internalError: { type: `${PROBLEM_BASE_URI}/internal-error`, status: 500, titleKey: "api.problem.internalError" },
 } as const;
 

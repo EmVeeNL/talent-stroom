@@ -28,4 +28,23 @@ export const unavailableHyperdrive: Hyperdrive = {
   },
 };
 
-export const testEnv: Env = { SERVICE_NAME: "api", ENVIRONMENT: "development", HYPERDRIVE: unavailableHyperdrive };
+export const testEnv: Env = {
+  SERVICE_NAME: "api",
+  ENVIRONMENT: "development",
+  HYPERDRIVE: unavailableHyperdrive,
+  RATE_LIMIT_ANON: fakeRateLimit(),
+  RATE_LIMIT_AUTH_ATTEMPT: fakeRateLimit(),
+};
+
+/** Fake Workers Rate Limiting binding for tests. */
+export function fakeRateLimit(behaviour: "allow" | "limit" | "throw" = "allow"): RateLimit & { keys: string[] } {
+  const keys: string[] = [];
+  return {
+    keys,
+    limit: async ({ key }) => {
+      keys.push(key);
+      if (behaviour === "throw") throw new Error("rate limit binding unavailable");
+      return { success: behaviour === "allow" };
+    },
+  };
+}

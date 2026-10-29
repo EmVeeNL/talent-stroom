@@ -20,6 +20,13 @@
       "id": "ecb0b75f1af74a0eb91784d7bea6ec39",
     },
   ],
+  // Workers Rate Limiting bindings (see "Rate limiting" in apps/api/README.md).
+  // namespace_id must be a unique positive integer string per Cloudflare account; period is 10 or 60 only.
+  // Counters are per Cloudflare location and approximate.
+  "ratelimits": [
+    { "name": "RATE_LIMIT_ANON", "namespace_id": "490001", "simple": { "limit": 120, "period": 60 } },
+    { "name": "RATE_LIMIT_AUTH_ATTEMPT", "namespace_id": "490002", "simple": { "limit": 10, "period": 60 } },
+  ],
   "vars": {
     "SERVICE_NAME": "api",
     "ENVIRONMENT": "development",
