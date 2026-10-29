@@ -130,6 +130,60 @@ Identity and tenancy (`0003_identity.sql`, [ADR 0012](../../docs/adr/0012-identi
 - Domain tables reference the tenant as `organization_id REFERENCES app.organizations (id)` and people as `FOREIGN KEY (organization_id, <x>_membership_id) REFERENCES app.memberships (organization_id, id)`, never `auth.*`.
 - New `app` tables get `ts_app` DML from default privileges and nothing for `ts_auth`; new `auth` tables get `ts_auth` DML and nothing for `ts_app`. Narrow these in the migration when a table needs less (as `0003` does).
 
+## Encrypted candidates (0004)
+
+Migration `0004_candidates.sql` implements [ADR 0011](../../docs/adr/0011-envelope-encryption-format.md).
+
+| Table                         | Stored data                                                                  | Access              |
+| ----------------------------- | ---------------------------------------------------------------------------- | ------------------- |
+| `app.candidates`              | Metadata, owner membership, timestamps, status, optimistic `version`; no PII | `ts_app` tenant DML |
+| `app.candidate_private`       | Whole serialized envelope in `bytea`, payload schema version                 | `ts_app` tenant DML |
+| `app.candidate_blind_indexes` | Versioned 32-byte HMAC digests for email/phone exact matching                | `ts_app` tenant DML |
+
+All three tables enable and force RLS. Without tenant context `ts_app` sees no rows;
+`ts_auth` has neither grants nor policies. Composite foreign keys prevent cross-tenant
+candidate and owner references. There is no separate `encryption_key_envelopes` table:
+the wrapped DEK, KEK version, nonce and authenticated ciphertext travel together in the envelope.
+The database checks the envelope format byte; the crypto parser checks the full binary format,
+including nonce and ciphertext lengths, before decryption authenticates it.
+
+The public repository functions `createCandidate`, `getCandidatePrivate`,
+`updateCandidatePrivate` and `findCandidateIdsByBlindIndex` accept encrypted bytes/digests
+and own their `withTenant` transaction. Create and update atomically store the envelope and
+complete index set. Updates increment `candidates.version` only when `expectedVersion`
+matches; `{ kind: "conflict" }` covers stale, missing and inaccessible rows. No callbacks
+or open transactions escape these functions. `source` must be a controlled code, never
+free text containing personal data.
+
+`createCandidateService(db, deps)` is a small request-scoped helper in this package, keeping
+the two-phase workflow next to the repository instead of adding another package for one
+record type. Pass a real KMS adapter, environment, the authorized organization's `kekRef`,
+an already-unwrapped environment index root (`indexRoot`), and `indexVersion`. Membership
+and permissions must already have been verified before passing a `TenantContext`.
+
+- `create(tenant, { candidateId, schemaVersion, payload, ownerMembershipId?, source? })`
+  normalizes email/phone for HKDF-scoped blind indexes and encrypts the JSON payload
+  **before** opening the database transaction. The payload retains its original formatting.
+- `get(tenant, candidateId)` commits the read **before** parsing/decrypting, using the verified
+  organization, requested candidate id, `recordType: "candidate_private"` and stored schema
+  version as authenticated context. Returns `{ version, schemaVersion, payload }` (payload
+  is `unknown`; validate against the application's schema), or `undefined` if inaccessible.
+- `update(tenant, { candidateId, schemaVersion, payload, expectedVersion })` encrypts first,
+  then replaces the full envelope/index set with optimistic concurrency.
+- `find(tenant, "email" | "phone", value)` normalizes and derives the tenant/field/version key
+  before querying. It returns candidate IDs only; callers fetching matches must authorize,
+  decrypt and verify them before returning minimal fields (flow 20).
+
+The helper maintains one index version. Rotation jobs can use the repository's complete
+index set to maintain multiple versions during dual-write/reindex; orchestration is follow-up
+work. The caller owns root lifetime/zeroization; roots, plaintext and KMS calls never enter
+repository transactions. Never log database errors with bound parameters, which can include
+ciphertext and index digests. No plaintext is logged or cached by the helper.
+
+`test/candidates.integration.test.ts` exercises dump bytes, swapped ciphertext, normalized
+tenant-only lookup, conflicts, atomic rollback, role denial, constraints and migration reruns.
+KMS probes also check Postgres for an open runtime transaction at wrap/unwrap boundaries.
+
 ## Writing migrations
 
 - New file `migrations/NNNN_lower_snake_case.sql`, next number, never edit or delete an applied file (the runner refuses on checksum mismatch). First statement: `SET LOCAL ROLE ts_owner;`.

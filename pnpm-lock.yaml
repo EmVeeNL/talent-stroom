@@ -402,6 +402,9 @@ importers:
 
   packages/database:
     dependencies:
+      '@talentstroom/crypto':
+        specifier: workspace:*
+        version: link:../crypto
       kysely:
         specifier: 'catalog:'
         version: 0.29.7
