@@ -245,6 +245,12 @@
   background: var(--ts-sidebar-bg);
   color: var(--ts-sidebar-text);
 }
+.gallery-brand__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--ts-space-5);
+}
 .gallery-icons-intro {
   width: 100%;
   margin: 0;
