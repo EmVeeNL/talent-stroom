@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Juridische briefing privacy en AI — TalentStroom</title>
+    <link rel="stylesheet" href="../_print/print.css" />
+  </head>
+  <body>
+    <header class="doc">
+      <div class="brand">Talent<span>Stroom</span></div>
+      <h1>Juridische briefing: privacy, AVG en AI Act</h1>
+      <div class="meta">
+        Voor: privacy- en IT-jurist · Fase 0 · issues #10–#15 · versie 1.0 · 28
+        oktober 2026 · vertrouwelijk concept
+      </div>
+    </header>
+
+    <div class="box warn">
+      Deze briefing beschrijft ons product en onze <strong>aannames</strong>.
+      Het is uitdrukkelijk geen juridisch advies; we vragen u die aannames te
+      toetsen. Waar we wetgeving of richtlijnen noemen, graag controleren of die
+      nog actueel zijn.
+    </div>
+
+    <h2>1. Wat we van u vragen</h2>
+    <p>
+      Wij bouwen TalentStroom, software (SaaS) voor recruitmentbureaus. Voordat
+      we echte kandidaatgegevens verwerken (een private alpha met 2–3 bureaus),
+      willen we de juridische basis op orde hebben. We vragen advies over zes
+      onderwerpen (hoofdstuk 5) en de volgende producten:
+    </p>
+    <table>
+      <tr>
+        <th style="width: 6%">#</th>
+        <th>Product</th>
+        <th style="width: 22%">Nodig vóór</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>
+          Memo rolverdeling verwerkingsverantwoordelijke / verwerker per
+          verwerking
+        </td>
+        <td>Private alpha</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>
+          Verwerkersovereenkomst (model) inclusief subverwerkerslijst en
+          beveiligingsbijlage
+        </td>
+        <td>Private alpha</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Uitkomst DPIA-screening en, indien nodig, aanpak DPIA</td>
+        <td>Private alpha</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>
+          Memo AI Act-classificatie van de AI-functies in de eerste versie
+        </td>
+        <td>Private alpha</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>
+          Advies over standaard bewaartermijnen die wij in de software
+          voorstellen
+        </td>
+        <td>Private alpha</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>Advies datalocatie en doorgiftes (EU of alleen NL)</td>
+        <td>Private alpha</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>Beleid voor bijzondere persoonsgegevens en BSN in cv's</td>
+        <td>Private alpha</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td>
+          Privacyverklaring, algemene voorwaarden en pagina
+          verwerkersovereenkomst voor de website
+        </td>
+        <td>Gesloten bèta</td>
+      </tr>
+    </table>
+    <p class="muted">
+      Graag vooraf een inschatting van tijd en kosten, en welke punten u
+      eventueel zou laten vervallen.
+    </p>
+
+    <h2>2. Het product in het kort</h2>
+    <ul>
+      <li>
+        <strong>Klanten:</strong> Nederlandse werving- en selectiebureaus en
+        headhunters met 2–10 recruiters (IT, techniek, finance, executive
+        search). Geen interne HR-afdelingen van werkgevers.
+      </li>
+      <li>
+        <strong>Gebruikers:</strong> recruiters en bureau-eigenaren. Eén persoon
+        kan lid zijn van meerdere bureaus (organisaties) en kiest na het
+        inloggen expliciet de actieve organisatie.
+      </li>
+      <li>
+        <strong>Kernfuncties:</strong> kandidaten en cv's beheren; vacatures en
+        opdrachtgevers; per vacature een pipeline met fases; taken en
+        herinneringen; plaatsingen met fee.
+      </li>
+      <li>
+        <strong>Delen met opdrachtgevers:</strong> de recruiter kiest welke
+        velden en cv's zichtbaar zijn, maakt daarvan een vaste momentopname en
+        deelt die via een <strong>verlopende, intrekbare link</strong>. De
+        opdrachtgever heeft geen account, bekijkt de kandidaten en geeft een
+        beoordeling en feedback.
+      </li>
+      <li>
+        <strong>AI-hulp (altijd met menselijke controle):</strong> cv uitlezen
+        naar een concept-profiel dat de recruiter controleert; teksten vertalen
+        Nederlands↔Engels; concepten schrijven (vacaturetekst, e-mail);
+        samenvatting van notities.
+      </li>
+      <li>
+        <strong>Bewust niet in de eerste versie:</strong> kandidaten
+        rangschikken, scoren of automatisch selecteren; profilering; scrapen van
+        internet; automatisch e-mails versturen; inbox-synchronisatie.
+      </li>
+      <li>
+        <strong>Maatwerkmodules:</strong> een beheerder van het bureau kan eigen
+        gestructureerde velden toevoegen (bijv. "IT-profiel"). Geen eigen code.
+      </li>
+    </ul>
+
+    <h2>3. Gegevensverwerkingen en voorgestelde rollen</h2>
+    <table>
+      <tr>
+        <th style="width: 20%">Verwerking</th>
+        <th style="width: 17%">Betrokkenen</th>
+        <th>Gegevens</th>
+        <th style="width: 21%">Onze aanname over de rol van TalentStroom</th>
+      </tr>
+      <tr>
+        <td>Kandidaatbeheer, pipeline, plaatsingen</td>
+        <td>Kandidaten</td>
+        <td>
+          NAW, contact, cv, werkervaring, opleiding, vaardigheden, notities,
+          status per vacature, salaris/tarief; incidenteel bijzondere gegevens
+          in cv's
+        </td>
+        <td>Verwerker voor het bureau</td>
+      </tr>
+      <tr>
+        <td>Opdrachtgevers en contactpersonen</td>
+        <td>Contactpersonen bij opdrachtgevers</td>
+        <td>Naam, functie, zakelijk e-mailadres en telefoonnummer</td>
+        <td>Verwerker voor het bureau</td>
+      </tr>
+      <tr>
+        <td>Shortlist delen en feedback</td>
+        <td>Kandidaten; beoordelaars bij opdrachtgever</td>
+        <td>
+          Door recruiter gekozen velden en cv; beoordeling, keuze, opmerking;
+          naam beoordelaar (optioneel); toegangslogs
+        </td>
+        <td>Verwerker voor het bureau</td>
+      </tr>
+      <tr>
+        <td>AI-functies</td>
+        <td>Kandidaten, gebruikers</td>
+        <td>
+          Minimale tekst nodig voor de taak (bijv. cv-tekst), uitkomst,
+          gebruikte model en goedkeuring
+        </td>
+        <td>Verwerker; AI-leverancier als subverwerker</td>
+      </tr>
+      <tr>
+        <td>Gebruikersaccounts, beveiliging, facturatie</td>
+        <td>Gebruikers (recruiters, eigenaren)</td>
+        <td>Naam, e-mail, inlogmethoden, beveiligingslogs, abonnement</td>
+        <td>Verwerkingsverantwoordelijke</td>
+      </tr>
+      <tr>
+        <td>Productanalyse en support</td>
+        <td>Gebruikers</td>
+        <td>Gebruiksstatistieken zonder kandidaatgegevens, supportverzoeken</td>
+        <td>Verwerkingsverantwoordelijke</td>
+      </tr>
+    </table>
+
+    <h2>4. Belangrijkste maatregelen (samenvatting)</h2>
+    <ul>
+      <li>
+        <strong>Versleuteling per record:</strong> persoonsgegevens van
+        kandidaten en documenten worden in de applicatie versleuteld met een
+        eigen sleutel per record. De hoofdsleutels staan in een aparte
+        sleuteldienst (KMS), niet in de database. Een gestolen database alleen
+        is daardoor onleesbaar.
+      </li>
+      <li>
+        <strong>Scheiding tussen bureaus:</strong> elk verzoek wordt
+        gecontroleerd op lidmaatschap van de actieve organisatie, met daarnaast
+        afscherming in de database zelf.
+      </li>
+      <li>
+        <strong>Gedeelde links:</strong> alleen een hash van de link wordt
+        opgeslagen; links verlopen en zijn direct in te trekken; alleen de
+        goedgekeurde momentopname is zichtbaar.
+      </li>
+      <li>
+        <strong>Inloggen:</strong> voorkeur voor passkeys en MFA; automatische
+        vergrendeling bij inactiviteit.
+      </li>
+      <li>
+        <strong>AI:</strong> alleen via de server, met minimale gegevens, bij
+        leveranciers die niet trainen op klantdata; uitkomsten zijn altijd een
+        concept dat de gebruiker goedkeurt; AI is per bureau uit te zetten.
+      </li>
+      <li>
+        <strong>Rechten van betrokkenen:</strong> export, verwijderen (inclusief
+        documenten, momentopnames en vertalingen) en bewaartermijnen met een
+        beoordelingslijst.
+      </li>
+      <li>
+        <strong>Hosting (voorlopig):</strong> applicatie op Cloudflare Workers,
+        database bij een beheerde PostgreSQL-dienst in de EU, bestanden in
+        Cloudflare R2 (EU), sleutelbeheer bij een EU-KMS. Definitieve
+        leveranciers worden nog gekozen.
+      </li>
+    </ul>
+
+    <div class="page-break"></div>
+    <h2>5. Vragen per onderwerp</h2>
+
+    <h3>
+      5.1 Rolverdeling verwerkingsverantwoordelijke / verwerker (issue #10)
+    </h3>
+    <ol>
+      <li>
+        Klopt het dat het bureau verwerkingsverantwoordelijke is voor
+        kandidaat-, opdrachtgever- en feedbackgegevens, en TalentStroom
+        verwerker?
+      </li>
+      <li>
+        Welke rol heeft de opdrachtgever die via een link kandidaten bekijkt en
+        feedback geeft? Ontvanger, zelfstandig verantwoordelijke of anders? Wat
+        betekent dat voor onze feedbackfunctie?
+      </li>
+      <li>
+        Zijn wij voor gebruikersaccounts, beveiligingslogs, facturatie en
+        geanonimiseerde productstatistieken terecht zelfstandig
+        verwerkingsverantwoordelijke?
+      </li>
+      <li>
+        Mogen wij geaggregeerde, niet-herleidbare statistieken (bijv. aantallen
+        gedeelde shortlists) gebruiken voor productontwikkeling? Onder welke
+        voorwaarden?
+      </li>
+      <li>
+        Welk model verwerkersovereenkomst raadt u aan (bijv. het model van NL
+        Digital) en hoe gaan we om met wijzigingen in subverwerkers?
+      </li>
+      <li>
+        Wat moet in de beveiligingsbijlage staan, en hoe concreet mogen onze
+        beveiligingsclaims zijn zolang er nog geen externe audit is?
+      </li>
+    </ol>
+
+    <h3>5.2 DPIA-screening (issue #11)</h3>
+    <ol>
+      <li>
+        Valt het gebruik van TalentStroom door een bureau onder de verwerkingen
+        waarvoor de Autoriteit Persoonsgegevens een DPIA verplicht stelt? Welke
+        criteria zijn hier relevant (bijv. omvang, beoordeling van personen,
+        nieuwe technologie, AI)?
+      </li>
+      <li>
+        De DPIA is een plicht van het bureau. Welke informatie moeten wij als
+        verwerker aanleveren? Is een standaard "DPIA-ondersteuningsdocument"
+        verstandig?
+      </li>
+      <li>
+        Adviseert u dat wij zelf een DPIA uitvoeren op het product, ook als dat
+        niet verplicht is?
+      </li>
+    </ol>
+
+    <h3>5.3 AI Act-classificatie (issue #12)</h3>
+    <p>
+      AI-systemen voor werving en selectie (o.a. sollicitaties analyseren en
+      filteren, kandidaten beoordelen) worden in de AI-verordening als
+      <strong>hoog risico</strong> aangemerkt. Onze eerste versie
+      <strong>rangschikt, scoort of filtert geen kandidaten</strong>. De
+      AI-functies zijn:
+    </p>
+    <table>
+      <tr>
+        <th style="width: 26%">Functie</th>
+        <th>Wat het doet</th>
+        <th style="width: 30%">Onze aanname</th>
+      </tr>
+      <tr>
+        <td>Cv uitlezen</td>
+        <td>
+          Zet de tekst van een cv om in velden (naam, ervaring, opleiding,
+          vaardigheden) als concept; de recruiter controleert en slaat op. Geen
+          oordeel over geschiktheid.
+        </td>
+        <td>
+          Smalle, procedurele of voorbereidende taak; geen hoog risico. Graag
+          toetsen.
+        </td>
+      </tr>
+      <tr>
+        <td>Vertalen NL↔EN</td>
+        <td>
+          Vertaalt vacatureteksten, samenvattingen en e-mails; origineel blijft
+          bewaard; publicatie na goedkeuring.
+        </td>
+        <td>Geen hoog risico.</td>
+      </tr>
+      <tr>
+        <td>Schrijfhulp</td>
+        <td>
+          Concepten voor vacatureteksten en e-mails; nooit automatisch
+          verzonden.
+        </td>
+        <td>Geen hoog risico; mogelijk transparantieplicht.</td>
+      </tr>
+      <tr>
+        <td>Samenvatten</td>
+        <td>
+          Vat notities en activiteit over een kandidaat samen, met verwijzing
+          naar de bron.
+        </td>
+        <td>Grensgeval? Graag toetsen.</td>
+      </tr>
+    </table>
+    <ol>
+      <li>
+        Vallen deze functies buiten de hoog-risicocategorie, bijvoorbeeld via de
+        uitzonderingen voor smalle procedurele of voorbereidende taken? Moeten
+        wij die beoordeling documenteren of registreren?
+      </li>
+      <li>
+        Welke verplichtingen gelden dan wel (transparantie richting gebruikers,
+        AI-geletterdheid, labeling van AI-uitkomsten)?
+      </li>
+      <li>
+        Zijn wij aanbieder en het bureau gebruiksverantwoordelijke ("deployer")?
+        Wat moeten wij het bureau meegeven?
+      </li>
+      <li>
+        Welke termijnen gelden op dit moment, mede gezien eventuele uitstel- of
+        wijzigingsvoorstellen?
+      </li>
+      <li>
+        Wat zou er veranderen als we later wél kandidaat-vacature-matching
+        aanbieden (backlog, alleen na apart onderzoek)?
+      </li>
+    </ol>
+
+    <h3>5.4 Bewaartermijnen (issue #13)</h3>
+    <p>
+      De AP noemt voor sollicitanten bij een werkgever circa 4 weken na afloop
+      van de procedure, en tot 1 jaar met toestemming. Recruitmentbureaus bouwen
+      echter een talentpool op voor toekomstige vacatures. De software zal
+      bewaartermijnen per categorie voorstellen, herinneringen geven en een
+      beoordelingslijst tonen; het bureau beslist.
+    </p>
+    <ol>
+      <li>
+        Welke standaardtermijnen kunnen wij verdedigbaar voorstellen voor: (a)
+        afgewezen kandidaat voor een specifieke vacature, (b) kandidaat in de
+        talentpool zonder lopende procedure, (c) geplaatste kandidaat, (d)
+        feedback van opdrachtgevers, (e) gedeelde momentopnames?
+      </li>
+      <li>
+        Welke grondslag past bij een talentpool (toestemming of gerechtvaardigd
+        belang)? Hoe moet toestemming worden vastgelegd en vernieuwd?
+      </li>
+      <li>
+        Wat is de verwachting voor back-ups: is het acceptabel dat verwijderde
+        gegevens maximaal [X] dagen in versleutelde back-ups blijven, met een
+        register van verwijderingen dat bij herstel opnieuw wordt toegepast?
+      </li>
+      <li>
+        Is "cryptografisch wissen" (de sleutel van een record vernietigen) een
+        aanvaardbare vorm van verwijderen?
+      </li>
+    </ol>
+
+    <h3>5.5 Datalocatie en doorgiftes (issue #14)</h3>
+    <ol>
+      <li>
+        Is opslag en verwerking binnen de EU voldoende, of verwacht u dat
+        bureaus contractueel verwerking alleen in Nederland eisen?
+      </li>
+      <li>
+        Cloudflare voert code uit op een wereldwijd netwerk dicht bij de
+        gebruiker; data-opslag kan op de EU worden ingesteld. Hoe beoordeelt u
+        dit, en welke instellingen of afspraken zijn nodig?
+      </li>
+      <li>
+        Meerdere beoogde leveranciers hebben een Amerikaanse moederorganisatie.
+        Wat is nodig om doorgiftes en toegang vanuit derde landen te beoordelen
+        en vast te leggen (bijv. adequaatheidsbesluit, modelcontractbepalingen,
+        doorgiftetoets)?
+      </li>
+      <li>
+        Welke eisen stelt u aan de AI-leverancier (EU-verwerking, geen training
+        op data, bewaartermijn van prompts)?
+      </li>
+    </ol>
+
+    <h3>5.6 Bijzondere persoonsgegevens en BSN (issue #15)</h3>
+    <p>
+      Cv's bevatten soms ongevraagd een BSN, pasfoto, nationaliteit,
+      geboortedatum, gezondheidsinformatie, religie of lidmaatschappen. Wij
+      willen dit in de software signaleren.
+    </p>
+    <ol>
+      <li>
+        Mag een bureau een BSN uit een cv bewaren in de wervingsfase? Zo niet:
+        moeten wij het automatisch maskeren of weigeren, of alleen waarschuwen?
+      </li>
+      <li>
+        Hoe moeten wij omgaan met overige bijzondere persoonsgegevens in cv's:
+        waarschuwen, laten verwijderen, of ongewijzigd laten?
+      </li>
+      <li>
+        Is een pasfoto in een cv een bijzonder persoonsgegeven in deze context?
+        Mogen we die tonen aan opdrachtgevers als de recruiter dat kiest?
+      </li>
+      <li>
+        Mag het automatisch signaleren van deze gegevens zelf (via AI)
+        plaatsvinden, en onder welke voorwaarden?
+      </li>
+    </ol>
+
+    <h3>5.7 Overige punten</h3>
+    <ol>
+      <li>
+        <strong>Merknaam (issue #9):</strong> kunt u een merkenonderzoek naar
+        "TalentStroom" (Benelux/EU) uitvoeren of iemand aanbevelen? Een eigen
+        domeinnaam gebruiken we voorlopig niet.
+      </li>
+      <li>
+        <strong>Datalekken:</strong> welke afspraken over meldtermijnen tussen
+        ons en het bureau raadt u aan?
+      </li>
+      <li>
+        <strong>Aansprakelijkheid:</strong> welke beperkingen zijn gebruikelijk
+        voor kleine SaaS-leveranciers aan zakelijke klanten?
+      </li>
+      <li>
+        <strong>Pilotovereenkomst:</strong> wat moet minimaal geregeld zijn voor
+        een gratis pilot met 2–3 bureaus?
+      </li>
+    </ol>
+
+    <h2>6. Wat wij nog moeten regelen</h2>
+    <ul>
+      <li>
+        Rechtspersoon en contactgegevens voor de overeenkomsten: [in te vullen].
+      </li>
+      <li>
+        Definitieve keuze van leveranciers (identiteit/inloggen, database,
+        sleutelbeheer, AI, e-mail, betalingen); wij leveren dan een
+        subverwerkerslijst aan.
+      </li>
+      <li>Een aanspreekpunt voor privacy binnen TalentStroom.</li>
+    </ul>
+
+    <h2>7. Achtergrondinformatie</h2>
+    <p>Op verzoek sturen we (Engelstalige) documentatie mee:</p>
+    <ul>
+      <li>Productvisie en functionele eisen (PRD)</li>
+      <li>Ontwerp versleuteling en sleutelbeheer</li>
+      <li>Identiteit, beveiliging en privacy</li>
+      <li>
+        Procesbeschrijvingen: delen met opdrachtgevers, AVG-export en
+        -verwijdering, sleutelrotatie
+      </li>
+    </ul>
+
+    <footer class="doc">
+      TalentStroom · Juridische briefing v1.0 · Contact: [naam, e-mailadres,
+      telefoonnummer]
+    </footer>
+  </body>
+</html>
