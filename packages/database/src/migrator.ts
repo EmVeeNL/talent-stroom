@@ -15,7 +15,8 @@ import { fileURLToPath } from "node:url";
 import { Client } from "pg";
 
 /** Default migrations directory shipped with this package. */
-export const MIGRATIONS_DIR = fileURLToPath(new URL("../migrations/", import.meta.url));
+// `.href`: the string overload also typechecks under the Workers lib (apps/api tests).
+export const MIGRATIONS_DIR = fileURLToPath(new URL("../migrations/", import.meta.url).href);
 
 /** Marker (first non-blank line) that opts a file out of the per-file transaction. */
 export const NO_TRANSACTION_MARKER = "-- migrate:no-transaction";

@@ -19,7 +19,21 @@
       "binding": "HYPERDRIVE",
       "id": "ecb0b75f1af74a0eb91784d7bea6ec39",
     },
+    // Better Auth as role ts_auth (ADR 0006, ADR 0012). Must be an UNCACHED configuration:
+    // a cached session or membership read would delay revocation by up to 75 s.
+    // PLACEHOLDER id: the owner must create the configuration before the first deploy, e.g.
+    //   wrangler hyperdrive create talentstroom-auth --caching-disabled --connection-string=…
+    // and replace this id. Local dev: CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE_AUTH.
+    {
+      "binding": "HYPERDRIVE_AUTH",
+      "id": "00000000000000000000000000000000",
+    },
   ],
+  // Set with `wrangler secret put` per environment; locally in apps/api/.env (git-ignored).
+  // BETTER_AUTH_URL is the public origin the browser uses (SPA and API share it, ADR 0006).
+  "secrets": {
+    "required": ["BETTER_AUTH_SECRET", "BETTER_AUTH_URL"],
+  },
   // Workers Rate Limiting bindings (see "Rate limiting" in apps/api/README.md).
   // namespace_id must be a unique positive integer string per Cloudflare account; period is 10 or 60 only.
   // Counters are per Cloudflare location and approximate.
@@ -30,5 +44,8 @@
   "vars": {
     "SERVICE_NAME": "api",
     "ENVIRONMENT": "development",
+    // Auth mail transport (ADR 0006 owner decision 7). "none" fails closed: no auth mail is
+    // sent until the production provider lands (#232). apps/api/.env sets "mailpit" locally.
+    "MAIL_TRANSPORT": "none",
   },
 }

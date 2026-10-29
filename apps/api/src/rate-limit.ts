@@ -51,7 +51,7 @@ export function rateLimit(binding: RateLimitBinding, options: RateLimitOptions):
   };
 }
 
-/** For future sign-in, sign-up and password-reset routes (not applied yet). Fails closed. */
+/** Sign-in, sign-up, password-reset and 2FA verification (src/auth/routes.ts). Fails closed. */
 export const authAttemptLimit = rateLimit("RATE_LIMIT_AUTH_ATTEMPT", {
   key: ipKey,
   failOpen: false,

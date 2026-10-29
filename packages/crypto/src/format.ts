@@ -179,7 +179,7 @@ export function parseEnvelope(bytes: Uint8Array): EncryptedEnvelope {
   if (kekRefLength < 1 || kekRefLength > MAX_KEK_REF_BYTES) throw new EnvelopeFormatError();
   let kekRef: string;
   try {
-    kekRef = new TextDecoder("utf-8", { fatal: true }).decode(take(kekRefLength));
+    kekRef = new TextDecoder("utf-8", { fatal: true, ignoreBOM: false }).decode(take(kekRefLength));
   } catch {
     throw new EnvelopeFormatError();
   }

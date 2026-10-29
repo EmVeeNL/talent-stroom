@@ -4,6 +4,9 @@ import { DEFAULT_LOCALE, t } from "@talentstroom/i18n";
 import { HTTPException } from "hono/http-exception";
 import { requestId } from "hono/request-id";
 import apiPackage from "../package.json" with { type: "json" };
+import { registerIdentity } from "./auth/routes.ts";
+import type { IdentityDeps } from "./auth/middleware.ts";
+import { mailTransportFromEnv } from "./mail/index.ts";
 import { problem, type AppEnv } from "./problem.ts";
 import { ipKey, rateLimit } from "./rate-limit.ts";
 import { cachePolicy, requestBodyLimit, securityHeaders } from "./security.ts";
@@ -71,25 +74,34 @@ export function createApp() {
   return app;
 }
 
-export const app = createApp();
-const healthSchema = app.openAPIRegistry.register("HealthResponse", HealthResponse);
-app.openapi(
-  createRoute({
-    method: "get",
-    path: "/health",
-    operationId: "getHealth",
-    responses: {
-      200: {
-        description: "API health",
-        headers: z.object({ "X-Request-Id": z.string() }),
-        content: { "application/json": { schema: healthSchema } },
-      },
-      500: { $ref: "#/components/responses/InternalError" },
-    },
-  }),
-  (c) => c.json(HealthResponse.parse({ status: "ok", service: c.env.SERVICE_NAME }), 200),
-);
+const defaultIdentityDeps: IdentityDeps = { mailTransport: mailTransportFromEnv };
 
-app.get("/openapi.json", (c) =>
-  c.env.ENVIRONMENT === "development" ? c.json(app.getOpenAPI31Document(openapiConfig)) : c.notFound(),
-);
+/** The full API. Tests pass their own identity dependencies (e.g. a recording mail transport). */
+export function createApiApp(identityDeps: IdentityDeps = defaultIdentityDeps) {
+  const app = createApp();
+  const healthSchema = app.openAPIRegistry.register("HealthResponse", HealthResponse);
+  app.openapi(
+    createRoute({
+      method: "get",
+      path: "/health",
+      operationId: "getHealth",
+      responses: {
+        200: {
+          description: "API health",
+          headers: z.object({ "X-Request-Id": z.string() }),
+          content: { "application/json": { schema: healthSchema } },
+        },
+        500: { $ref: "#/components/responses/InternalError" },
+      },
+    }),
+    (c) => c.json(HealthResponse.parse({ status: "ok", service: c.env.SERVICE_NAME }), 200),
+  );
+
+  app.get("/openapi.json", (c) =>
+    c.env.ENVIRONMENT === "development" ? c.json(app.getOpenAPI31Document(openapiConfig)) : c.notFound(),
+  );
+  registerIdentity(app, identityDeps);
+  return app;
+}
+
+export const app = createApiApp();

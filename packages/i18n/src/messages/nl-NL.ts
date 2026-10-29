@@ -6,12 +6,26 @@ export const nlNL = {
   "api.problem.notFound": "Niet gevonden",
   "api.problem.internalError": "Interne serverfout",
   "api.problem.tooManyRequests": "Te veel verzoeken",
+  "api.problem.unauthorized": "Niet aangemeld",
+  "api.problem.forbidden": "Geen toegang",
+  "api.problem.organizationMismatch": "Actieve organisatie komt niet overeen",
   "api.problem.invalidValue": "Ongeldige waarde",
   "app.name": "TalentStroom",
   "app.tagline": "Werven zonder gedoe.",
   "app.apiStatus.loading": "API-status laden…",
   "app.apiStatus.error": "API-status niet beschikbaar",
   "app.welcome": "Welkom bij {app}",
+  "mail.footer":
+    "Je ontvangt deze e-mail omdat dit adres is gebruikt bij {app}. Verwachtte je hem niet? Dan kun je hem negeren.",
+  "mail.verifyEmail.subject": "Bevestig je e-mailadres voor {app}",
+  "mail.verifyEmail.body":
+    "Hallo {name},\n\nBevestig je e-mailadres om je account te activeren:\n{url}\n\nDeze link is 1 uur geldig.",
+  "mail.resetPassword.subject": "Wachtwoord opnieuw instellen voor {app}",
+  "mail.resetPassword.body":
+    "Hallo {name},\n\nStel via deze link een nieuw wachtwoord in:\n{url}\n\nDeze link is 1 uur geldig. Na het wijzigen word je op al je apparaten afgemeld.",
+  "mail.invitation.subject": "Uitnodiging voor {organization} op {app}",
+  "mail.invitation.body":
+    "Hallo,\n\n{inviter} nodigt je uit om lid te worden van {organization} op {app}.\n\nAccepteer de uitnodiging via deze link:\n{url}\n\nDe uitnodiging is 7 dagen geldig.",
   "nav.dashboard": "Dashboard",
   "nav.vacancies": "Vacatures",
   "nav.candidates": "Kandidaten",

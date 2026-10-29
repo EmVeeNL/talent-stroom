@@ -14,6 +14,8 @@ catalog:
   "@vitejs/plugin-react": 6.1.2
   astro: 7.4.2
   "@hono/zod-openapi": 1.6.3
+  # Identity (ADR 0006). Pinned: the 7-day release age rule keeps us a patch or two behind.
+  better-auth: 1.7.12
   openapi-fetch: 0.17.0
   openapi-typescript: 7.13.0
   hono: 4.13.13

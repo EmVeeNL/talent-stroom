@@ -8,12 +8,26 @@ export const enGB = {
   "api.problem.notFound": "Not Found",
   "api.problem.internalError": "Internal Server Error",
   "api.problem.tooManyRequests": "Too Many Requests",
+  "api.problem.unauthorized": "Not signed in",
+  "api.problem.forbidden": "Forbidden",
+  "api.problem.organizationMismatch": "Active organization does not match",
   "api.problem.invalidValue": "Invalid value",
   "app.name": "TalentStroom",
   "app.tagline": "Recruiting without the hassle.",
   "app.apiStatus.loading": "Loading API status…",
   "app.apiStatus.error": "API status unavailable",
   "app.welcome": "Welcome to {app}",
+  "mail.footer":
+    "You are receiving this email because this address was used with {app}. Not expecting it? You can ignore it.",
+  "mail.verifyEmail.subject": "Confirm your email address for {app}",
+  "mail.verifyEmail.body":
+    "Hello {name},\n\nConfirm your email address to activate your account:\n{url}\n\nThis link is valid for 1 hour.",
+  "mail.resetPassword.subject": "Reset your {app} password",
+  "mail.resetPassword.body":
+    "Hello {name},\n\nSet a new password using this link:\n{url}\n\nThis link is valid for 1 hour. After the change you will be signed out on all your devices.",
+  "mail.invitation.subject": "Invitation to {organization} on {app}",
+  "mail.invitation.body":
+    "Hello,\n\n{inviter} invites you to join {organization} on {app}.\n\nAccept the invitation using this link:\n{url}\n\nThe invitation is valid for 7 days.",
   "nav.dashboard": "Dashboard",
   "nav.vacancies": "Vacancies",
   "nav.candidates": "Candidates",

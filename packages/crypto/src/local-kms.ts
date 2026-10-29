@@ -96,7 +96,13 @@ export async function createLocalKms(options: LocalKmsOptions): Promise<LocalKms
 
   async function newKek(kekRef: string, keyVersion: number): Promise<CryptoKey> {
     if (rootKey === undefined) {
-      return crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+      const generated = await crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, false, [
+        "encrypt",
+        "decrypt",
+      ]);
+      // Symmetric generateKey yields a CryptoKey; Workers types declare the CryptoKeyPair union too.
+      if ("privateKey" in generated) throw new TypeError("unexpected key pair");
+      return generated;
     }
     return crypto.subtle.deriveKey(
       {

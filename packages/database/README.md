@@ -48,7 +48,8 @@ Mail: point local SMTP at `127.0.0.1:1025` (any credentials accepted) and read m
 
 ## Tenant queries on Workers
 
-Create a handle **inside each request handler**, using the uncached `HYPERDRIVE.connectionString`
+Workers import the tenant layer from `@talentstroom/database/tenant` (same exports as below,
+without the migrator, which needs `node:fs` and runs top-level code). Create a handle **inside each request handler**, using the uncached `HYPERDRIVE.connectionString`
 (`ts_app`). The handle owns one `pg` Client and a private Kysely `PostgresDialect`, with a
 single-connection pool wrapper (`max: 1`). It connects lazily and serializes transactions
 on that handle. Never keep a handle or client in module scope or share one between requests.

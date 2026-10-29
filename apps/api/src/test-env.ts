@@ -1,7 +1,7 @@
 // Shared test environment for API unit tests.
-// These routes never touch the database; any use of the binding fails the test loudly.
+// These routes never touch the database; any use of a binding fails the test loudly.
 const unavailable = (): never => {
-  throw new Error("HYPERDRIVE is not available in unit tests");
+  throw new Error("Hyperdrive is not available in unit tests");
 };
 export const unavailableHyperdrive: Hyperdrive = {
   connect: unavailable,
@@ -31,7 +31,12 @@ export const unavailableHyperdrive: Hyperdrive = {
 export const testEnv: Env = {
   SERVICE_NAME: "api",
   ENVIRONMENT: "development",
+  MAIL_TRANSPORT: "none",
   HYPERDRIVE: unavailableHyperdrive,
+  HYPERDRIVE_AUTH: unavailableHyperdrive,
+  // Synthetic placeholder for tests only.
+  BETTER_AUTH_SECRET: "unit-test-secret-not-used-anywhere-else-0000",
+  BETTER_AUTH_URL: "http://localhost:5173",
   RATE_LIMIT_ANON: fakeRateLimit(),
   RATE_LIMIT_AUTH_ATTEMPT: fakeRateLimit(),
 };

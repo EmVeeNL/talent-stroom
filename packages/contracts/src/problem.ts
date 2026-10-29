@@ -20,6 +20,13 @@ export const PROBLEMS = {
     status: 429,
     titleKey: "api.problem.tooManyRequests",
   },
+  unauthorized: { type: `${PROBLEM_BASE_URI}/unauthorized`, status: 401, titleKey: "api.problem.unauthorized" },
+  forbidden: { type: `${PROBLEM_BASE_URI}/forbidden`, status: 403, titleKey: "api.problem.forbidden" },
+  organizationMismatch: {
+    type: `${PROBLEM_BASE_URI}/organization-mismatch`,
+    status: 409,
+    titleKey: "api.problem.organizationMismatch",
+  },
   internalError: { type: `${PROBLEM_BASE_URI}/internal-error`, status: 500, titleKey: "api.problem.internalError" },
 } as const;
 
