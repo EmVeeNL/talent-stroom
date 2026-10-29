@@ -19,7 +19,9 @@
     "db:down": "docker compose down",
     "db:reset": "docker compose down --volumes && docker compose up --detach --wait && node packages/database/src/cli.ts migrate --local && node packages/database/src/cli.ts dev-passwords --local",
     "db:migrate": "node --env-file-if-exists=.env packages/database/src/cli.ts migrate",
-    "db:dev-passwords": "node --env-file-if-exists=.env packages/database/src/cli.ts dev-passwords"
+    "db:dev-passwords": "node --env-file-if-exists=.env packages/database/src/cli.ts dev-passwords",
+    "visual": "pnpm --filter @talentstroom/web visual",
+    "visual:install": "pnpm --filter @talentstroom/web visual:install"
   },
   "devDependencies": {
     "oxfmt": "catalog:",

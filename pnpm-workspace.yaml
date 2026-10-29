@@ -19,6 +19,7 @@ catalog:
   openapi-fetch: 0.17.0
   openapi-typescript: 7.13.0
   hono: 4.13.13
+  "@playwright/test": 1.64.1
   # UI component tests (packages/ui)
   "@testing-library/dom": 10.4.2
   "@testing-library/react": 16.3.3

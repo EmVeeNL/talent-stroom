@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Tabs, ThemeToggle, setThemePreference } from "@talentstroom/ui";
+import { Tabs, ThemeToggle } from "@talentstroom/ui";
 import { t, DEFAULT_LOCALE, LOCALES, isLocale } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
 import { pages } from "./pages/index.ts";
@@ -7,14 +7,22 @@ import { GalleryContext } from "./context.ts";
 import "./gallery.css";
 const readPage = () => pages.find((p) => p.id === window.location.hash.slice(1))?.id ?? "layout";
 export function Gallery() {
-  useEffect(() => {
-    if (!import.meta.env.DEV) return;
-    const theme = new URLSearchParams(window.location.search).get("theme");
-    if (theme === "light" || theme === "dark") setThemePreference(theme);
-  }, []);
+  const requestedTheme = new URLSearchParams(window.location.search).get("theme");
+  const forcedTheme =
+    import.meta.env.DEV && (requestedTheme === "light" || requestedTheme === "dark") ? requestedTheme : null;
   const [locale, setLocale] = useState<Locale>(DEFAULT_LOCALE);
   const [page, setPage] = useState<string>(readPage);
   const tr = (key: MessageKey) => t(locale, key);
+  useEffect(() => {
+    if (!forcedTheme) return undefined;
+    const root = document.documentElement;
+    const previous = root.dataset["theme"];
+    root.dataset["theme"] = forcedTheme;
+    return () => {
+      if (previous === undefined) delete root.dataset["theme"];
+      else root.dataset["theme"] = previous;
+    };
+  }, [forcedTheme]);
   useEffect(() => {
     const update = () => setPage(readPage());
     window.addEventListener("hashchange", update);
@@ -36,14 +44,16 @@ export function Gallery() {
             <p>{tr("gallery.intro")}</p>
           </div>
           <div className="gallery-controls">
-            <ThemeToggle
-              label={tr("gallery.theme")}
-              labels={{
-                system: tr("gallery.theme.system"),
-                light: tr("gallery.theme.light"),
-                dark: tr("gallery.theme.dark"),
-              }}
-            />
+            {!forcedTheme && (
+              <ThemeToggle
+                label={tr("gallery.theme")}
+                labels={{
+                  system: tr("gallery.theme.system"),
+                  light: tr("gallery.theme.light"),
+                  dark: tr("gallery.theme.dark"),
+                }}
+              />
+            )}
             <label>
               {tr("gallery.language")}
               <select
