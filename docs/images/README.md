@@ -16,7 +16,7 @@ Earlier screen renders include placeholder names including **TalentMate**, **Tal
 
 ## Licensing & restrictions
 
-No commercial fonts or Google icon fonts are bundled. Use official upstream repositories and comply with their licenses. Do not treat example companies/candidates in mockups as real endorsements or usable stock imagery.
+Asap Sharp (SIL Open Font License 1.1) and Material Symbols Outlined (Apache-2.0) are bundled under `packages/ui/fonts/` with their license files and source revisions. Do not treat example companies/candidates in mockups as real endorsements or usable stock imagery.
 
 ## Related
 

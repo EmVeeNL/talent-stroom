@@ -5,12 +5,8 @@ Design font: **Asap Sharp**, by Omnibus-Type. Recommended weights: 400 regular, 
 Source: https://github.com/Omnibus-Type/Asap_Sharp
 License reported by the upstream project: SIL Open Font License 1.1.
 
-**Font binaries are intentionally not included.** Fetch from the official source separately, check its license and redistribute/self-host compliantly. No claim is made that Google Fonts currently hosts this family. Until installed, CSS falls back to Asap/system UI.
+Licensed Asap Sharp WOFF2 files are self-hosted in `packages/ui/fonts/asap-sharp/`. Import `@talentstroom/ui/fonts.css` before `@talentstroom/ui/tokens.css`; the package defines the four normal-style weights with `font-display: swap`. The source revision and conversion command are recorded alongside the files in `SOURCE.md`.
 
 ```css
-@font-face {
- font-family: 'Asap Sharp';
- src: url('/fonts/AsapSharp-Regular.woff2') format('woff2'); /* Replace with actual downloaded filename */
- font-style: normal; font-weight: 400; font-display: swap;
-}
+@import "@talentstroom/ui/fonts.css";
 ```
