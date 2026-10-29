@@ -65,6 +65,12 @@
       }
     },
     {
+      "files": ["packages/crypto/**/*.ts"],
+      "rules": {
+        "no-console": "error"
+      }
+    },
+    {
       "files": ["apps/web/**/*.ts", "apps/web/**/*.tsx"],
       "plugins": ["typescript", "unicorn", "oxc", "import", "react", "jsx-a11y"],
       "env": {

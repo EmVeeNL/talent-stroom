@@ -18,3 +18,4 @@ One file per significant decision: `NNNN-short-title.md`, numbered sequentially.
 | [0008](0008-key-management-kms.md)             | Key management: external KMS for envelope encryption       | Proposed                                  |
 | [0009](0009-oxlint-and-oxfmt.md)               | oxlint and oxfmt replace ESLint and Prettier               | Accepted                                  |
 | [0010](0010-migration-runner.md)               | Migration runner: own runner on `pg`                       | Accepted                                  |
+| [0011](0011-envelope-encryption-format.md)     | Envelope encryption format                                 | Accepted                                  |
