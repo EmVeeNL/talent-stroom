@@ -1,5 +1,10 @@
 /** Source catalog. Keys are stable identifiers; never store translated labels in the database. */
 export const nlNL = {
+  "api.problem.validationError": "Validatiefout",
+  "api.problem.malformedJson": "Ongeldige JSON",
+  "api.problem.notFound": "Niet gevonden",
+  "api.problem.internalError": "Interne serverfout",
+  "api.problem.invalidValue": "Ongeldige waarde",
   "app.name": "TalentStroom",
   "app.tagline": "Werven zonder gedoe.",
   "app.welcome": "Welkom bij {app}",

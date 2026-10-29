@@ -64,3 +64,11 @@ jobs:
             echo "::error::apps/api/worker-configuration.d.ts is stale. Run 'pnpm --filter @talentstroom/api cf-typegen' and commit."
             exit 1
           }
+
+      - name: Generated OpenAPI contract is up to date
+        run: |
+          pnpm --filter @talentstroom/api openapi
+          git diff --exit-code -- apps/api/openapi.json || {
+            echo "::error::apps/api/openapi.json is stale. Run 'pnpm --filter @talentstroom/api openapi' and commit."
+            exit 1
+          }
