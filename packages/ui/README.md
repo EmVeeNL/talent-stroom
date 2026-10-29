@@ -131,3 +131,19 @@ Automated tests cover semantics, keyboard interactions, meaningful empty/loading
 `src/brand/talentstroom-mark.svg` is the vector person/wave mark (hand-authored Bézier paths and linear gradients, redrawn from `docs/logo/*.png`; no raster data). `Logo` renders it inline with `variant` `mark | full`, `tone` `auto | light | dark`, `size` `sm | md | lg | xl`; the full variant sets "Talent" + "Stroom" as live Asap Sharp 700 text (the PNG lettering is a placeholder font and is not reused). It has the accessible name "TalentStroom"; pass `decorative` when visible text sits next to it. `Logo.test.tsx` keeps the component paths identical to the SVG file.
 
 Favicons and app icons for `apps/web` and `apps/site` (`favicon.svg/.ico`, `apple-touch-icon.png`, `icon-192/512.png`, `site.webmanifest`) are generated with `pnpm --filter @talentstroom/ui brand-icons` (needs Node 22+ and `rsvg-convert`, `brew install librsvg`). Commit the output.
+
+## Visual review
+
+Run `pnpm visual:install` once, then `pnpm visual` from the repository root. Playwright
+starts and stops its own Vite server on port **5178**; no API server is needed. Every page
+in the gallery registry is captured automatically in light/dark at 1440×1000 and 390×844,
+after text and icon fonts load. PNGs live at `artifacts/visual/<page>-<theme>-<width>.png`;
+open `artifacts/visual/index.html` for the contact sheet. Artifacts are git-ignored.
+
+For manual review use `/?gallery&theme=light#forms` or `theme=dark` on the dev server.
+This dev-only override never writes localStorage. Review against `docs/images/redesign/`:
+tokens and component specs win over mockup pixels, and WCAG 2.2 AA wins over the visual spec.
+
+UI PRs receive a `visual` CI artifact (14-day retention); this job is not a required check.
+There are no pixel assertions yet. Auth screenshots await the missing auth screen
+implementation. See [the web README](../../apps/web/README.md) for scope and follow-ups.

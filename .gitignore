@@ -10,3 +10,5 @@ dist/
 .dev.vars
 *.log
 
+# Local/CI visual review output
+artifacts/
