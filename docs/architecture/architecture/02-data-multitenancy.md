@@ -1,7 +1,7 @@
 # 08 — Database design and multi-organization identity
 
 ## Membership model
-A human has one global identity and belongs to zero or many organizations. Tables: `identities`, `organizations`, `organization_memberships(identity_id, organization_id, role, status)`, `organization_invitations`, `sessions`, `authenticators`, `security_events`. Keep identity email global but organization-owned profiles and business data tenant scoped. An invitation does not grant membership until accepted and verified.
+A human has one global identity in `users` and belongs to zero or many organizations. Better Auth (ADR 0006) manages the identity tables `users`, `sessions`, `auth_accounts`, `auth_verifications`, `auth_passkeys`, `auth_two_factors` and `auth_rate_limits`, plus the organization plugin tables `organizations`, `memberships(organization_id, user_id, role, …)` and `organization_invitations`. Better Auth tables live in the `auth` schema; whether `organizations` and `memberships` stay there or move to `app` (they are referenced by every tenant table) is decided in #55. Security events go to our own `auth_security_events` table (schema decided in #55). Keep identity email global but organization-owned profiles and business data tenant scoped. An invitation does not grant membership until accepted and verified.
 
 ## Login step two
 1. Authenticate with approved IdP/passkey/password.
@@ -26,3 +26,6 @@ Record-level encryption makes arbitrary plaintext SQL `LIKE`, full-text search a
 
 ## Migrations
 Forward-only additive migrations first; backfills via idempotent durable jobs; compatibility rollout (expand → migrate → contract); backups and rollback plans. Version encryption envelope and schemas independently.
+
+## Naming and source of truth
+Migrations in `packages/database/migrations/` are authoritative for the real schema. Better Auth owns the `auth` schema; domain tables live in schema `app`. See [the detailed identity mapping](04-identity-better-auth.md#5-schema-reconciliation-52).
