@@ -1,0 +1,28 @@
+/* TalentStroom design tokens. Source: docs/images/tokens/design-tokens.json */
+:root {
+  --font-ui: "Asap Sharp", "Asap", system-ui, sans-serif;
+  --ts-sidebar: #111827;
+  --ts-surface: #fff;
+  --ts-bg: #f5f7fb;
+  --ts-primary: #4f59f7;
+  --ts-primary-hover: #3e48d4;
+  --ts-mint: #5dddc1;
+  --ts-success: #158365;
+  --ts-warning: #bd7b20;
+  --ts-danger: #c63e55;
+  --ts-text: #172137;
+  --ts-text-muted: #68748a;
+  --ts-border: #e5e9f1;
+  --ts-radius-sm: 6px;
+  --ts-radius-md: 10px;
+  --ts-radius-lg: 16px;
+  --ts-radius-xl: 20px;
+  --ts-space: 4px;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  background: var(--ts-bg);
+  color: var(--ts-text);
+}

@@ -1,0 +1,4 @@
+{
+  "extends": "@talentstroom/config/tsconfig.base.json",
+  "include": ["src"]
+}

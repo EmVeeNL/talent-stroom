@@ -1,0 +1,22 @@
+{
+  "name": "@talentstroom/site",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "typecheck": "astro check"
+  },
+  "dependencies": {
+    "@talentstroom/i18n": "workspace:*",
+    "@talentstroom/ui": "workspace:*",
+    "astro": "catalog:"
+  },
+  "devDependencies": {
+    "@astrojs/check": "catalog:",
+    "@talentstroom/config": "workspace:*",
+    "typescript": "catalog:typescript6"
+  }
+}

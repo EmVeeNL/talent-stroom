@@ -1,0 +1,24 @@
+---
+import "@talentstroom/ui/tokens.css";
+import { t, type Locale } from "@talentstroom/i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const lang = locale.slice(0, 2);
+---
+
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{t(locale, "app.name")} — {t(locale, "app.tagline")}</title>
+    <link rel="alternate" hreflang="nl" href="/nl/" />
+    <link rel="alternate" hreflang="en" href="/en/" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,44 @@
+packages:
+  - apps/*
+  - packages/*
+
+# Single source of truth for shared dependency versions (use "catalog:" in package.json).
+catalog:
+  # TypeScript 7 (native compiler) builds and typechecks; see docs/adr/0003-typescript-7-toolchain.md
+  typescript: 7.0.2
+  "@astrojs/check": 0.9.11
+  "@eslint/js": 10.0.1
+  "@types/react": 19.3.0
+  "@types/react-dom": 19.3.0
+  "@vitejs/plugin-react": 6.1.2
+  astro: 7.4.1
+  eslint: 10.13.0
+  eslint-plugin-import-x: 4.17.1
+  eslint-plugin-react-hooks: 7.1.1
+  globals: 17.13.0
+  hono: 4.13.13
+  prettier: 3.9.10
+  prettier-plugin-astro: 1.1.1
+  react: 19.3.1
+  react-dom: 19.3.1
+  turbo: 2.11.10
+  typescript-eslint: 8.72.0
+  vite: 8.3.4
+  vitest: 5.0.5
+  wrangler: 4.151.3
+  zod: 4.6.7
+
+# TypeScript 6 for packages whose only TypeScript consumer needs the JS API (astro check).
+catalogs:
+  typescript6:
+    typescript: 6.0.3
+
+# Supply-chain policy: only install releases older than 7 days (minutes).
+minimumReleaseAge: 10080
+
+# Only these packages may run install scripts.
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+  workerd: true
