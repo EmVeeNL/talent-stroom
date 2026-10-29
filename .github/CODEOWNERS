@@ -1,0 +1,11 @@
+# Security-sensitive areas require explicit review by the owner.
+# See AGENTS.md: changes here need an accepted ADR.
+
+/.github/                  @EmVeeNL
+/.pnpmfile.cjs             @EmVeeNL
+/pnpm-workspace.yaml       @EmVeeNL
+/docs/adr/                 @EmVeeNL
+/apps/api/wrangler.jsonc   @EmVeeNL
+/packages/crypto/          @EmVeeNL
+/packages/auth/            @EmVeeNL
+/packages/database/        @EmVeeNL
