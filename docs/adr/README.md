@@ -13,3 +13,4 @@ One file per significant decision: `NNNN-short-title.md`, numbered sequentially.
 | [0003](0003-typescript-7-toolchain.md)         | TypeScript 7 toolchain with TypeScript 6 for API consumers | Accepted |
 | [0004](0004-local-dev-and-hosting.md)          | Local development with Wrangler and hosting on workers.dev | Accepted |
 | [0005](0005-dependency-supply-chain-policy.md) | Dependency supply-chain policy                             | Accepted |
+| [0009](0009-oxlint-and-oxfmt.md)               | oxlint and oxfmt replace ESLint and Prettier               | Accepted |
