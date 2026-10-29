@@ -29,6 +29,8 @@ describe("auth runtime", () => {
   it("never serves organization deletion, raw switching or operator escalation over HTTP", () => {
     for (const path of [
       "/organization/set-active",
+      "/organization/accept-invitation",
+      "/organization/reject-invitation",
       "/organization/delete",
       "/organization/remove-member",
       "/organization/leave",

@@ -84,17 +84,18 @@ Better Auth endpoints used now: `POST /api/auth/sign-up/email`, `GET /api/auth/v
 `POST /api/auth/sign-in/email`, `POST /api/auth/sign-out`, `GET /api/auth/get-session`,
 `POST /api/auth/request-password-reset`, `POST /api/auth/reset-password`, `/api/auth/two-factor/*`,
 invitation endpoints under `/api/auth/organization/*`. Not served over HTTP (404, `DISABLED_PATHS`
-in `src/auth/create-auth.ts`): organization create/set-active/delete/leave/remove-member and every
+in `src/auth/create-auth.ts`): organization create/set-active/delete/leave/remove-member/accept-invitation/reject-invitation and every
 admin path except `ban-user`, `unban-user` and `revoke-user-sessions` (`platform-support` role).
 
 Our endpoints (`/v1`, cookie session, `application/problem+json` errors):
 
-| Route                                   | Checks                                     | Result                                                        |
-| --------------------------------------- | ------------------------------------------ | ------------------------------------------------------------- |
-| `GET /v1/me/organizations`              | session, verified email, not banned        | active memberships in active organizations, active org id     |
-| `POST /v1/organizations`                | same + same-origin                         | 201, creator is `owner`, session rotated into the new org     |
-| `POST /v1/organizations/{orgId}/switch` | same + active membership in `orgId`        | 200, old session deleted, new cookie bound to `orgId`         |
-| `GET /v1/organizations/current`         | same + active membership in the active org | the verified context, read through `ts_app` with `withTenant` |
+| Route                                        | Checks                                                                                    | Result                                                                 |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `GET /v1/me/organizations`                   | session, verified email, not banned                                                       | active memberships in active organizations, active org id              |
+| `POST /v1/organizations`                     | same + same-origin                                                                        | 201, creator is `owner`, session rotated into the new org              |
+| `POST /v1/organizations/{orgId}/switch`      | same + active membership in `orgId`                                                       | 200, old session deleted, new cookie bound to `orgId`                  |
+| `POST /v1/invitations/{invitationId}/accept` | same + pending, unexpired invitation addressed to the verified email, active organization | 200, invited membership created, session rotated into its organization |
+| `GET /v1/organizations/current`              | same + active membership in the active org                                                | the verified context, read through `ts_app` with `withTenant`          |
 
 401 without a valid session; 403 for an unverified or banned user, a cross-origin unsafe request,
 or no active membership; 409 when `X-Organization-Id` differs from the session's active
@@ -111,8 +112,58 @@ organization (the header never selects a tenant).
   switch endpoint calls a server-only Better Auth endpoint (`src/auth/session-rotation.ts`) that
   deletes the current session row, creates a new one with `active_organization_id` set (copying
   `created_at` and `expires_at`, so a switch neither makes the session "fresh" nor extends it) and
-  sets the new cookie. Creating an organization rotates the same way. Clients must abort in-flight
+  sets the new cookie. Creating an organization and accepting an invitation rotate the same way. Clients must abort in-flight
   requests and drop every cached response of the previous organization.
+
+### Sign-in method and MFA policy
+
+Session creation records `auth_method` from the verified route: `password`,
+`social:google`, `social:apple`, `social:microsoft`, or `passkey`. Successful
+`/two-factor/verify-totp` upgrades only that session to `password+totp` or
+`social:<provider>+totp`; failed codes and backup codes do not grant MFA. A password
+sign-in challenge creates its session only after verification. Organization rotation
+preserves the method, session age and expiry. Unknown and legacy null methods fail closed.
+
+`app.organizations.settings.requireMfa = true` requires a passkey, password + TOTP,
+or Google/Apple/Microsoft + TOTP (ADR 0006 owner decision 2). Membership middleware
+and organization switching return 403 `https://talentstroom.dev/problems/mfa-required`
+otherwise. Policies are read on each request. Invitation acceptance still creates the
+membership and rotates; subsequent tenant access is subject to the same MFA check.
+The picker and TOTP endpoints remain accessible for step-up.
+
+A new session automatically selects the organization only when exactly one active
+membership belongs to an active organization and its MFA policy is satisfied.
+`settings.requireExplicitSelection = true` also keeps the selection null. Zero or
+multiple eligible memberships leave `active_organization_id` null; policy checks never
+filter several active organizations down to one. No rotation is needed for a new session.
+Existing columns from migration 0003 suffice; no migration is added.
+
+Passkey recording is ready for the passkey verification route; enabling/configuring the
+passkey plugin and requiring user verification remains a follow-up. Allowed-method and
+idle-lock policies are outside this minimal require-MFA hook.
+
+### Accepting invitations
+
+`POST /v1/invitations/{invitationId}/accept` requires a same-origin request and a verified,
+non-banned session; it does not require an existing organization membership. The invitation email
+must match the current user email case-insensitively. Unknown ids and invitations addressed to
+someone else return the same 404 problem, before exposing invitation state. For the recipient:
+non-pending invitations (accepted, rejected or canceled) return 409, inactive organizations return
+403, and expired pending invitations in active organizations return 410. Existing memberships
+(active **or suspended**) return 409 without changing the role or reactivating access; reinstatement
+requires a separate authorized policy flow.
+
+Acceptance locks the invitation and holds the user and organization state stable, then creates the
+membership with the invited role, marks the invitation accepted and inserts `invitation.accepted`
+in one `ts_auth` transaction. Unique membership constraints protect against concurrent invitations;
+retries of an accepted invitation return 409. The event contains only user/organization ids and the
+event type, with empty metadata. After commit the handler calls the same server-only rotation
+endpoint as organization switching. Rotation is a separate operation: if it fails, acceptance stays
+committed; the existing helper revokes the old token before issuing a new one. Sign in again and
+use the organization switch endpoint to recover. Rotation preserves session age and expiry.
+
+Raw Better Auth acceptance and rejection are disabled (404); rejection lacks our organization-state
+and expiry checks. A `/v1` decline endpoint is deferred.
 
 ### Cookies
 
@@ -160,9 +211,9 @@ follow the link, sign in, then `POST /api/v1/organizations`.
 
 ### Tests
 
-- Unit (no database): `src/auth/auth.test.ts`, `src/mail/mail.test.ts`.
+- Unit (no database): `src/auth/auth.test.ts`, `src/auth/auth-method.test.ts`, `src/mail/mail.test.ts`.
 - Postgres (skipped without `DATABASE_TEST_URL`; scratch database per file, as `ts_auth` and
-  `ts_app`): `src/auth/identity.integration.test.ts` (BDD scenarios of #61, #62, #67) and
+  `ts_app`): `src/auth/identity.integration.test.ts` (BDD scenarios of #61, #62, #67, #361, #362) and
   `src/auth/schema.integration.test.ts`, the Better Auth runtime schema check
   (`validateSchema: true`) that CI runs in the `database` job instead of `auth generate` (ADR 0012).
 

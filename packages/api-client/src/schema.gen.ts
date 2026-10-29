@@ -20,6 +20,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/invitations/{invitationId}/accept": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Accept an invitation and rotate the session into its organization
+     * @description Requires the recipient's verified email and an active organization. Membership, invitation status and security event commit together before session rotation. Existing memberships, including suspended memberships, are refused. Clients must drop previous organization caches.
+     */
+    post: operations["acceptInvitation"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/me/organizations": {
     parameters: {
       query?: never;
@@ -125,7 +145,7 @@ export interface components {
     };
   };
   responses: {
-    /** @description Email not verified, account banned, cross-origin request, or no active membership */
+    /** @description Email not verified, account banned, cross-origin request, no active membership, or MFA required (mfa-required) */
     Forbidden: {
       headers: {
         /** @description Request correlation ID */
@@ -251,6 +271,81 @@ export interface operations {
           "application/json": components["schemas"]["HealthResponse"];
         };
       };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  acceptInvitation: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        invitationId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Accepted. A new session cookie replaces the revoked previous session. */
+      200: {
+        headers: {
+          /** @description The rotated session cookie (HttpOnly, SameSite=Lax) */
+          "Set-Cookie": string;
+          "X-Request-Id": string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** Format: uuid */
+            membershipId: string;
+            name: string;
+            /** Format: uuid */
+            organizationId: string;
+            /** @enum {string} */
+            role: "owner" | "admin" | "recruiter" | "viewer";
+          };
+        };
+      };
+      401: components["responses"]["Unauthorized"];
+      403: components["responses"]["Forbidden"];
+      404: components["responses"]["NotFound"];
+      /** @description Invitation no longer pending, or membership already exists (including suspended) */
+      409: {
+        headers: {
+          "X-Request-Id": string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": {
+            detail?: string;
+            instance?: string;
+            requestId: string;
+            status: number;
+            title: string;
+            /** Format: uri */
+            type: string;
+          };
+        };
+      };
+      /** @description Invitation expired */
+      410: {
+        headers: {
+          "X-Request-Id": string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/problem+json": {
+            detail?: string;
+            instance?: string;
+            requestId: string;
+            status: number;
+            title: string;
+            /** Format: uri */
+            type: string;
+          };
+        };
+      };
+      422: components["responses"]["ValidationError"];
+      429: components["responses"]["TooManyRequests"];
       500: components["responses"]["InternalError"];
     };
   };

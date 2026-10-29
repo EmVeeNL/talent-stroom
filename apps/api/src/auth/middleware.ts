@@ -3,6 +3,7 @@ import type { Context, MiddlewareHandler } from "hono";
 import type { Kysely } from "kysely";
 import type { MailTransport } from "../mail/index.ts";
 import { problem, type AppEnv } from "../problem.ts";
+import { satisfiesMfa } from "./auth-method.ts";
 import { createAuth, type AuthEnv } from "./create-auth.ts";
 import type { IdentityDatabase } from "./identity-db.ts";
 import type { VerifiedMembership } from "./types.ts";
@@ -76,6 +77,7 @@ export const requireSession: MiddlewareHandler<AppEnv> = async (c, next) => {
   c.set("principal", {
     userId: user.id,
     sessionId: response.session.id,
+    authMethod: response.session.authMethod ?? null,
     activeOrganizationId: response.session.activeOrganizationId ?? null,
   });
   return next();
@@ -90,7 +92,13 @@ export async function findActiveMembership(
   const row = await db
     .selectFrom("app.memberships as m")
     .innerJoin("app.organizations as o", "o.id", "m.organization_id")
-    .select(["m.id as membershipId", "m.organization_id as organizationId", "m.role", "o.name as organizationName"])
+    .select([
+      "m.id as membershipId",
+      "m.organization_id as organizationId",
+      "m.role",
+      "o.name as organizationName",
+      "o.settings",
+    ])
     .where("m.user_id", "=", userId)
     .where("m.organization_id", "=", organizationId)
     .where("m.state", "=", "active")
@@ -110,6 +118,8 @@ export const requireMembership: MiddlewareHandler<AppEnv> = async (c, next) => {
   if (principal.activeOrganizationId === null) return problem(c, "forbidden");
   const membership = await findActiveMembership(c.get("identity").db, principal.userId, principal.activeOrganizationId);
   if (membership === undefined) return problem(c, "forbidden");
+  if (membership.settings["requireMfa"] === true && !satisfiesMfa(principal.authMethod))
+    return problem(c, "mfaRequired");
   const claimed = c.req.header("X-Organization-Id");
   if (claimed !== undefined && claimed.toLowerCase() !== membership.organizationId.toLowerCase()) {
     return problem(c, "organizationMismatch");

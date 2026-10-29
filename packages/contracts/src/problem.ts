@@ -22,10 +22,21 @@ export const PROBLEMS = {
   },
   unauthorized: { type: `${PROBLEM_BASE_URI}/unauthorized`, status: 401, titleKey: "api.problem.unauthorized" },
   forbidden: { type: `${PROBLEM_BASE_URI}/forbidden`, status: 403, titleKey: "api.problem.forbidden" },
+  mfaRequired: { type: `${PROBLEM_BASE_URI}/mfa-required`, status: 403, titleKey: "api.problem.mfaRequired" },
   organizationMismatch: {
     type: `${PROBLEM_BASE_URI}/organization-mismatch`,
     status: 409,
     titleKey: "api.problem.organizationMismatch",
+  },
+  invitationExpired: {
+    type: `${PROBLEM_BASE_URI}/invitation-expired`,
+    status: 410,
+    titleKey: "api.problem.invitationExpired",
+  },
+  invitationConflict: {
+    type: `${PROBLEM_BASE_URI}/invitation-conflict`,
+    status: 409,
+    titleKey: "api.problem.invitationConflict",
   },
   internalError: { type: `${PROBLEM_BASE_URI}/internal-error`, status: 500, titleKey: "api.problem.internalError" },
 } as const;

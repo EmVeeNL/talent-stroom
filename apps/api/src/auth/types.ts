@@ -6,6 +6,7 @@ export type MembershipRole = IdentityDatabase["app.memberships"]["role"];
 export interface Principal {
   userId: string;
   sessionId: string;
+  authMethod: string | null;
   activeOrganizationId: string | null;
 }
 
@@ -15,4 +16,5 @@ export interface VerifiedMembership {
   membershipId: string;
   role: MembershipRole;
   organizationName: string;
+  settings: Record<string, unknown>;
 }

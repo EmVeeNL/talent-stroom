@@ -8,3 +8,5 @@ export {
   OrganizationIdParam,
   OrganizationMembership,
 } from "./organizations.ts";
+
+export { InvitationIdParam } from "./invitations.ts";

@@ -13,6 +13,7 @@
     "openapi": "node scripts/openapi.ts && oxfmt openapi.json"
   },
   "dependencies": {
+    "@better-auth/core": "catalog:",
     "@hono/zod-openapi": "catalog:",
     "@talentstroom/contracts": "workspace:*",
     "@talentstroom/database": "workspace:*",
