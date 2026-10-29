@@ -7,20 +7,32 @@ Schema migrations, database roles and the tenant-scoped Kysely data layer. Decis
 Requirements: Docker (Compose v2). Everything below runs on your machine only; the credentials in `compose.yaml`, `.env.example` and `src/local.ts` are **public throwaway values for the local container** and must never be used anywhere else.
 
 ```sh
-pnpm db:reset                          # fresh Postgres + Mailpit, migrate, set local passwords
 cp .env.example .env                   # DATABASE_MIGRATION_URL / DATABASE_TEST_URL for local tooling
 cp apps/api/.env.example apps/api/.env # Hyperdrive local override, required by `wrangler dev`
+pnpm db:reset                          # fresh Postgres + Mailpit, migrate, set local passwords
+pnpm db:seed                           # add synthetic local users and organizations
 ```
 
 | Command                 | What it does                                                                              |
 | ----------------------- | ----------------------------------------------------------------------------------------- |
 | `pnpm db:up`            | Start Postgres (127.0.0.1:5432) and Mailpit (SMTP 127.0.0.1:1025, UI :8025), wait healthy |
 | `pnpm db:down`          | Stop the containers, keep the data volume                                                 |
-| `pnpm db:reset`         | Drop the volume, start again, apply all migrations, set local passwords (no seed yet)     |
+| `pnpm db:reset`         | Drop the volume, start again, apply all migrations and set local passwords                |
+| `pnpm db:seed`          | Add synthetic organizations, users, credentials and memberships (local only)              |
 | `pnpm db:migrate`       | Apply pending migrations to `DATABASE_MIGRATION_URL` (from the shell or `.env`)           |
 | `pnpm db:dev-passwords` | Set the throwaway `ts_app`/`ts_auth` passwords; refuses non-local hosts                   |
 
 `db:reset` always targets the compose database (`--local`), even if `.env` points elsewhere.
+
+### Synthetic seed data
+
+**LOCAL DEVELOPMENT ONLY.** Run `pnpm db:reset` first, then `pnpm db:seed`. The seed refuses
+to connect unless `DATABASE_MIGRATION_URL` points to `localhost` or `127.0.0.1` and the
+database is named `talentstroom`. It creates two synthetic Dutch organizations and four fake
+users with memberships. All accounts use the development password `Welkom-bij-TalentStroom-1`;
+passwords are hashed by Better Auth and stored only in `auth.auth_accounts.password`. Never use
+these accounts or password outside the local development database. No candidate records are
+seeded because candidate private data requires KMS encryption.
 
 Integration tests run when `DATABASE_TEST_URL` (a superuser URL on the local server) is set, and are skipped with a message otherwise. They create and drop `ts_test_*` scratch databases:
 
