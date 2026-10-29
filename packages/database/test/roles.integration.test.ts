@@ -90,12 +90,15 @@ describe.skipIf(TEST_URL === "")("roles and tenant context (Postgres)", () => {
     await expect(app.query("CREATE TABLE app.sneaky (id int)")).rejects.toThrow(/permission denied for schema app/);
   });
 
-  it("ts_app has no access to the auth schema; ts_auth none to app", async () => {
+  it("ts_app has no access to the auth schema; ts_auth gets nothing on new app tables", async () => {
+    // ts_auth has USAGE on app for the identity tables only (ADR 0012); default privileges
+    // never grant it anything, so a new domain table such as rls_probe stays closed to it.
     const { rows } = await admin(
       `SELECT has_schema_privilege('ts_app', 'auth', 'USAGE') AS app_auth,
-              has_schema_privilege('ts_auth', 'app', 'USAGE') AS auth_app`,
+              has_any_column_privilege('ts_auth', 'app.rls_probe', 'SELECT, INSERT, UPDATE') AS auth_probe_columns,
+              has_table_privilege('ts_auth', 'app.rls_probe', 'SELECT, INSERT, UPDATE, DELETE') AS auth_probe`,
     );
-    expect(rows[0]).toEqual({ app_auth: false, auth_app: false });
+    expect(rows[0]).toEqual({ app_auth: false, auth_probe_columns: false, auth_probe: false });
   });
 
   it("ts_app cannot disable or un-force RLS, or truncate", async () => {

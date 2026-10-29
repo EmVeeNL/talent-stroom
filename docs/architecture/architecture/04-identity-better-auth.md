@@ -182,6 +182,8 @@ Key options and their sources:
 3. Names follow the SQL baseline (`users`, `memberships`), not `02-data-multitenancy.md` (`identities`, `organization_memberships`). #52 updates that doc.
 4. Better Auth's SQL output is the starting point of a migration, never applied unreviewed.
 
+> **Superseded in part by [ADR 0012](../../adr/0012-identity-schema-placement.md):** `organizations`, `memberships` and `organization_invitations` live in schema `app`; `ts_auth` has SELECT/INSERT/UPDATE on them but **no DELETE** (members are suspended), and `auth_security_events` is append-only. Use the Better Auth configuration from ADR 0012.
+
 ### Table mapping
 
 | Better Auth model | Our table | Notes |
