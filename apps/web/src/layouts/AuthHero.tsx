@@ -27,8 +27,8 @@ function Photo({ index, className, priority = false }: { index: number; classNam
   if (!photo) return null;
   return (
     <picture className={className}>
-      <source type="image/avif" srcSet={photo.avif} sizes="50vw" />
-      <source type="image/webp" srcSet={photo.webp} sizes="50vw" />
+      <source type="image/avif" srcSet={photo.avif} sizes="100vw" />
+      <source type="image/webp" srcSet={photo.webp} sizes="100vw" />
       <img
         src={photo.fallback}
         alt=""

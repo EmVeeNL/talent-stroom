@@ -599,41 +599,36 @@
 .gallery-auth-shell {
   height: 47.5rem;
   min-height: 47.5rem;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   border: 1px solid var(--ts-border);
   border-radius: var(--ts-radius-lg);
   overflow: hidden;
 }
 .gallery-auth-shell .auth-brand {
-  padding: var(--ts-space-6);
+  position: absolute;
 }
 .gallery-auth-shell .auth-brand-copy {
-  margin: auto 0;
+  display: none;
 }
 .gallery-auth-shell .auth-brand-title {
   font-size: var(--ts-font-size-2xl);
 }
 .gallery-auth-shell .auth-panel {
-  padding: var(--ts-space-5);
+  width: min(100%, 440px);
 }
 .gallery-auth-shell .auth-content {
-  max-width: 35rem;
-  padding-block: var(--ts-space-5);
+  max-width: 100%;
 }
 .gallery-auth-preview:has(.org-picker) .gallery-auth-shell .auth-content {
   max-width: 35rem;
 }
 @media (max-width: 800px) {
   .gallery-auth-shell {
-    display: block;
     height: auto;
     min-height: auto;
-  }
-  .gallery-auth-shell .auth-brand {
-    display: none;
+    padding-block: 5rem 2rem;
   }
   .gallery-auth-shell .auth-panel {
-    min-height: 44rem;
+    min-height: 0;
   }
 }
 
