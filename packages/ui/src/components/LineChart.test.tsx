@@ -19,10 +19,10 @@ describe("LineChart", () => {
         area
       />,
     );
-    expect(screen.getByRole("img", { name: "Plaatsingen" })).toBeDefined();
+    expect(await screen.findByRole("img", { name: "Plaatsingen" })).toBeDefined();
     await user.click(screen.getByText("Gegevens", { selector: "summary" }));
     expect(screen.getByRole("table").textContent).toContain("Team A");
-    const mark = container.querySelector<SVGElement>("[data-chart-mark]");
+    const mark = container.querySelector<SVGElement>("svg[tabindex]");
     act(() => mark?.focus());
     expect(screen.getByRole("tooltip").textContent).toContain("4");
     expect(await axeViolations(container)).toEqual([]);
@@ -53,7 +53,7 @@ describe("LineChart", () => {
         series={[{ id: "a", label: "Team", values: [3] }]}
       />,
     );
-    const point = container.querySelector<SVGElement>("[data-chart-mark]");
+    const point = container.querySelector<SVGElement>("svg[tabindex]");
     act(() => point?.focus());
     expect(screen.getByRole("tooltip")).toBeDefined();
     await user.keyboard("{Escape}");

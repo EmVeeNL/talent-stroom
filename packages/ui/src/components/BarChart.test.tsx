@@ -1,6 +1,6 @@
 import { render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { BarChart } from "./BarChart.tsx";
 import { axeViolations } from "../test-utils.ts";
 
@@ -19,12 +19,12 @@ describe("BarChart", () => {
         horizontal
       />,
     );
-    expect(screen.getByRole("img", { name: "Plaatsingen" })).toBeDefined();
+    expect(await screen.findByRole("img", { name: "Plaatsingen" })).toBeDefined();
     await user.click(screen.getByText("Gegevens", { selector: "summary" }));
     expect(screen.getByRole("table").textContent).toContain("Team A");
-    const mark = container.querySelector<SVGElement>("[data-chart-mark]");
+    const mark = container.querySelector<SVGElement>("svg[tabindex]");
     act(() => mark?.focus());
-    expect(screen.getByRole("tooltip").textContent).toContain("4");
+    expect(screen.getByRole("tooltip").textContent).toContain("Jan");
     expect(await axeViolations(container)).toEqual([]);
   });
   it("supports no series and zero values without invalid geometry", async () => {
@@ -42,5 +42,38 @@ describe("BarChart", () => {
     );
     expect(container.innerHTML).not.toMatch(/NaN|Infinity/);
     expect(await axeViolations(container)).toEqual([]);
+  });
+  it("tracks document theme changes and keeps animation disabled for reduced motion", async () => {
+    const mediaQuery = {
+      matches: true,
+      addEventListener: vi.fn<() => void>(),
+      removeEventListener: vi.fn<() => void>(),
+    };
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn<() => typeof mediaQuery>(() => mediaQuery),
+    );
+    Object.defineProperty(window, "matchMedia", {
+      configurable: true,
+      value: vi.fn<() => typeof mediaQuery>(() => mediaQuery),
+    });
+    document.documentElement.dataset["theme"] = "light";
+    const { container } = render(
+      <BarChart
+        label="Plaatsingen"
+        tableLabel="Gegevens"
+        categories={["Jan"]}
+        series={[{ id: "a", label: "Team", values: [1] }]}
+      />,
+    );
+    const chart = await screen.findByRole("img", { name: "Plaatsingen" });
+    expect(chart.closest("[data-chart-theme]")?.getAttribute("data-chart-theme")).toBe("light");
+    document.documentElement.dataset["theme"] = "dark";
+    await screen.findByRole("img", { name: "Plaatsingen" });
+    expect(container.querySelector("[data-chart-theme='dark']")).not.toBeNull();
+    expect(container.querySelector("[data-chart-animation='off']")).not.toBeNull();
+    expect(container.querySelector("[data-chart-reduced-motion='yes']")).not.toBeNull();
+    delete document.documentElement.dataset["theme"];
+    vi.unstubAllGlobals();
   });
 });

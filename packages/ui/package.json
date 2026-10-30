@@ -19,6 +19,10 @@
   "peerDependencies": {
     "react": "catalog:"
   },
+  "dependencies": {
+    "@tanstack/charts": "catalog:",
+    "@tanstack/react-table": "catalog:"
+  },
   "devDependencies": {
     "@talentstroom/config": "workspace:*",
     "@testing-library/dom": "catalog:",
