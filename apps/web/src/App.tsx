@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { DEFAULT_LOCALE, isLocale, LOCALES, t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
 import { Button, Icon, Logo, Select, ThemeToggle, NavigationLinkContext } from "@talentstroom/ui";
-import { createTransport, errorKey, isAborted, listOrganizations, RequestError } from "./auth.ts";
+import { createTransport, errorKey, isAborted, RequestError } from "./auth.ts";
 import { RouterProvider, useRouterState } from "@tanstack/react-router";
 import { createAppRouter, activeMembership, ViewContext } from "./router.tsx";
 import type { AppRouter, AppView, SessionContext } from "./router.tsx";
@@ -13,6 +13,9 @@ import type { SessionUser } from "./Workspace.tsx";
 import { AuthLayout } from "./layouts/AuthLayout.tsx";
 import { AuthHero } from "./layouts/AuthHero.tsx";
 import { authRouteTitles, demoAuthRoutes, demoPagesEnabled, findRoute, knownTitles } from "./routes.ts";
+import { createDataLayer } from "./query.ts";
+import type { Bootstrap } from "./query.ts";
+import { QueryProvider } from "./QueryProvider.tsx";
 import "./auth.css";
 
 const OrganizationPicker = lazy(() =>
@@ -55,13 +58,15 @@ function AuthApp() {
     const value = new URLSearchParams(window.location.search).get("preview");
     return value === "dashboard" || value === "guest" ? value : null;
   });
+  const [layer] = useState(() => createDataLayer());
+  const [transitioning, setTransitioning] = useState(false);
   const initialCallback = useRef(callback);
   const [router, setRouter] = useState<AppRouter>();
   useEffect(() => {
     const captured = initialCallback.current;
     const params = new URLSearchParams(captured.query);
     if (params.has("token") || params.has("error")) window.history.replaceState(null, "", captured.path);
-    const current = createAppRouter({ demoAuthEnabled: harness !== "dashboard" });
+    const current = createAppRouter({ demoAuthEnabled: harness !== "dashboard", queryClient: layer.client });
     initialCallback.current = { path: captured.path, query: "" };
     let mounted = true;
     queueMicrotask(() => {
@@ -71,7 +76,7 @@ function AuthApp() {
       mounted = false;
       current.history.destroy();
     };
-  }, [harness]);
+  }, [harness, layer]);
   const demoAuth =
     demoPagesEnabled &&
     demoAuthRoutes.some((route) => route.path === window.location.pathname) &&
@@ -128,19 +133,8 @@ function AuthApp() {
     const signal = transport.signal;
     async function load() {
       try {
-        const session = await transport.auth("get-session", undefined, DEFAULT_LOCALE, signal);
-        if (signal.aborted) return;
-        if (!session || typeof session !== "object" || !("user" in session)) {
-          setContext({ kind: "guest" });
-          sessionGate.current.resolve({ kind: "guest" });
-          return;
-        }
-        const data = await listOrganizations(transport, signal);
-        if (!signal.aborted) {
-          const next = { kind: "ready" as const, data, user: readUser(session) };
-          sessionGate.current.resolve(next);
-          setContext(next);
-        }
+        const result = await layer.bootstrap(transport);
+        if (!signal.aborted) publish(result);
       } catch (err) {
         if (isAborted(err) || signal.aborted) return;
         const next: SessionContext =
@@ -152,12 +146,50 @@ function AuthApp() {
       }
     }
     void load();
-    return () => transport.cancel();
-  }, [transport, harness, demoAuth]);
+    return () => {
+      transport.cancel();
+      void layer.reset();
+    };
+  }, [transport, harness, demoAuth, layer]);
 
+  function publish(result: Bootstrap) {
+    const next: SessionContext =
+      result.session && result.data
+        ? { kind: "ready", data: result.data, user: readUser(result.session) }
+        : { kind: "guest" };
+    sessionGate.current.resolve(next);
+    setContext(next);
+  }
+  useEffect(() => {
+    layer.setHandlers({
+      onExpired: expire,
+      onLoaded: publish,
+      onBarrier: (blocked) => {
+        setTransitioning(blocked);
+        router?.clearCache();
+      },
+      onRecoveryError: (error) => setContext({ kind: "error", message: errorKey(error) }),
+      onScopeChanged: reloadContext,
+    });
+  });
+  // Revalidate cookie context after tab changes/reconnection. Exchange no data across tabs.
+  useEffect(() => {
+    if (harness || demoAuth) return undefined;
+    const revalidate = () => {
+      if (document.visibilityState === "visible" && context.kind === "ready" && !transitioning) reloadContext();
+    };
+    window.addEventListener("focus", revalidate);
+    window.addEventListener("online", revalidate);
+    document.addEventListener("visibilitychange", revalidate);
+    return () => {
+      window.removeEventListener("focus", revalidate);
+      window.removeEventListener("online", revalidate);
+      document.removeEventListener("visibilitychange", revalidate);
+    };
+  });
   const active = activeMembership(context);
   // Guards are UX only: every organization-owned API read/write must verify membership and scope server-side.
-  // Session/organization state stays in the existing auth lifecycle; #424 adds Query.
+  // Query owns bootstrap data; router context is the resolved guard/view projection.
   const routerContext: AppView = {
     session: context,
     locale,
@@ -174,12 +206,13 @@ function AuthApp() {
     router.update({
       context: {
         session: context,
+        queryClient: layer.client,
         resolveSession: () => (context.kind === "loading" ? sessionGate.current.promise : Promise.resolve(context)),
       },
     });
     router.clearCache();
     void router.invalidate();
-  }, [router, context]);
+  }, [router, context, layer]);
   useEffect(
     () =>
       router?.subscribe("onResolved", ({ toLocation }) => {
@@ -195,14 +228,21 @@ function AuthApp() {
       navigate("/", true);
       return;
     }
+    reloadContext();
+    navigate("/", true);
+  }
+  function reloadContext() {
+    void layer.reset();
     transport.cancel();
     sessionGate.current = Promise.withResolvers<SessionContext>();
     setContext({ kind: "loading" });
     setTransport(createTransport());
-    navigate("/", true);
   }
   function expire() {
     transport.cancel();
+    layer.client.clear();
+    router?.clearCache();
+    sessionGate.current.resolve({ kind: "guest" });
     setContext({ kind: "guest" });
     navigate("/inloggen", true);
   }
@@ -212,10 +252,19 @@ function AuthApp() {
     setActionError(undefined);
     transport.cancel();
     try {
-      await transport.auth("sign-out", {}, locale);
+      await layer.transition(
+        transport,
+        ["session", "sign-out"],
+        (signal) => transport.auth("sign-out", {}, locale, signal),
+        false,
+      );
       expire();
     } catch (err) {
-      if (!isAborted(err)) setActionError(errorKey(err));
+      if (err instanceof RequestError && err.status === 401) expire();
+      else if (!isAborted(err)) {
+        setActionError(errorKey(err));
+        setContext({ kind: "error", message: errorKey(err) });
+      }
     } finally {
       setSignOutBusy(false);
     }
@@ -247,23 +296,30 @@ function AuthApp() {
         data={context.data}
         locale={locale}
         transport={transport}
-        onChanged={refresh}
+        onChanged={() => navigate("/", true)}
         onExpired={expire}
       />
     ) : null;
   if (!router) return <output>{tr("auth.loading")}</output>;
   return (
-    <ViewContext value={routerContext}>
-      <NavigationLinkContext value={RouterAnchor}>
-        <RouterProvider
-          router={router}
-          context={{
-            session: context,
-            resolveSession: () => (context.kind === "loading" ? sessionGate.current.promise : Promise.resolve(context)),
-          }}
-        />
-      </NavigationLinkContext>
-    </ViewContext>
+    <QueryProvider layer={layer} synthetic={!!harness}>
+      {transitioning && <output>{tr("auth.loading")}</output>}
+      <div hidden={transitioning} inert={transitioning}>
+        <ViewContext value={routerContext}>
+          <NavigationLinkContext value={RouterAnchor}>
+            <RouterProvider
+              router={router}
+              context={{
+                session: context,
+                queryClient: layer.client,
+                resolveSession: () =>
+                  context.kind === "loading" ? sessionGate.current.promise : Promise.resolve(context),
+              }}
+            />
+          </NavigationLinkContext>
+        </ViewContext>
+      </div>
+    </QueryProvider>
   );
 
   function renderFrame(path: string, children: ReactNode) {
@@ -271,6 +327,7 @@ function AuthApp() {
     if (active && context.kind === "ready" && (currentRoute || !Object.hasOwn(authRouteTitles, path))) {
       return (
         <Workspace
+          key={active.organizationId}
           locale={locale}
           onLocaleChange={setLocale}
           transport={transport}
@@ -278,7 +335,7 @@ function AuthApp() {
           user={context.user}
           signOutBusy={signOutBusy}
           onSignOut={() => void signOut()}
-          onChanged={refresh}
+          onChanged={() => navigate("/", true)}
           onExpired={expire}
           headingRef={heading}
           currentPath={path}
@@ -289,7 +346,7 @@ function AuthApp() {
               {tr(actionError)}
             </p>
           )}
-          {children}
+          {transitioning ? null : children}
         </Workspace>
       );
     }

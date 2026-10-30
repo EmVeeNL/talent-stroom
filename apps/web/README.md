@@ -145,12 +145,45 @@ photograph is bundled. The email/password flow does not currently support a
 remember-me session option, so the login screen omits that checkbox. Social
 buttons are omitted because provider discovery is not configured by the API.
 
-TanStack Router is pinned in the workspace catalog under ADR 0015. Better Auth calls use plain fetch;
-organization operations use `@talentstroom/api-client`. The only retained server
-data is the app's in-memory membership context. Switching/creating aborts outstanding
-scope requests; success discards context and reloads the session and memberships
-before opening the workspace. Future tenant caches must join this invalidation
-boundary. There is no service-worker or persistent tenant cache.
+### Data layer
+
+TanStack Router and Query follow ADR 0015. Query and its development-only devtools
+are pinned to **5.104.5** in the workspace catalog. Each mounted app creates a private
+in-memory QueryClient above the router; the same client is available in router context.
+There is no persistence, dehydration, offline mutation queue or cross-tab cache sharing.
+Better Auth still uses the unchanged `auth.ts` fetch transport; typed organization
+operations use `@talentstroom/api-client` (openapi-fetch).
+
+`query.ts` owns session and membership options, typed organization query/mutation
+factories and the lifecycle barrier. `QueryProvider.tsx` exposes the layer to controls.
+Bootstrap keys are `['session']` and `['me', 'organizations']`. Organization query and
+mutation keys use `['org', verifiedOrganizationId, resource, operation, safeParameters]`.
+Only reviewed pagination/sort parameters belong in keys; never include credentials,
+callback tokens, names, emails or free-text searches. Organization work is allowed
+only after the active organization matches an authoritative membership. Future router
+loaders should call `ensureQueryData` with these same options and return no second
+copy of personal data in loader results.
+
+Switch/create/sign-out hide the old view and block new scoped work, advance a generation,
+abort transport and mutation work, cancel queries, clear both caches and clear router
+matches. The lifecycle request uses a separate signal. Switch/create reload session and
+memberships after the server rotates the cookie, even after a failed operation. The
+workspace remounts when its verified organization changes. Late responses and mutation
+callbacks cannot populate or invalidate the new scope. Sign-out and 401 expiry clear
+all caches; a failed sign-out retains generic recovery UI without restoring tenant data.
+Forbidden/mismatched scoped responses trigger a fresh bootstrap. Focus, visibility and
+reconnection refresh cookie context without exchanging personal data between tabs.
+
+Ordinary queries use 30-second freshness and five-minute garbage collection, with focus
+and reconnect refetching. Bootstrap queries are immediately stale and never retry.
+Ordinary reads retry once for network/5xx errors; aborts and 4xx do not retry. Mutations
+never retry. RFC 9457 errors are validated through the public contracts and retain only
+allowlisted problem types, UUID request IDs and known field paths/codes. Raw server
+text is discarded; existing translated auth error semantics are preserved.
+
+Devtools are lazy and gated by `import.meta.env.DEV`; they mount only in the synthetic
+preview harness. Production contains neither their UI nor their chunks. Do not dump
+query/mutation caches or inspect real personal data through devtools.
 
 Errors use translated safe messages; raw problem details, email addresses,
 passwords and tokens are never logged or rendered in errors. HTML form constraints
