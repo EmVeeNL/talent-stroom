@@ -1,3 +1,4 @@
+import { NavigationLink } from "./NavigationLink.tsx";
 import type { IconName } from "../icons.ts";
 import { useEffect, useId, useRef, useState } from "react";
 import type { MouseEventHandler, ReactNode } from "react";
@@ -114,7 +115,7 @@ function Entry({
     );
   return (
     <li>
-      <a
+      <NavigationLink
         ref={entryRef}
         className="ts-sidebar__item"
         href={item.href}
@@ -129,7 +130,7 @@ function Entry({
         }}
       >
         {content}
-      </a>
+      </NavigationLink>
     </li>
   );
 }
@@ -225,9 +226,9 @@ export function Sidebar({
     <div id={id} className={cx("ts-sidebar", collapsed && "ts-sidebar--collapsed", className)}>
       <div className="ts-sidebar__brand">
         {home ? (
-          <a className="ts-sidebar__home" href={home.href} onClick={home.onClick} aria-label={home.label}>
+          <NavigationLink className="ts-sidebar__home" href={home.href} onClick={home.onClick} aria-label={home.label}>
             {logo}
-          </a>
+          </NavigationLink>
         ) : (
           logo
         )}

@@ -1,3 +1,4 @@
+import { useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 import type { ReactNode, Ref } from "react";
 import { LOCALES, t } from "@talentstroom/i18n";
@@ -164,7 +165,7 @@ export function DashboardLayout({
         label: tr("shell.navigation"),
         soonLabel: tr("shell.soon"),
         home: { href: "/", label: tr("shell.home") },
-        sections: navigationSections(tr, currentPath),
+        sections: navigationSections(tr, useRouterState({ select: (state) => state.location.pathname })),
         footer: (
           <SidebarAssistant
             title={tr("shell.assistant.title")}

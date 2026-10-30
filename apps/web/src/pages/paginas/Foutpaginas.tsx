@@ -17,14 +17,24 @@ const data: Record<ErrorKind, { title: MessageKey; body: MessageKey; icon: strin
     code: "Offline",
   },
 };
-export function ErrorPage({ locale, kind }: { locale: Locale; kind?: ErrorKind }) {
+export function ErrorPage({
+  locale,
+  kind,
+  standalone = false,
+}: {
+  locale: Locale;
+  kind?: ErrorKind;
+  /** A real error route: the title is the page's h1. Examples on the index use h2. */
+  standalone?: boolean;
+}) {
   const item = data[kind ?? "404"];
+  const Heading = standalone ? "h1" : "h2";
   return (
     <section className="page-panel page-error">
       <div className="page-error-content">
         <Icon>{item.icon}</Icon>
         <div className="page-error-code">{item.code}</div>
-        <h2>{t(locale, item.title)}</h2>
+        <Heading>{t(locale, item.title)}</Heading>
         <p>{t(locale, item.body)}</p>
       </div>
       <div className="page-actions">

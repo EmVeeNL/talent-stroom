@@ -1,3 +1,4 @@
+import { Link } from "../../Link.tsx";
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { Button, Checkbox, Tabs, TextField } from "@talentstroom/ui";
@@ -133,9 +134,9 @@ export function AuthScreens({
       {(done || verified) && <output>{tr(done ?? "auth.verified")}</output>}
       {(invalid || invalidReset) && <p role="alert">{tr("auth.invalidLink")}</p>}
       {error && <p role="alert">{tr(error)}</p>}
-      {reset && error && <a href="/wachtwoord-vergeten">{tr("auth.newReset")}</a>}
+      {reset && error && <Link to="/wachtwoord-vergeten">{tr("auth.newReset")}</Link>}
       {invalidReset ? (
-        <a href="/wachtwoord-vergeten">{tr("auth.newReset")}</a>
+        <Link to="/wachtwoord-vergeten">{tr("auth.newReset")}</Link>
       ) : (
         !done && (
           <>
@@ -207,7 +208,7 @@ export function AuthScreens({
                 {login && (
                   <div className="auth-login-options">
                     <span aria-hidden="true" />
-                    <a href="/wachtwoord-vergeten">{tr("auth.forgotLink")}</a>
+                    <Link to="/wachtwoord-vergeten">{tr("auth.forgotLink")}</Link>
                   </div>
                 )}
                 {verify && <p className="auth-intro">{tr("auth.verificationHelp")}</p>}
@@ -237,10 +238,10 @@ export function AuthScreens({
       <nav className="auth-links">
         {login ? (
           <p>
-            {tr("auth.newAccount")} <a href="/registreren">{tr("auth.signUp")}</a>
+            {tr("auth.newAccount")} <Link to="/registreren">{tr("auth.signUp")}</Link>
           </p>
         ) : (
-          <a href="/inloggen">{tr(verified || done ? "auth.signIn" : "auth.back")}</a>
+          <Link to="/inloggen">{tr(verified || done ? "auth.signIn" : "auth.back")}</Link>
         )}
       </nav>
     </>

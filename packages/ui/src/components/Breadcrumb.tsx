@@ -1,3 +1,4 @@
+import { NavigationLink } from "./NavigationLink.tsx";
 import { cx } from "../classnames.ts";
 export interface BreadcrumbProps {
   label: string;
@@ -14,7 +15,7 @@ export function Breadcrumb({ label, items, className }: BreadcrumbProps) {
             {index === items.length - 1 ? (
               <span aria-current="page">{item.label}</span>
             ) : (
-              <a href={item.href ?? "/"}>{item.label}</a>
+              <NavigationLink href={item.href ?? "/"}>{item.label}</NavigationLink>
             )}
           </li>
         ))}
