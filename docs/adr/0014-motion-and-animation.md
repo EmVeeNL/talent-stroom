@@ -1,6 +1,6 @@
 # 0014 — Motion and animation
 
-- **Status:** Proposed
+- **Status:** Accepted with owner amendment (2026-10-30: Motion broadly)
 - **Date:** 2026-10-30
 - **Resolves:** —
 - **Issue:** #397 (epic #369; follow-ups #398–#402)
@@ -63,6 +63,15 @@ These are minimal Vite 8.3.5 + React 19.3.1 production builds of the same app: a
 | Playwright screenshots       | rAF springs not stopped by `animations: "disabled"`; use reduced motion / skip flag | same                                        | `animations: "disabled"` completes them                                  | same as CSS, flag for Motion             |
 | Licence                      | MIT                                                                                 | proprietary "no charge", Webflow-controlled | n/a                                                                      | MIT                                      |
 | Release churn vs. 7-day rule | high (several releases a week)                                                      | low                                         | n/a                                                                      | moderate (one pin, few call sites)       |
+
+## Owner amendment (2026-10-30)
+
+The owner chose **Motion (`motion/react`) broadly** instead of "CSS first, Motion only where CSS is not enough". This replaces the decision below where they conflict:
+
+- `motion` (MIT) is added to the catalog in #398 (exact pin, 7-day rule) and used for overlays (Dialog, Sheet, Popover, menus, toasts), page/route transitions, list enter/exit/reorder, Kanban drag and layout animation, expand/collapse and micro-interactions where it improves feel.
+- Bundle guard rails stay: `LazyMotion` with `domAnimation` features loaded via `import()` for the app, `domMax` (layout) only on routes that need it (Kanban, reorderable lists); components import from `@talentstroom/ui` motion helpers, never `motion/react` directly in pages.
+- Unchanged from this ADR: motion principles, tokens (durations/easings exported as Motion transition presets), the reduced-motion policy (`MotionConfig reducedMotion="user"` plus our `data-motion` override), interruptible and non-blocking motion, focus management unaffected, deterministic screenshots (`MotionGlobalConfig.skipAnimations` in tests/harness), and plain CSS transitions remain fine for trivial hover/press states.
+- Follow-up issues #398–#402 implement this amended approach.
 
 ## Decision
 
