@@ -1,8 +1,9 @@
-import { AuthScreens } from "../../AuthScreens.tsx";
-import { OrganizationPicker } from "../../OrganizationPicker.tsx";
+import { AuthScreens } from "../../pages/auth/AuthFlow.tsx";
+import { OrganizationPicker } from "../../pages/auth/OrganizationPicker.tsx";
 import { createTransport } from "../../auth.ts";
 import type { OrganizationList } from "../../auth.ts";
 import { Logo } from "@talentstroom/ui";
+import { AuthHero } from "../../layouts/AuthHero.tsx";
 import { t } from "@talentstroom/i18n";
 import { useGallery } from "../context.ts";
 
@@ -62,7 +63,10 @@ export function Auth() {
           </h2>
           <div className="auth-shell gallery-auth-shell">
             <aside className="auth-brand">
-              <Logo tone="dark" size="lg" />
+              <AuthHero />
+              <a href="/inloggen" className="auth-wordmark" aria-label={tr("app.name")}>
+                <Logo tone="dark" size="lg" />
+              </a>
               <div className="auth-brand-copy">
                 <h2 className="auth-brand-title">{tr("auth.brandLine")}</h2>
                 <p>{tr("auth.brandText")}</p>

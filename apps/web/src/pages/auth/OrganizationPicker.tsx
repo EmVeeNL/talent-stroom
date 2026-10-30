@@ -3,8 +3,8 @@ import type { FormEvent } from "react";
 import { Button, RadioGroup, TextField } from "@talentstroom/ui";
 import { t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
-import { errorKey, isAborted, RequestError } from "./auth.ts";
-import type { OrganizationList, Transport } from "./auth.ts";
+import { errorKey, isAborted, RequestError } from "../../auth.ts";
+import type { OrganizationList, Transport } from "../../auth.ts";
 
 const roleLabels = {
   owner: "auth.roleOwner",

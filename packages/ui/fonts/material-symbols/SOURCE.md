@@ -5,7 +5,7 @@
 - Source: `variablefont/MaterialSymbolsRounded[FILL,GRAD,opsz,wght].ttf`
 - Source SHA-256: `7e74e36533ccee12c2b81e75bfcf3ccf123d3bb7e7e46d65d94445f23db0c97c`
 - License: Apache-2.0, included as `LICENSE`.
-- Output: `MaterialSymbolsRounded.woff2`, **26,728 bytes**, 92 ligatures.
+- Output: `MaterialSymbolsRounded.woff2`, **29,928 bytes**, 102 ligatures.
 - Axes: FILL 0–1, wght 400–600, opsz 20–24; GRAD pinned to 0.
 
 ## Reproduce from the repository root

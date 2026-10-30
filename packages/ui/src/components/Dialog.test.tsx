@@ -26,3 +26,35 @@ it("labels its modal, sets initial focus, closes on cancel and restores trigger 
   expect(document.activeElement).toBe(trigger);
   expect(dialog.hasAttribute("open")).toBe(false);
 });
+
+it("can be opened and closed by the caller without its own trigger", () => {
+  const changes: boolean[] = [];
+  const { rerender } = render(
+    <Dialog
+      title="Beheerd"
+      triggerLabel="Open"
+      closeLabel="Sluiten"
+      hideTrigger
+      open={false}
+      onOpenChange={(v) => changes.push(v)}
+    >
+      <p>Inhoud</p>
+    </Dialog>,
+  );
+  expect(screen.queryByRole("button", { name: "Open" })).toBeNull();
+  rerender(
+    <Dialog
+      title="Beheerd"
+      triggerLabel="Open"
+      closeLabel="Sluiten"
+      hideTrigger
+      open
+      onOpenChange={(v) => changes.push(v)}
+    >
+      <p>Inhoud</p>
+    </Dialog>,
+  );
+  expect(screen.getByRole("dialog").hasAttribute("open")).toBe(true);
+  fireEvent.click(screen.getByRole("button", { name: "Sluiten" }));
+  expect(changes).toContain(false);
+});

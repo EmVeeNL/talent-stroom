@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { cx } from "../classnames.ts";
 import { Button } from "./Button.tsx";
@@ -16,6 +16,11 @@ export interface DialogProps {
   /** Used by AlertDialog to focus the least destructive action. */
   initialFocus?: "cancel";
   role?: "dialog" | "alertdialog";
+  /** Controlled visibility. Without it the dialog opens through its own trigger button. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** Hides the trigger button; use together with `open` when the caller opens the dialog. */
+  hideTrigger?: boolean;
 }
 export function Dialog({
   inline = false,
@@ -28,6 +33,9 @@ export function Dialog({
   className,
   initialFocus,
   role = "dialog",
+  open: controlledOpen,
+  onOpenChange,
+  hideTrigger = false,
 }: DialogProps) {
   const id = useId();
   const dialog = useRef<HTMLDialogElement>(null);
@@ -37,19 +45,34 @@ export function Dialog({
     if (inline) return;
     dialog.current?.close();
     setOpen(false);
+    onOpenChange?.(false);
     trigger.current?.focus();
   };
   const show = () => {
-    dialog.current?.showModal();
+    if (!dialog.current?.open) dialog.current?.showModal();
     setOpen(true);
+    onOpenChange?.(true);
     (
       dialog.current?.querySelector<HTMLElement>(initialFocus === "cancel" ? "[data-cancel]" : focusable) ??
       dialog.current
     )?.focus();
   };
+  useEffect(() => {
+    if (inline || controlledOpen === undefined) return;
+    const element = dialog.current;
+    if (!element) return;
+    if (controlledOpen && !element.open) {
+      element.showModal();
+      setOpen(true);
+      (element.querySelector<HTMLElement>(initialFocus === "cancel" ? "[data-cancel]" : focusable) ?? element).focus();
+    } else if (!controlledOpen && element.open) {
+      element.close();
+      setOpen(false);
+    }
+  }, [controlledOpen, inline, initialFocus]);
   return (
     <>
-      {!inline && (
+      {!inline && !hideTrigger && (
         <Button
           ref={trigger}
           variant="secondary"
@@ -78,6 +101,7 @@ export function Dialog({
         }}
         onClose={() => {
           setOpen(false);
+          onOpenChange?.(false);
           trigger.current?.focus();
         }}
       >
