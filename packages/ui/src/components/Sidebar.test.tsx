@@ -74,3 +74,28 @@ it("renders the AI assistant card, disabled until it has an action", async () =>
   await userEvent.click(screen.getByRole("button", { name: "AI Assistent Stel een vraag…" }));
   expect(clicked).toBe(1);
 });
+
+it("opens the active expandable group and supports keyboard disclosure controls", async () => {
+  const expandable: SidebarSection[] = [
+    {
+      id: "dashboard",
+      label: "Dashboard",
+      icon: "dashboard",
+      nested: true,
+      expandable: true,
+      items: [{ id: "recruitment", label: "Recruitment", icon: "dashboard", href: "/", active: true }],
+    },
+  ];
+  render(<Sidebar {...props} sections={expandable} />);
+  const toggle = screen.getByRole("button", { name: "Dashboard" });
+  expect(toggle.getAttribute("aria-expanded")).toBe("true");
+  expect(toggle.querySelector('.ts-icon[aria-hidden="true"]')).toBeTruthy();
+  const child = screen.getByRole("link", { name: "Recruitment" });
+  expect(child.getAttribute("aria-current")).toBe("page");
+  expect(child.querySelector(".ts-icon")).toBeNull();
+  await userEvent.click(toggle);
+  expect(toggle.getAttribute("aria-expanded")).toBe("false");
+  toggle.focus();
+  await userEvent.keyboard("{Enter}");
+  expect(toggle.getAttribute("aria-expanded")).toBe("true");
+});

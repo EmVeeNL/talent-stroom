@@ -8,5 +8,6 @@ it("labels navigation and the current page", async () => {
   );
   expect(screen.getByRole("navigation", { name: "Kruimelpad" })).toBeTruthy();
   expect(screen.getByText("Kandidaten").getAttribute("aria-current")).toBe("page");
+  expect(screen.getByRole("link", { name: "Start" }).getAttribute("href")).toBe("#start");
   expect(await axeViolations(container)).toEqual([]);
 });

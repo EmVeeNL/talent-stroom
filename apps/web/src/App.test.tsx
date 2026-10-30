@@ -92,9 +92,9 @@ describe("authentication routing", () => {
     await screen.findByRole("heading", { level: 1, name: "Je werkruimte" });
     expect(screen.getAllByText(org.name).length).toBeGreaterThan(0);
     expect(screen.getByRole("navigation", { name: "Hoofdnavigatie" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Dashboard" }).getAttribute("aria-current")).toBe("page");
+    expect(screen.getByRole("button", { name: "Dashboard" }).getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByRole("link", { name: "Recruitment" }).getAttribute("aria-current")).toBe("page");
     expect(screen.queryByRole("link", { name: /Kandidaten/ })).toBeNull();
-    expect(screen.getByText("Kandidaten").closest("[aria-disabled]")?.textContent).toContain("Binnenkort");
     const result = await axe.run(container, { rules: { "color-contrast": { enabled: false } } });
     expect(result.violations.map((v) => v.id)).toEqual([]);
     const menu = screen.getByRole("button", { name: "Gebruikersmenu: Robin Voorbeeld, Testbureau" });

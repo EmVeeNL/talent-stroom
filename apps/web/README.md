@@ -12,7 +12,7 @@ pnpm visual         # capture the gallery
 ```
 
 On Linux, `pnpm visual:install --with-deps` also installs Chromium's system dependencies.
-Playwright owns the Vite server on **127.0.0.1:5178**, uses strict port binding, and stops it
+Playwright owns the Vite server on **127.0.0.1:5185**, uses strict port binding, and stops it
 when finished. No running API is needed; API requests are intercepted and blocked.
 
 The harness imports `src/gallery/pages/index.ts` through Vite to discover all gallery pages
@@ -35,14 +35,10 @@ PRs touching `apps/web/**`, `packages/ui/**` or `packages/i18n/**` run the optio
 CI job and upload the contact sheet and PNGs as a `visual` artifact for 14 days. Keep this
 job out of required branch checks.
 
-### Pending screen coverage and design differences
-
-`/inloggen`, `/registreren` and `/organisatie-kiezen` do not exist in this worktree:
-`App.tsx` currently renders the same placeholder Home for every non-gallery URL. Auth
-captures are pending the screen implementation; screenshots of that placeholder would
-misrepresent coverage. Once the screens land, add route-specific synthetic session and
-organization fixtures using Playwright `page.route` interception before navigating.
-Never connect visual captures to real sessions or personal data.
+The visual harness captures the dashboard and a nested demo route through the
+development-only `?preview=dashboard&theme=light|dark` path, which supplies synthetic
+session context without a running API. The preview branch is removed from production
+builds; it does not change the real auth guards.
 
 The redesign kit in `docs/images/redesign/` is the review authority (tokens and component
 specifications take priority over historical mockup pixels). Existing UI still uses
@@ -77,6 +73,12 @@ remain accessible.
 
 The dev-only component gallery remains at `/?gallery`; it bypasses auth and is
 excluded from production.
+
+Demo navigation pages are enabled by default in development (`vite`).
+Production builds hide demo routes unless `VITE_DEMO_PAGES=true` is set at build
+time. With the flag off, only the Recruitment dashboard remains in the sidebar
+and other demo URLs render the 404 placeholder. Demo screens must use synthetic
+data only. See `apps/web/.env.example` for the opt-in setting.
 
 ## Try locally
 
