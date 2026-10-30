@@ -177,6 +177,11 @@
   /* Motion */
   --ts-duration-fast: 120ms;
   --ts-duration-base: 200ms;
+  --ts-duration-slow: 320ms;
+  --ts-delay-tooltip: 500ms;
+  --ts-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ts-ease-emphasised: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ts-ease-exit: cubic-bezier(0.3, 0, 1, 1);
 }
 
 body {
