@@ -184,22 +184,6 @@
 .gallery-wide {
   width: 100%;
 }
-.gallery-kanban {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(15rem, 1fr));
-  gap: var(--ts-space-4);
-  overflow: auto;
-  padding: var(--ts-space-1);
-}
-.gallery-kanban section {
-  display: grid;
-  align-content: start;
-  gap: var(--ts-space-3);
-}
-.gallery-kanban h3 {
-  margin: 0;
-  font-size: var(--ts-font-size-md);
-}
 .gallery-brand {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
@@ -598,4 +582,14 @@
   .gallery-card-examples {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* Kanban page: the board fills the row; the list preview is capped to a phone-like width. */
+.gallery-pipeline {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+.gallery-pipeline--narrow {
+  flex: 0 1 390px;
+  max-width: 100%;
 }

@@ -1,0 +1,326 @@
+/* Kanban board and list view. Stage tint comes from the shared tone tokens. */
+.ts-kanban {
+  min-width: 0;
+  max-width: 100%;
+  --ts-kanban-column-width: 300px;
+  --ts-kanban-wash: 38%;
+}
+
+:root[data-theme="dark"] .ts-kanban {
+  --ts-kanban-wash: 18%;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .ts-kanban {
+    --ts-kanban-wash: 18%;
+  }
+}
+
+/* Tone to tint (header and column wash) and ink (title text). */
+.ts-kanban__column {
+  --ts-kanban-tint: var(--ts-neutral-subtle);
+  --ts-kanban-ink: var(--ts-neutral-text);
+}
+.ts-kanban__column[data-tone="info"] {
+  --ts-kanban-tint: var(--ts-info-subtle);
+  --ts-kanban-ink: var(--ts-info-text);
+}
+.ts-kanban__column[data-tone="warning"] {
+  --ts-kanban-tint: var(--ts-warning-subtle);
+  --ts-kanban-ink: var(--ts-warning-text);
+}
+.ts-kanban__column[data-tone="violet"] {
+  --ts-kanban-tint: var(--ts-violet-subtle);
+  --ts-kanban-ink: var(--ts-violet-text);
+}
+.ts-kanban__column[data-tone="accent"] {
+  --ts-kanban-tint: var(--ts-accent-subtle);
+  --ts-kanban-ink: var(--ts-accent-text);
+}
+.ts-kanban__column[data-tone="success"] {
+  --ts-kanban-tint: var(--ts-success-subtle);
+  --ts-kanban-ink: var(--ts-success-text);
+}
+.ts-kanban__column[data-tone="danger"] {
+  --ts-kanban-tint: var(--ts-danger-subtle);
+  --ts-kanban-ink: var(--ts-danger-text);
+}
+.ts-kanban__column[data-tone="custom"] {
+  --ts-kanban-tint: var(--ts-primary-subtle);
+  --ts-kanban-ink: var(--ts-primary-text);
+}
+
+/* Board layout: horizontal scroll with persistent edge shadows as scroll affordance. */
+.ts-kanban__scroller {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding-block: var(--ts-space-1) var(--ts-space-3);
+  scrollbar-width: thin;
+  scrollbar-color: var(--ts-border-strong) transparent;
+  border-radius: var(--ts-radius-lg);
+  background:
+    linear-gradient(to right, var(--ts-bg) 30%, transparent) left center / 40px 100% no-repeat local,
+    linear-gradient(to left, var(--ts-bg) 30%, transparent) right center / 40px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgb(16 32 56 / 22%), transparent) left center / 14px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgb(16 32 56 / 22%), transparent) right center / 14px 100% no-repeat
+      scroll;
+}
+.ts-kanban__scroller:focus-visible {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: var(--ts-focus-ring-offset);
+}
+.ts-kanban--board .ts-kanban__columns {
+  display: flex;
+  align-items: stretch;
+  gap: var(--ts-space-4);
+  width: max-content;
+  min-width: 100%;
+}
+.ts-kanban--board .ts-kanban__column {
+  flex: 0 0 var(--ts-kanban-column-width);
+  width: var(--ts-kanban-column-width);
+}
+.ts-kanban--board .ts-kanban__column[data-collapsed] {
+  flex-basis: 56px;
+  width: 56px;
+}
+
+/* List layout (< 768 px): columns become stacked, collapsible stage groups. */
+.ts-kanban--list .ts-kanban__columns {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ts-space-4);
+}
+
+.ts-kanban__column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: var(--ts-border-width) solid color-mix(in srgb, var(--ts-kanban-tint) 70%, var(--ts-border));
+  border-radius: var(--ts-radius-lg);
+  background: color-mix(in srgb, var(--ts-kanban-tint) var(--ts-kanban-wash), var(--ts-surface));
+}
+.ts-kanban__column[data-drop-target] {
+  border-color: var(--ts-primary-text);
+  box-shadow: 0 0 0 1px var(--ts-primary-text);
+}
+
+.ts-kanban__header {
+  display: flex;
+  align-items: center;
+  gap: var(--ts-space-1);
+  padding: var(--ts-space-3) var(--ts-space-2) var(--ts-space-3) var(--ts-space-4);
+  background: var(--ts-kanban-tint);
+  color: var(--ts-kanban-ink);
+}
+.ts-kanban__title {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--ts-font-label);
+  font-size: var(--ts-font-size-md);
+  color: var(--ts-kanban-ink);
+}
+.ts-kanban__header .ts-kanban__count {
+  min-inline-size: 24px;
+  flex: none;
+  justify-content: center;
+  margin-inline-start: var(--ts-space-1);
+  border-radius: var(--ts-radius-full);
+  background: var(--ts-surface);
+  color: var(--ts-kanban-ink);
+  font-variant-numeric: tabular-nums;
+  margin-inline-end: auto;
+}
+.ts-kanban__header .ts-context-menu-anchor > .ts-button {
+  min-width: 32px;
+  min-height: 32px;
+  padding: var(--ts-space-1);
+  color: var(--ts-kanban-ink);
+}
+.ts-kanban__header .ts-context-menu-anchor > .ts-button:hover {
+  background: color-mix(in srgb, var(--ts-surface) 55%, transparent);
+}
+
+.ts-kanban__icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 32px;
+  block-size: 32px;
+  flex: none;
+  border: 0;
+  border-radius: var(--ts-radius-sm);
+  background: transparent;
+  color: var(--ts-kanban-ink);
+  cursor: pointer;
+}
+.ts-kanban__icon-button:hover {
+  background: color-mix(in srgb, var(--ts-surface) 55%, transparent);
+}
+.ts-kanban__icon-button:focus-visible {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: 0;
+}
+
+/* Collapsed board column: a narrow strip with a vertical title. */
+.ts-kanban--board .ts-kanban__column[data-collapsed] .ts-kanban__header {
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--ts-space-3) var(--ts-space-2);
+}
+.ts-kanban--board .ts-kanban__column[data-collapsed] .ts-kanban__title {
+  order: 3;
+  writing-mode: vertical-rl;
+  max-block-size: 70%;
+}
+.ts-kanban--board .ts-kanban__column[data-collapsed] .ts-kanban__count {
+  order: 2;
+  margin: 0;
+}
+.ts-kanban--board .ts-kanban__column[data-collapsed] .ts-kanban__toggle {
+  order: 1;
+  margin: 0;
+}
+
+.ts-kanban__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--ts-space-3);
+  padding: var(--ts-space-3);
+  min-block-size: 120px;
+}
+.ts-kanban__cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ts-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ts-kanban__cards:empty {
+  display: none;
+}
+.ts-kanban__body .ts-empty-state {
+  margin-block: auto;
+}
+.ts-kanban__drop-indicator {
+  block-size: 4px;
+  margin-block: calc(var(--ts-space-1) * -1);
+  border-radius: var(--ts-radius-full);
+  background: var(--ts-primary-text);
+}
+
+/* Candidate card: Card surface from Card.css (.ts-card) with a compact grid layout. */
+.ts-kanban-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--ts-space-3);
+  padding: var(--ts-space-3);
+  cursor: default;
+}
+.ts-kanban-card[draggable="true"] {
+  cursor: grab;
+}
+.ts-kanban-card:focus-visible {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: var(--ts-focus-ring-offset);
+}
+.ts-kanban-card[data-dragging] {
+  opacity: 0.45;
+}
+.ts-kanban-card[data-lifted] {
+  border-color: var(--ts-primary-text);
+  box-shadow: var(--ts-shadow-popover);
+}
+.ts-kanban-card__avatar {
+  display: inline-flex;
+}
+.ts-kanban-card__main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+.ts-kanban-card__name {
+  margin: 0;
+  font: var(--ts-font-label);
+  color: var(--ts-text);
+  overflow-wrap: anywhere;
+}
+.ts-kanban-card__name a {
+  color: inherit;
+  text-decoration: none;
+}
+.ts-kanban-card__name a:hover {
+  text-decoration: underline;
+}
+.ts-kanban-card__name a:focus-visible {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: 2px;
+  border-radius: var(--ts-radius-sm);
+}
+.ts-kanban-card__role,
+.ts-kanban-card__meta {
+  margin: 0;
+  color: var(--ts-text-muted);
+  font: var(--ts-font-compact);
+}
+.ts-kanban-card__meta {
+  font: var(--ts-font-caption);
+  margin-block-start: var(--ts-space-1);
+}
+.ts-kanban-card__status {
+  margin-block-start: var(--ts-space-2);
+}
+.ts-kanban-card__aside {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ts-space-1);
+}
+.ts-kanban-card__age {
+  padding-block-start: var(--ts-space-0-5);
+  color: var(--ts-text-muted);
+  font: var(--ts-font-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ts-kanban-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ts-space-1);
+  margin: var(--ts-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.ts-kanban__add {
+  inline-size: 100%;
+  justify-content: center;
+  margin-block-start: auto;
+  border: var(--ts-border-width) dashed color-mix(in srgb, var(--ts-kanban-ink) 35%, transparent);
+  color: var(--ts-kanban-ink);
+}
+.ts-kanban__add:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ts-surface) 55%, transparent);
+}
+.ts-kanban-card__menu {
+  margin: calc(var(--ts-space-1) * -1) calc(var(--ts-space-1) * -1) 0 0;
+}
+.ts-kanban-card__menu .ts-context-menu-anchor > .ts-button {
+  min-width: 32px;
+  min-height: 32px;
+  padding: var(--ts-space-1);
+  color: var(--ts-text-muted);
+}
+
+@media (pointer: coarse) {
+  .ts-kanban__icon-button {
+    inline-size: 44px;
+    block-size: 44px;
+  }
+}

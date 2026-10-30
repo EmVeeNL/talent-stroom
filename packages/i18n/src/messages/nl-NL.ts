@@ -589,6 +589,35 @@ export const nlNL = {
   "gallery.shell.greeting": "Goedemiddag, Robin",
   "gallery.shell.subtitle": "Hier vind je een overzicht van al je recruitmentactiviteiten.",
   "gallery.shell.newCandidate": "Nieuwe kandidaat",
+  "gallery.page.kanban": "Kanban en pijplijn",
+  "kanban.board": "Pijplijn",
+  "kanban.instructions":
+    "Druk op spatie om een kandidaat op te pakken. Verplaats met de pijltjestoetsen, plaats neer met spatie of annuleer met Escape. Je kunt ook het menu Verplaatsen naar gebruiken.",
+  "kanban.cardRole": "verplaatsbare kandidaatkaart",
+  "kanban.count": "{count} kandidaten",
+  "kanban.addCardShort": "Kandidaat toevoegen",
+  "kanban.addCard": "Kandidaat toevoegen aan {column}",
+  "kanban.collapse": "{column} inklappen",
+  "kanban.expand": "{column} uitklappen",
+  "kanban.columnMenu": "Acties voor {column}",
+  "kanban.cardMenu": "Acties voor {name}",
+  "kanban.moveTo": "Verplaatsen naar {column}",
+  "kanban.emptyTitle": "Nog geen kandidaten",
+  "kanban.emptyBody": "Sleep een kandidaat hierheen of verplaats via het menu.",
+  "kanban.pickedUp":
+    "{name} opgepakt in {column}, positie {position} van {total}. Gebruik de pijltjestoetsen om te verplaatsen.",
+  "kanban.moving": "{name} in {column}, positie {position} van {total}",
+  "kanban.moved": "{name} verplaatst naar {column}, positie {position} van {total}",
+  "kanban.cancelled": "Verplaatsen van {name} geannuleerd",
+  "gallery.kanban.board": "Pijplijn met kolommen",
+  "gallery.kanban.boardHint":
+    "Sleep kaarten, of druk op spatie op een kaart en gebruik de pijltjestoetsen. De kolom Aanbod is ingeklapt en Geplaatst is leeg.",
+  "gallery.kanban.list": "Lijstweergave (onder 768 px)",
+  "gallery.kanban.openProfile": "Profiel openen",
+  "gallery.kanban.addNote": "Notitie toevoegen",
+  "gallery.kanban.sort": "Sorteren op dagen in fase",
+  "gallery.kanban.daysInStage": "{count} d in fase",
+  "gallery.kanban.urgent": "Urgent",
 } as const;
 
 export type MessageKey = keyof typeof nlNL;

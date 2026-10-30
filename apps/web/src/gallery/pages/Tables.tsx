@@ -10,7 +10,10 @@ import {
   SearchInput,
   StatusPill,
   ViewSwitcher,
+  KanbanBoard,
 } from "@talentstroom/ui";
+import type { KanbanColumnData } from "@talentstroom/ui";
+import { createLabels } from "./Kanban.tsx";
 import type { DataColumn, DataTableSort } from "@talentstroom/ui";
 import { Section } from "../Section.tsx";
 import { useGallery } from "../context.ts";
@@ -134,6 +137,16 @@ export function Tables() {
     emptyLabel: tr("gallery.tables.empty"),
     loadingLabel: tr("gallery.tables.loading"),
   };
+  const [moved, setMoved] = useState<Record<string, string>>({});
+  const pipelineTones = ["info", "warning", "success"] as const;
+  const pipelineColumns: KanbanColumnData[] = statuses.map((stage, index) => ({
+    id: stage.value,
+    title: stage.label,
+    tone: pipelineTones[index],
+    cards: shown
+      .filter((r) => (moved[r.id] ?? r.status) === stage.value)
+      .map((r) => ({ id: r.id, name: r.name, role: r.role, meta: r.source })),
+  }));
   const card = (r: Candidate) => (
     <Card key={r.id} title={r.name}>
       <div className="gallery-candidate-card">
@@ -230,14 +243,11 @@ export function Tables() {
               {shown.length === 0 && <p>{tr("gallery.tables.empty")}</p>}
             </div>
           ) : (
-            <div className="gallery-kanban">
-              {statuses.map((s) => (
-                <section key={s.value} aria-label={s.label}>
-                  <h3>{s.label}</h3>
-                  {shown.filter((r) => r.status === s.value).map(card)}
-                </section>
-              ))}
-            </div>
+            <KanbanBoard
+              columns={pipelineColumns}
+              labels={createLabels(locale)}
+              onMove={(move) => setMoved((previous) => ({ ...previous, [move.cardId]: move.toColumnId }))}
+            />
           )}
           <Pagination
             label={tr("gallery.tables.pagination")}
