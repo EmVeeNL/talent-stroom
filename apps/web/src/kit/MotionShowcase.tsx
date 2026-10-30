@@ -14,6 +14,11 @@ const presetNames: MotionPresetName[] = [
   "collapse",
   "expand",
   "listItem",
+  "popover",
+  "dialog",
+  "sheetLeft",
+  "sheetRight",
+  "toast",
 ];
 const presetKeys: Record<MotionPresetName, MessageKey> = {
   fade: "gallery.motion.fade",
@@ -25,6 +30,11 @@ const presetKeys: Record<MotionPresetName, MessageKey> = {
   collapse: "gallery.motion.collapse",
   expand: "gallery.motion.expand",
   listItem: "gallery.motion.listItem",
+  popover: "gallery.motion.popover",
+  dialog: "gallery.motion.dialog",
+  sheetLeft: "gallery.motion.sheetLeft",
+  sheetRight: "gallery.motion.sheetRight",
+  toast: "gallery.motion.toast",
 };
 export function MotionShowcase({ locale }: { locale: Locale }) {
   const reduced = useReducedMotion();
@@ -39,6 +49,11 @@ export function MotionShowcase({ locale }: { locale: Locale }) {
     collapse: 0,
     expand: 0,
     listItem: 0,
+    popover: 0,
+    dialog: 0,
+    sheetLeft: 0,
+    sheetRight: 0,
+    toast: 0,
   });
   const label = (key: MessageKey) => t(locale, key);
   return (

@@ -3,6 +3,7 @@ import { Badge } from "./Badge.tsx";
 import { Button } from "./Button.tsx";
 import { Icon } from "./Icon.tsx";
 import { cx } from "../classnames.ts";
+import { MotionPanel, MotionPresence } from "../motion/presence.tsx";
 export interface ComboboxOption {
   value: string;
   label: string;
@@ -160,30 +161,39 @@ export function Combobox({
           {error}
         </p>
       )}
-      {open && (
-        <div className="ts-combobox__popup" style={previewQuery !== undefined ? { position: "static" } : undefined}>
-          <ul id={`${id}-list`} role="listbox" aria-label={label} aria-multiselectable={multiple || undefined}>
-            {filtered.map((o) => (
-              <li
-                id={`${id}-${encodeURIComponent(o.value)}`}
-                key={o.value}
-                role="option"
-                aria-selected={value.includes(o.value)}
-                aria-disabled={o.disabled || undefined}
-                className={cx("ts-combobox__option", item?.value === o.value && "ts-combobox__option--active")}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => {
-                  if (!o.disabled) select(o);
-                }}
-              >
-                <span>{o.label}</span>
-                {value.includes(o.value) && <Icon name="check" size={20} />}
-              </li>
-            ))}
-          </ul>
-          {filtered.length === 0 && <p role="status">{emptyLabel}</p>}
-        </div>
-      )}
+      <MotionPresence>
+        {open && (
+          <MotionPanel
+            className="ts-combobox__popup"
+            {...(previewQuery !== undefined ? { style: { position: "static" as const } } : {})}
+            initial={previewQuery !== undefined ? false : "initial"}
+            animate="animate"
+            exit="exit"
+            preset="popover"
+          >
+            <ul id={`${id}-list`} role="listbox" aria-label={label} aria-multiselectable={multiple || undefined}>
+              {filtered.map((o) => (
+                <li
+                  id={`${id}-${encodeURIComponent(o.value)}`}
+                  key={o.value}
+                  role="option"
+                  aria-selected={value.includes(o.value)}
+                  aria-disabled={o.disabled || undefined}
+                  className={cx("ts-combobox__option", item?.value === o.value && "ts-combobox__option--active")}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    if (!o.disabled) select(o);
+                  }}
+                >
+                  <span>{o.label}</span>
+                  {value.includes(o.value) && <Icon name="check" size={20} />}
+                </li>
+              ))}
+            </ul>
+            {filtered.length === 0 && <p role="status">{emptyLabel}</p>}
+          </MotionPanel>
+        )}
+      </MotionPresence>
     </div>
   );
 }

@@ -3,6 +3,7 @@ import type { IconName } from "../icons.ts";
 import { Icon } from "./Icon.tsx";
 import { Button } from "./Button.tsx";
 import { useFloating } from "./floating.ts";
+import { MotionPanel, MotionPresence } from "../motion/presence.tsx";
 
 export type ContextMenuItem = { id: string } & (
   | { separator: true }
@@ -52,7 +53,6 @@ export function ContextMenu({
   useEffect(() => {
     if (!open) return undefined;
     const node = panel.current;
-    node?.showPopover?.();
     const buttons = node?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]');
     buttons?.[initial.current === "last" ? buttons.length - 1 : 0]?.focus();
     search.current = { text: "", time: 0 };
@@ -65,7 +65,6 @@ export function ContextMenu({
     };
     document.addEventListener("click", outside);
     return () => {
-      if (node?.isConnected) node.hidePopover?.();
       document.removeEventListener("click", outside);
     };
   }, [open, panel, anchor, onOpenChange]);
@@ -94,76 +93,84 @@ export function ContextMenu({
       >
         <Icon name="more_horiz" size={16} />
       </Button>
-      {open && (
-        <div
-          ref={panel}
-          id={id}
-          role="menu"
-          aria-label={triggerLabel}
-          className="ts-context-menu"
-          style={position}
-          popover={typeof HTMLElement !== "undefined" && "showPopover" in HTMLElement.prototype ? "manual" : undefined}
-          onKeyDown={(event) => {
-            const buttons = Array.from(panel.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') ?? []);
-            const index = buttons.findIndex((button) => button === document.activeElement);
-            let next: number | undefined;
-            if (event.key === "Escape") {
-              event.preventDefault();
-              event.stopPropagation();
-              close();
-              return;
-            }
-            if (event.key === "Tab") {
-              close();
-              return;
-            }
-            if (event.key === "ArrowDown") next = (index + 1) % buttons.length;
-            if (event.key === "ArrowUp") next = (index - 1 + buttons.length) % buttons.length;
-            if (event.key === "Home") next = 0;
-            if (event.key === "End") next = buttons.length - 1;
-            if (event.key.length === 1 && event.key !== " " && !event.ctrlKey && !event.altKey && !event.metaKey) {
-              const now = Date.now();
-              const previous = now - search.current.time < 500 ? search.current.text : "";
-              const text = previous + event.key.toLocaleLowerCase();
-              search.current = { text, time: now };
-              const query = Array.from(text).every((letter) => letter === text[0]) ? (text[0] ?? text) : text;
-              next = buttons.findIndex((_, offset) =>
-                buttons[(index + offset + 1) % buttons.length]?.dataset["label"]?.toLocaleLowerCase().startsWith(query),
-              );
-              next = next < 0 ? undefined : (index + next + 1) % buttons.length;
-            }
-            if (next !== undefined) {
-              event.preventDefault();
-              buttons[next]?.focus();
-            }
-          }}
-        >
-          {items.map((item) =>
-            item.separator ? (
-              <div key={item.id} role="separator" className="ts-context-menu__separator" />
-            ) : (
-              <button
-                key={item.id}
-                type="button"
-                role="menuitem"
-                tabIndex={-1}
-                aria-disabled={item.disabled || undefined}
-                data-label={item.label}
-                data-tone={item.tone}
-                onClick={() => {
-                  if (!item.disabled) {
-                    close();
-                    item.onSelect();
-                  }
-                }}
-              >
-                {item.icon && <Icon name={item.icon} size={16} />}
-                {item.label}
-              </button>
-            ),
-          )}
-        </div>
-      )}
+      <MotionPresence>
+        {open && (
+          <MotionPanel
+            nativePopover
+            ref={panel}
+            id={id}
+            role="menu"
+            aria-label={triggerLabel}
+            className="ts-context-menu"
+            style={position}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            preset="popover"
+            onKeyDown={(event) => {
+              const buttons = Array.from(panel.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') ?? []);
+              const index = buttons.findIndex((button) => button === document.activeElement);
+              let next: number | undefined;
+              if (event.key === "Escape") {
+                event.preventDefault();
+                event.stopPropagation();
+                close();
+                return;
+              }
+              if (event.key === "Tab") {
+                close();
+                return;
+              }
+              if (event.key === "ArrowDown") next = (index + 1) % buttons.length;
+              if (event.key === "ArrowUp") next = (index - 1 + buttons.length) % buttons.length;
+              if (event.key === "Home") next = 0;
+              if (event.key === "End") next = buttons.length - 1;
+              if (event.key.length === 1 && event.key !== " " && !event.ctrlKey && !event.altKey && !event.metaKey) {
+                const now = Date.now();
+                const previous = now - search.current.time < 500 ? search.current.text : "";
+                const text = previous + event.key.toLocaleLowerCase();
+                search.current = { text, time: now };
+                const query = Array.from(text).every((letter) => letter === text[0]) ? (text[0] ?? text) : text;
+                next = buttons.findIndex((_, offset) =>
+                  buttons[(index + offset + 1) % buttons.length]?.dataset["label"]
+                    ?.toLocaleLowerCase()
+                    .startsWith(query),
+                );
+                next = next < 0 ? undefined : (index + next + 1) % buttons.length;
+              }
+              if (next !== undefined) {
+                event.preventDefault();
+                buttons[next]?.focus();
+              }
+            }}
+          >
+            {items.map((item) =>
+              item.separator ? (
+                <div key={item.id} role="separator" className="ts-context-menu__separator" />
+              ) : (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="menuitem"
+                  tabIndex={-1}
+                  aria-disabled={item.disabled || undefined}
+                  data-label={item.label}
+                  data-tone={item.tone}
+                  onClick={() => {
+                    if (!item.disabled) {
+                      close();
+                      item.onSelect();
+                    }
+                  }}
+                >
+                  {item.icon && <Icon name={item.icon} size={16} />}
+                  {item.label}
+                </button>
+              ),
+            )}
+          </MotionPanel>
+        )}
+      </MotionPresence>
     </span>
   );
 }

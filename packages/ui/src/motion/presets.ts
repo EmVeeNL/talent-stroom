@@ -10,7 +10,12 @@ export type MotionPresetName =
   | "scaleIn"
   | "collapse"
   | "expand"
-  | "listItem";
+  | "listItem"
+  | "popover"
+  | "dialog"
+  | "sheetLeft"
+  | "sheetRight"
+  | "toast";
 export interface MotionPreset {
   variants: Variants;
   transition: Transition;
@@ -80,6 +85,39 @@ const variants: Record<MotionPresetName, Variants> = {
     animate: { opacity: 1, y: 0 },
     exit: { opacity: 0, y: -4, transition: { duration: (motionDurations.fast * 0.75) / 1000, ease: easing.exit } },
   },
+  popover: {
+    initial: { opacity: 0, scale: 0.98, transformOrigin: "var(--ts-motion-origin, center)" },
+    animate: { opacity: 1, scale: 1 },
+    exit: {
+      opacity: 0,
+      scale: 0.98,
+      transition: { duration: (motionDurations.base * 0.75) / 1000, ease: easing.exit },
+    },
+  },
+  dialog: {
+    initial: { opacity: 0, scale: 0.98 },
+    animate: { opacity: 1, scale: 1 },
+    exit: {
+      opacity: 0,
+      scale: 0.98,
+      transition: { duration: (motionDurations.base * 0.75) / 1000, ease: easing.exit },
+    },
+  },
+  sheetLeft: {
+    initial: { opacity: 0, x: -24 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -24, transition: { duration: (motionDurations.slow * 0.75) / 1000, ease: easing.exit } },
+  },
+  sheetRight: {
+    initial: { opacity: 0, x: 24 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: 24, transition: { duration: (motionDurations.slow * 0.75) / 1000, ease: easing.exit } },
+  },
+  toast: {
+    initial: { opacity: 0, x: 8 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: 8, transition: { duration: (motionDurations.base * 0.75) / 1000, ease: easing.exit } },
+  },
 };
 
 export const motionPresets: Record<MotionPresetName, MotionPreset> = {
@@ -92,21 +130,18 @@ export const motionPresets: Record<MotionPresetName, MotionPreset> = {
   collapse: { variants: variants.collapse, transition: transitions.slow },
   expand: { variants: variants.expand, transition: transitions.slow },
   listItem: { variants: variants.listItem, transition: { type: "spring", ...springs.snappy } },
+  popover: { variants: variants.popover, transition: transitions.fast },
+  dialog: { variants: variants.dialog, transition: transitions.base },
+  sheetLeft: { variants: variants.sheetLeft, transition: transitions.slow },
+  sheetRight: { variants: variants.sheetRight, transition: transitions.slow },
+  toast: { variants: variants.toast, transition: transitions.base },
 };
 
 export function getMotionPreset(name: MotionPresetName, reducedMotion = false): MotionPreset {
   if (!reducedMotion) return motionPresets[name];
-  const opacity =
-    name === "fade" ||
-    name === "slideUp" ||
-    name === "slideDown" ||
-    name === "slideLeft" ||
-    name === "slideRight" ||
-    name === "scaleIn" ||
-    name === "listItem";
   return {
     variants: {
-      initial: opacity ? { opacity: 0 } : { opacity: 0 },
+      initial: { opacity: 0 },
       animate: { opacity: 1 },
       exit: { opacity: 0 },
     },

@@ -10,7 +10,7 @@
   border-radius: 0 var(--ts-radius-xl) var(--ts-radius-xl) 0;
 }
 .ts-sheet[open] {
-  animation: ts-sheet-in var(--ts-duration-base) ease-out;
+  animation: ts-sheet-in var(--ts-duration-slow) var(--ts-ease-emphasised);
 }
 .ts-sheet--left[open] {
   animation-name: ts-sheet-left-in;

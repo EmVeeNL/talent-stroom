@@ -4,6 +4,8 @@ import { cx } from "../classnames.ts";
 import { Button } from "./Button.tsx";
 import { Icon } from "./Icon.tsx";
 import { feedbackIcons } from "./AlertBanner.tsx";
+import { MotionPanel } from "../motion/presence.tsx";
+import { useReducedMotion } from "../motion/index.ts";
 import type { FeedbackTone } from "./AlertBanner.tsx";
 export interface ToastProps {
   children: ReactNode;
@@ -13,8 +15,19 @@ export interface ToastProps {
   closeLabel: string;
   onDismiss: () => void;
   duration?: number;
+  layout?: boolean;
 }
-export function Toast({ children, tone = "info", title, action, closeLabel, onDismiss, duration = 6000 }: ToastProps) {
+export function Toast({
+  children,
+  tone = "info",
+  title,
+  action,
+  closeLabel,
+  onDismiss,
+  duration = 6000,
+  layout,
+}: ToastProps) {
+  const reduced = useReducedMotion();
   const feedbackTone = tone === "error" ? "danger" : tone;
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -33,8 +46,13 @@ export function Toast({ children, tone = "info", title, action, closeLabel, onDi
     };
   }, [hovered, focused, duration]);
   return (
-    <div
+    <MotionPanel
       className={cx("ts-toast", `ts-toast--${feedbackTone}`)}
+      {...(layout && !reduced ? { layout: true } : {})}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      preset="toast"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setFocused(true)}
@@ -51,6 +69,6 @@ export function Toast({ children, tone = "info", title, action, closeLabel, onDi
       </div>
       {action && <div className="ts-toast__action">{action}</div>}
       <Button variant="ghost" icon="close" aria-label={closeLabel} onClick={onDismiss} />
-    </div>
+    </MotionPanel>
   );
 }
