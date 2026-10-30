@@ -3,8 +3,8 @@ import type { FormEvent } from "react";
 import { Button, Checkbox, Tabs, TextField } from "@talentstroom/ui";
 import { DEFAULT_LOCALE, t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
-import { errorKey, isAborted } from "./auth.ts";
-import type { Transport } from "./auth.ts";
+import { errorKey, isAborted } from "../../auth.ts";
+import type { Transport } from "../../auth.ts";
 
 export const publicRoutes = [
   "/inloggen",

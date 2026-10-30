@@ -1,0 +1,121 @@
+.notes {
+  display: grid;
+  gap: var(--ts-space-4);
+  min-width: 0;
+}
+.notes__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ts-space-3) var(--ts-space-4);
+}
+.notes__filters,
+.notes__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--ts-space-3);
+}
+.notes__filters .ts-search {
+  min-width: 16rem;
+}
+.notes__heading {
+  margin: 0 0 var(--ts-space-3);
+  color: var(--ts-text-muted);
+  font: var(--ts-font-label);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.notes section + section {
+  margin-top: var(--ts-space-2);
+}
+.notes__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--ts-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.notes__grid > li {
+  display: flex;
+  min-width: 0;
+}
+.note {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--ts-space-2);
+  min-width: 0;
+  padding: var(--ts-space-4);
+  border: var(--ts-border-width) solid var(--ts-border);
+  border-radius: var(--ts-radius-lg);
+  background: var(--ts-surface);
+  box-shadow: var(--ts-shadow-card);
+}
+.note[data-color="geel"] {
+  background: var(--ts-warning-subtle);
+}
+.note[data-color="blauw"] {
+  background: var(--ts-info-subtle);
+}
+.note[data-color="groen"] {
+  background: var(--ts-success-subtle);
+}
+.note[data-color="roze"] {
+  background: var(--ts-danger-subtle);
+}
+.note[data-color="paars"] {
+  background: var(--ts-violet-subtle);
+}
+.note__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ts-space-2);
+}
+.note__head h3 {
+  margin: 0;
+  font: var(--ts-font-card-title);
+}
+.note__body {
+  flex: 1;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+  overflow: hidden;
+}
+.note__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ts-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.note__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--ts-text-muted);
+  font: var(--ts-font-caption);
+}
+.note__actions {
+  display: flex;
+  gap: var(--ts-space-1);
+}
+.notes-form {
+  display: grid;
+  gap: var(--ts-space-4);
+}
+@media (max-width: 767px) {
+  .notes__filters,
+  .notes__filters .ts-search,
+  .notes__filters .ts-field {
+    width: 100%;
+    min-width: 0;
+  }
+}
