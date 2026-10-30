@@ -282,31 +282,6 @@ button.ts-filter-chip:hover:not(:disabled) {
   opacity: 0.6;
 }
 
-/* Card */
-.ts-card {
-  background: var(--ts-surface);
-  border: var(--ts-border-width) solid var(--ts-border);
-  border-radius: var(--ts-radius-lg);
-  box-shadow: var(--ts-shadow-card);
-}
-
-.ts-card__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ts-space-3);
-  padding: var(--ts-space-4) var(--ts-space-5) 0;
-}
-
-.ts-card__title {
-  margin: 0;
-  font: var(--ts-font-card-title);
-}
-
-.ts-card__body {
-  padding: var(--ts-space-4) var(--ts-space-5) var(--ts-space-5);
-}
-
 /* Tabs */
 .ts-tabs__list {
   position: relative;
