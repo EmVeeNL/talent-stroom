@@ -34,6 +34,12 @@
   border-radius: var(--ts-radius-sm);
   background: var(--ts-surface-muted);
   box-sizing: border-box;
+  transition:
+    transform var(--ts-duration-fast) var(--ts-ease-standard),
+    background-color var(--ts-duration-fast) var(--ts-ease-standard);
+}
+.ts-check input:checked + .ts-check__visual {
+  transform: scale(1.04);
 }
 .ts-check input:checked + .ts-check__visual::after {
   content: "";

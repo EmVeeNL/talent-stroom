@@ -4,6 +4,8 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { MouseEventHandler, ReactNode } from "react";
 import { cx } from "../classnames.ts";
 import { Icon } from "./Icon.tsx";
+import { getMotionPreset, m, useReducedMotion } from "../motion/index.ts";
+import { motionDurations, motionEasings } from "../tokens.ts";
 import { Logo } from "./Logo.tsx";
 
 export interface SidebarItem {
@@ -150,8 +152,11 @@ function SectionView({
   activeId: string | undefined;
   soonLabel: string;
 }) {
+  const reduced = useReducedMotion();
   const activeChild = section.items.some((item) => item.active ?? item.id === activeId);
   const [open, setOpen] = useState(activeChild);
+  const closed = Boolean(section.expandable && !open);
+  const preset = getMotionPreset(closed ? "collapse" : "expand", reduced);
   const listId = `${uid}-${section.id}-items`;
   useEffect(() => {
     if (activeChild) setOpen(true);
@@ -174,35 +179,52 @@ function SectionView({
             onClick={() => setOpen((value) => !value)}
           >
             {section.icon ? <Icon name={section.icon} size={20} filled={activeChild} /> : null}
-            <span className={collapsed ? "ts-visually-hidden" : "ts-sidebar__group-label"}>{section.label}</span>
-            <Icon name={open ? "expand_less" : "expand_more"} size={16} />
+            <span className="ts-sidebar__group-label">{section.label}</span>
+            <m.span
+              className="ts-sidebar__chevron"
+              aria-hidden="true"
+              initial={false}
+              animate={{ rotate: open ? 180 : 0 }}
+              transition={{ duration: reduced ? 0 : motionDurations.fast / 1000, ease: motionEasings.standard }}
+            >
+              <Icon name="expand_more" size={16} />
+            </m.span>
           </button>
         ) : (
           <p
             id={`${uid}-${section.id}`}
             className={cx("ts-sidebar__heading", collapsed && index > 0 && "ts-sidebar__heading--divider")}
           >
-            <span className={collapsed ? "ts-visually-hidden" : undefined}>{section.label}</span>
+            <span className="ts-sidebar__section-label">{section.label}</span>
           </p>
         )
       ) : null}
-      <ul
-        id={listId}
-        className={section.nested ? "ts-sidebar__nested" : undefined}
-        aria-labelledby={section.label ? `${uid}-${section.id}` : undefined}
-        hidden={section.expandable && !open}
+      <m.div
+        className="ts-sidebar__disclosure"
+        initial={false}
+        variants={reduced ? { animate: { height: closed ? 0 : "auto", opacity: closed ? 0 : 1 } } : preset.variants}
+        animate="animate"
+        transition={preset.transition}
+        inert={closed}
+        aria-hidden={closed || undefined}
       >
-        {section.items.map((item) => (
-          <Entry
-            key={item.id}
-            item={item}
-            active={item.active ?? activeId === item.id}
-            collapsed={collapsed}
-            soonLabel={soonLabel}
-            hideIcon={(section.nested ?? false) && !collapsed}
-          />
-        ))}
-      </ul>
+        <ul
+          id={listId}
+          className={section.nested ? "ts-sidebar__nested" : undefined}
+          aria-labelledby={section.label ? `${uid}-${section.id}` : undefined}
+        >
+          {section.items.map((item) => (
+            <Entry
+              key={item.id}
+              item={item}
+              active={item.active ?? activeId === item.id}
+              collapsed={collapsed}
+              soonLabel={soonLabel}
+              hideIcon={(section.nested ?? false) && !collapsed}
+            />
+          ))}
+        </ul>
+      </m.div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import type { MouseEventHandler, ReactNode } from "react";
 import { cx } from "../classnames.ts";
 import { Icon } from "./Icon.tsx";
+import { getMotionPreset, m, useReducedMotion, useIsPresent } from "../motion/index.ts";
 
 interface SharedProps {
   children: ReactNode;
@@ -30,10 +31,22 @@ export interface ActionFilterChipProps extends SharedProps {
 export type FilterChipProps = ToggleFilterChipProps | RemovableFilterChipProps | ActionFilterChipProps;
 
 export function FilterChip(props: FilterChipProps) {
+  const present = useIsPresent();
+  const reduced = useReducedMotion();
+  const preset = getMotionPreset("listItem", reduced);
   const { kind, className, children } = props;
   if (kind === "removable") {
     return (
-      <span className={cx("ts-filter-chip", "ts-filter-chip--removable", className)}>
+      <m.span
+        inert={!present}
+        aria-hidden={!present || undefined}
+        variants={preset.variants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={preset.transition}
+        className={cx("ts-filter-chip", "ts-filter-chip--removable", className)}
+      >
         <span className="ts-filter-chip__label">{children}</span>
         <button
           type="button"
@@ -44,12 +57,19 @@ export function FilterChip(props: FilterChipProps) {
         >
           <Icon name="close" size={16} />
         </button>
-      </span>
+      </m.span>
     );
   }
 
   return (
-    <button
+    <m.button
+      inert={!present}
+      aria-hidden={!present || undefined}
+      variants={preset.variants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      transition={preset.transition}
       type="button"
       {...(kind === "toggle"
         ? { "aria-pressed": props.pressed, onClick: () => props.onPressedChange(!props.pressed) }
@@ -65,6 +85,6 @@ export function FilterChip(props: FilterChipProps) {
       {kind === "add" && <Icon name="add" size={16} />}
       <span>{children}</span>
       {kind === "dropdown" && <Icon name="expand_more" size={16} />}
-    </button>
+    </m.button>
   );
 }

@@ -13,6 +13,7 @@
   top: 0;
   z-index: 20;
   flex: none;
+  width: var(--ts-sidebar-width);
   height: var(--ts-shell-height);
 }
 .ts-app-shell__sidebar[hidden] {
@@ -123,4 +124,9 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--ts-space-3);
+}
+
+/* Reserve the destination rail width once; its inner width transition never reflows content per frame. */
+.ts-app-shell:not(.ts-app-shell--mobile) .ts-app-shell__sidebar:has(.ts-sidebar--collapsed) {
+  width: var(--ts-sidebar-width-collapsed);
 }

@@ -39,7 +39,7 @@
   background: var(--ts-border-strong);
   padding: 3px;
   box-sizing: border-box;
-  transition: background-color var(--ts-duration-fast) ease;
+  transition: background-color var(--ts-duration-fast) var(--ts-ease-standard);
   flex: none;
 }
 .ts-switch__track span {
@@ -48,7 +48,7 @@
   height: 20px;
   border-radius: 50%;
   background: var(--ts-neutral-0);
-  transition: transform var(--ts-duration-fast) ease;
+  transition: transform var(--ts-duration-fast) var(--ts-ease-standard);
 }
 .ts-switch__control:is(:hover, [data-state="hover"] .ts-switch__control) .ts-switch__track {
   outline: 1px solid var(--ts-text-muted);

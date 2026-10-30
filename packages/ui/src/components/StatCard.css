@@ -90,3 +90,12 @@
   gap: var(--ts-space-1);
   white-space: nowrap;
 }
+
+/* Reserve the final formatted width; animated digits do not move adjacent content. */
+.ts-stat-card__value {
+  position: relative;
+}
+.ts-stat-card__count {
+  position: absolute;
+  inset: 0;
+}

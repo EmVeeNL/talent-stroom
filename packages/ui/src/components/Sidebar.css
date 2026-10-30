@@ -9,7 +9,7 @@
   background: var(--ts-sidebar-bg);
   color: var(--ts-sidebar-text);
   border-inline-end: var(--ts-border-width) solid var(--ts-sidebar-border);
-  transition: width var(--ts-duration-base) ease;
+  transition: width var(--ts-duration-slow) var(--ts-ease-standard);
 }
 .ts-sidebar--collapsed {
   width: var(--ts-sidebar-width-collapsed);
@@ -52,6 +52,7 @@
   padding-inline: var(--ts-space-3);
 }
 .ts-sidebar__heading {
+  position: relative;
   margin: var(--ts-space-4) 0 var(--ts-space-1);
   padding-inline: var(--ts-space-3);
   color: var(--ts-sidebar-text-muted);
@@ -90,7 +91,7 @@
   line-height: var(--ts-line-height-sm);
   font-weight: var(--ts-font-weight-semibold);
 }
-.ts-sidebar__group-button > .ts-icon:last-child {
+.ts-sidebar__group-button > .ts-sidebar__chevron {
   color: inherit;
   opacity: 0.7;
 }
@@ -148,7 +149,7 @@
   line-height: var(--ts-line-height-sm);
   font-weight: var(--ts-font-weight-medium);
   text-decoration: none;
-  transition: background-color var(--ts-duration-fast) ease;
+  transition: background-color var(--ts-duration-fast) var(--ts-ease-standard);
 }
 .ts-sidebar--collapsed .ts-sidebar__item {
   justify-content: center;
@@ -167,7 +168,7 @@
   width: 1px;
   height: 1px;
   overflow: hidden;
-  clip-path: inset(50%);
+  opacity: 0;
   white-space: nowrap;
 }
 a.ts-sidebar__item:hover {
@@ -297,7 +298,7 @@ a.ts-sidebar__item:hover {
   width: 1px;
   height: 1px;
   overflow: hidden;
-  clip-path: inset(50%);
+  opacity: 0;
   white-space: nowrap;
 }
 .ts-sidebar--collapsed .ts-sidebar-assistant__chevron {
@@ -360,7 +361,7 @@ a.ts-sidebar__item:hover {
   justify-content: center;
   padding-inline: 0;
 }
-.ts-sidebar--collapsed .ts-sidebar__group-button > .ts-icon:last-child {
+.ts-sidebar--collapsed .ts-sidebar__group-button > .ts-sidebar__chevron {
   display: none;
 }
 
@@ -370,4 +371,39 @@ a.ts-sidebar__item:hover {
 
 .ts-sidebar ul[hidden] {
   display: none;
+}
+
+.ts-sidebar__disclosure {
+  overflow: hidden;
+}
+.ts-sidebar--collapsed .ts-sidebar__disclosure:not([inert]) {
+  overflow: visible;
+}
+.ts-sidebar__chevron {
+  display: inline-flex;
+  flex: none;
+}
+.ts-sidebar__label,
+.ts-sidebar__group-label,
+.ts-sidebar__section-label,
+.ts-sidebar-assistant__text {
+  transition: opacity var(--ts-duration-fast) var(--ts-ease-standard);
+}
+.ts-sidebar--collapsed :is(.ts-sidebar__group-label, .ts-sidebar__section-label) {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.ts-sidebar--collapsed .ts-sidebar__item[aria-disabled="true"] .ts-sidebar__label {
+  opacity: 0;
+}
+
+/* Keep labels at a readable width for the fade, outside the shrinking icon slot. */
+.ts-sidebar--collapsed .ts-sidebar__label {
+  inset-inline-start: var(--ts-space-12);
+  width: calc(var(--ts-sidebar-width) - var(--ts-space-16));
+  height: auto;
+  pointer-events: none;
 }

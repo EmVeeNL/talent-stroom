@@ -39,10 +39,14 @@
   border: 1px solid var(--ts-border-strong);
   border-radius: var(--ts-radius-full);
   background: var(--ts-surface-muted);
+  transition:
+    border-width var(--ts-duration-fast) var(--ts-ease-standard),
+    transform var(--ts-duration-fast) var(--ts-ease-standard);
 }
 .ts-radio-option input:checked {
   border: 6px solid var(--ts-primary);
   background: var(--ts-text-on-primary);
+  transform: scale(1.04);
 }
 .ts-radio-option:is(:hover, [data-state="hover"] .ts-radio-option) input:not(:disabled) {
   outline: 1px solid var(--ts-primary-text);

@@ -216,6 +216,7 @@
 
 button.ts-filter-chip {
   cursor: pointer;
+  transition: background-color var(--ts-duration-fast) var(--ts-ease-standard);
 }
 
 .ts-filter-chip:focus-visible,
@@ -308,6 +309,7 @@ button.ts-filter-chip:hover:not(:disabled) {
 
 /* Tabs */
 .ts-tabs__list {
+  position: relative;
   display: flex;
   gap: var(--ts-space-1);
   border-bottom: var(--ts-border-width) solid var(--ts-border);
@@ -363,4 +365,72 @@ button.ts-filter-chip:hover:not(:disabled) {
 .ts-breadcrumb a:focus-visible {
   outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
   outline-offset: var(--ts-focus-ring-offset);
+}
+
+.ts-tabs__indicator {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--ts-primary);
+  pointer-events: none;
+}
+.ts-tabs__list--measured .ts-tabs__tab--selected {
+  border-bottom-color: transparent;
+}
+
+/* Both preference sources override imported component styles, including previews. */
+:root[data-motion="reduce"]
+  :is(
+    .ts-button,
+    .ts-check__visual,
+    .ts-radio-option input,
+    .ts-switch__track,
+    .ts-switch__track span,
+    .ts-progress__fill,
+    .ts-card,
+    .ts-sidebar,
+    .ts-sidebar__item,
+    .ts-sidebar__label,
+    .ts-sidebar__group-label,
+    .ts-sidebar__section-label,
+    .ts-sidebar-assistant__text
+  ) {
+  transition: none;
+}
+:root[data-motion="reduce"] .ts-button:is(:active, [data-state="active"]):not(:disabled, [aria-disabled="true"]) {
+  transform: none;
+}
+:root[data-motion="reduce"] .ts-check input:checked + .ts-check__visual,
+:root[data-motion="reduce"] .ts-radio-option input:checked {
+  transform: none;
+}
+:root[data-motion="reduce"] .ts-progress--indeterminate .ts-progress__fill {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(
+    .ts-button,
+    .ts-check__visual,
+    .ts-radio-option input,
+    .ts-switch__track,
+    .ts-switch__track span,
+    .ts-progress__fill,
+    .ts-card,
+    .ts-sidebar,
+    .ts-sidebar__item,
+    .ts-sidebar__label,
+    .ts-sidebar__group-label,
+    .ts-sidebar__section-label,
+    .ts-sidebar-assistant__text
+  ) {
+    transition: none;
+  }
+  .ts-button:is(:active, [data-state="active"]):not(:disabled, [aria-disabled="true"]) {
+    transform: none;
+  }
+  .ts-check input:checked + .ts-check__visual,
+  .ts-radio-option input:checked {
+    transform: none;
+  }
 }

@@ -33,9 +33,12 @@
   display: block;
   height: 100%;
   background: var(--ts-progress-color);
+  transform-origin: left;
+  transition: transform var(--ts-duration-base) var(--ts-ease-standard);
 }
 .ts-progress--indeterminate .ts-progress__fill {
-  animation: ts-progress-slide 1.8s ease-in-out infinite alternate;
+  width: 35%;
+  animation: ts-progress-slide calc(var(--ts-duration-slow) * 5) var(--ts-ease-standard) infinite alternate;
 }
 @keyframes ts-progress-slide {
   to {
@@ -43,6 +46,9 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .ts-progress__fill {
+    transition: none;
+  }
   .ts-progress--indeterminate .ts-progress__fill {
     animation: none;
   }

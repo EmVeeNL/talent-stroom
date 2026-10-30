@@ -36,7 +36,10 @@ export function Progress({ label, value, min = 0, max = 100, tone = "info", form
         aria-valuemax={upper}
         aria-valuenow={current}
       >
-        <span className="ts-progress__fill" style={{ width: current === undefined ? "35%" : `${percent}%` }} />
+        <span
+          className="ts-progress__fill"
+          style={current === undefined ? undefined : { transform: `scaleX(${(percent ?? 0) / 100})` }}
+        />
       </div>
     </div>
   );
