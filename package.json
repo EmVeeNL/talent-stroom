@@ -21,7 +21,8 @@
     "db:migrate": "node --env-file-if-exists=.env packages/database/src/cli.ts migrate",
     "db:dev-passwords": "node --env-file-if-exists=.env packages/database/src/cli.ts dev-passwords",
     "visual": "pnpm --filter @talentstroom/web visual",
-    "visual:install": "pnpm --filter @talentstroom/web visual:install"
+    "visual:install": "pnpm --filter @talentstroom/web visual:install",
+    "db:seed": "node --env-file-if-exists=.env packages/database/src/seed.ts"
   },
   "devDependencies": {
     "oxfmt": "catalog:",
