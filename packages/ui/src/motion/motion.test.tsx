@@ -41,6 +41,11 @@ const presetNames: MotionPresetName[] = [
   "collapse",
   "expand",
   "listItem",
+  "popover",
+  "dialog",
+  "sheetLeft",
+  "sheetRight",
+  "toast",
 ];
 
 describe("motion foundation", () => {
@@ -99,6 +104,11 @@ describe("motion foundation", () => {
       "collapse",
       "expand",
       "listItem",
+      "popover",
+      "dialog",
+      "sheetLeft",
+      "sheetRight",
+      "toast",
     ]);
     expect(getMotionPreset("slideUp").variants["initial"]).toMatchObject({ y: 8 });
     for (const name of presetNames) {

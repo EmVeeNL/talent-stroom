@@ -5,6 +5,7 @@ import { useReducedMotion } from "./reduced-motion.ts";
 const loadDomAnimation = () => import("motion/react").then((module) => module.domAnimation);
 
 export { AnimatePresence, animate, m, useIsPresent };
+export { MotionGlobalConfig, LayoutGroup } from "motion/react";
 
 export function MotionProvider({ children }: { children: ReactNode }) {
   const reducedMotion = useReducedMotion();

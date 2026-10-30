@@ -10,10 +10,47 @@
   background: var(--ts-surface-raised);
   color: var(--ts-text);
   box-shadow: var(--ts-shadow-modal);
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity var(--ts-duration-base) var(--ts-ease-emphasised),
+    transform var(--ts-duration-base) var(--ts-ease-emphasised);
 }
 .ts-dialog::backdrop {
   background: var(--ts-sidebar-bg);
   opacity: 0.6;
+  transition: opacity var(--ts-duration-base) var(--ts-ease-emphasised);
+}
+.ts-dialog[open] {
+  animation: ts-dialog-in var(--ts-duration-base) var(--ts-ease-emphasised);
+}
+.ts-dialog[open]::backdrop {
+  animation: ts-dialog-backdrop-in var(--ts-duration-base) var(--ts-ease-emphasised);
+}
+@keyframes ts-dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes ts-dialog-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.6;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ts-dialog,
+  .ts-dialog::backdrop {
+    transition-duration: 0ms;
+    animation: none !important;
+  }
 }
 .ts-dialog--sm {
   max-width: 26rem;

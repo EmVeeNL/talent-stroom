@@ -1,3 +1,4 @@
+import { MotionGlobalConfig } from "@talentstroom/ui";
 import { afterEach } from "vitest";
 import { cleanup } from "@testing-library/react";
 
@@ -11,3 +12,5 @@ HTMLDialogElement.prototype.showModal = function () {
 HTMLDialogElement.prototype.close = function () {
   this.open = false;
 };
+
+MotionGlobalConfig.skipAnimations = true;

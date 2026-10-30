@@ -343,3 +343,36 @@ Component regressions cover first-view observation, cancellation, repeated toggl
 reduced-motion sources. `apps/web/visual/micro-interactions.visual.ts` checks real CSS transitions,
 keyboard focus, indicator geometry and chip presence with full motion, OS reduction and the
 HTML override. Run it through the existing Playwright harness; use port 5200 in isolated worktrees.
+
+Overlays use the token-backed `dialog`, `sheetLeft`, `sheetRight`, `popover` and `toast`
+presets. Native dialogs retain their browser focus trap and synchronous close/focus return;
+CSS animates their entrance and backdrop. Tooltips use `motionDelay.tooltip` before appearing.
+
+Popover and ContextMenu retain the native popover top layer when supported; their
+Escape and outside-click handlers close logical state and restore focus immediately.
+Presence keeps the native element showing only for the visual exit, then calls
+`hidePopover()` before removal. Exiting panels are inert and hidden from assistive
+technology. Reduced motion removes panels immediately and disables toast layout
+movement. Card loading crossfades mount new content immediately alongside the inert
+exiting skeleton, so content and lazy children never wait for an exit animation.
+
+Dashboard content uses `MotionContent` keyed by organization and route. It animates only the
+incoming content and never retains an outgoing route. The Query barrier keeps the router tree
+`hidden` and `inert` immediately during organization changes; only a neutral loading message
+fades during the barrier, followed by the new organization's content. Never wrap scoped content
+in exit presence across that barrier.
+
+`MotionCollection` and keyed `MotionListItem` / `MotionTableRow` preserve native list/table markup,
+skip initial-load animation, and animate later insertions, removals and position changes. Exiting
+items become inert and hidden from assistive technology immediately. Keep the collection mounted
+when it becomes empty so its last exit can finish. Use `reorder={false}` for collections whose
+positions never change, avoiding the lazy `domMax` bundle there. List entrances and layout moves
+use bounded token tweens (320 ms), with shorter exits, rather than an unbounded settling spring.
+Reduced motion disables FLIP and translation entirely.
+
+Kanban uses board-local shared card positions for pointer, keyboard and menu moves, an opacity
+entrance for the drop placeholder, and transform layout animation for column collapse/expand.
+Disclosure removes its body immediately, leaving toggle focus and keyboard announcements intact.
+The auth photo and other auth-layout surfaces have no route transition. Vitest uses the public
+`MotionGlobalConfig.skipAnimations` export; visual review remains the reduced-motion Playwright
+harness plus a normal-motion keyboard/drag pass (performance tracing is tracked in #402).

@@ -6,6 +6,7 @@ import { LOCALES, t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
 import {
   AppShell,
+  MotionContent,
   CommandPalette,
   LanguageMenu,
   NavbarIconButton,
@@ -123,6 +124,7 @@ export function DashboardLayout({
   children: ReactNode;
 }) {
   const layer = useDataLayer();
+  const matchedRoute = useRouterState({ select: (state) => state.matches.at(-1)?.id ?? "/" });
   const tr = (key: MessageKey) => t(locale, key);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<MessageKey>();
@@ -263,12 +265,14 @@ export function DashboardLayout({
         ),
       }}
     >
-      {currentPath === "/" ? (
-        <h1 ref={headingRef} tabIndex={-1} className="ts-visually-hidden">
-          {tr("auth.home")}
-        </h1>
-      ) : null}
-      {children}
+      <MotionContent identity={`${data.activeOrganizationId}:${matchedRoute}`}>
+        {currentPath === "/" ? (
+          <h1 ref={headingRef} tabIndex={-1} className="ts-visually-hidden">
+            {tr("auth.home")}
+          </h1>
+        ) : null}
+        {children}
+      </MotionContent>
     </AppShell>
   );
 }

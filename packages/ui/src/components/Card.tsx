@@ -4,6 +4,7 @@ import { ContextMenu } from "./ContextMenu.tsx";
 import type { ContextMenuItem } from "./ContextMenu.tsx";
 import { Skeleton } from "./Skeleton.tsx";
 import { cx } from "../classnames.ts";
+import { MotionPanel, MotionPresence } from "../motion/presence.tsx";
 
 export interface CardProps extends Omit<HTMLAttributes<HTMLElement>, "title"> {
   as?: "div" | "section" | "article";
@@ -64,6 +65,18 @@ export function Card({
         ) : null}
       </div>
     ) : null,
-    <div className="ts-card__body">{loading ? <Skeleton shape="card" /> : children}</div>,
+    <div className="ts-card__body">
+      <MotionPresence>
+        <MotionPanel
+          key={loading ? "loading" : "content"}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          preset="fade"
+        >
+          {loading ? <Skeleton shape="card" /> : children}
+        </MotionPanel>
+      </MotionPresence>
+    </div>,
   );
 }

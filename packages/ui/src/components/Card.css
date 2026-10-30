@@ -16,7 +16,9 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--ts-space-3);
-  padding: var(--ts-space-3) var(--ts-space-4);
+  box-sizing: border-box;
+  min-height: 52px;
+  padding: var(--ts-space-2) var(--ts-space-4);
   border-bottom: var(--ts-border-width) solid var(--ts-border);
 }
 
@@ -47,5 +49,11 @@
 }
 
 .ts-card__body {
+  display: grid;
   padding: var(--ts-space-4);
+}
+
+.ts-card__body > div {
+  grid-area: 1 / 1;
+  min-width: 0;
 }

@@ -1,6 +1,7 @@
 import { cloneElement, useEffect, useId, useState } from "react";
 import type { ButtonHTMLAttributes, ReactElement, ReactNode } from "react";
 import { cx } from "../classnames.ts";
+import { MotionPanel, MotionPresence } from "../motion/presence.tsx";
 import { focusable, useFloating } from "./floating.ts";
 export interface PopoverProps {
   /** Always-visible in-flow gallery example; does not capture focus. */
@@ -19,7 +20,6 @@ export function Popover({ trigger, label, children, className, initialFocus, inl
   useEffect(() => {
     if (!open || inline) return undefined;
     const node = panel.current;
-    node?.showPopover?.();
     (node?.querySelector<HTMLElement>(initialFocus ?? focusable) ?? node)?.focus();
     const close = () => {
       setOpen(false);
@@ -38,8 +38,6 @@ export function Popover({ trigger, label, children, className, initialFocus, inl
     document.addEventListener("keydown", key);
     document.addEventListener("click", outside);
     return () => {
-      // Removing a native popover already closes it; detached nodes reject hidePopover().
-      if (node?.isConnected) node.hidePopover?.();
       document.removeEventListener("keydown", key);
       document.removeEventListener("click", outside);
     };
@@ -55,24 +53,26 @@ export function Popover({ trigger, label, children, className, initialFocus, inl
           if (!event.defaultPrevented) setOpen(!open);
         },
       })}
-      {(inline || open) && (
-        <div
-          ref={panel}
-          id={id}
-          popover={
-            !inline && typeof HTMLElement !== "undefined" && "showPopover" in HTMLElement.prototype
-              ? "manual"
-              : undefined
-          }
-          role="dialog"
-          aria-label={label}
-          tabIndex={-1}
-          className={cx("ts-popover", className)}
-          style={inline ? { position: "static" } : position}
-        >
-          {children}
-        </div>
-      )}
+      <MotionPresence>
+        {(inline || open) && (
+          <MotionPanel
+            nativePopover={!inline}
+            ref={panel}
+            id={id}
+            role="dialog"
+            aria-label={label}
+            tabIndex={-1}
+            className={cx("ts-popover", className)}
+            style={inline ? { position: "static" } : position}
+            initial={inline ? false : "initial"}
+            animate="animate"
+            exit="exit"
+            preset="popover"
+          >
+            {children}
+          </MotionPanel>
+        )}
+      </MotionPresence>
     </span>
   );
 }
