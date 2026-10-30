@@ -2,10 +2,25 @@ import type { Generated } from "kysely";
 
 /** Columns of the identity tables that our own code reads or writes as ts_auth (0003). */
 export interface IdentityDatabase {
+  "auth.users": {
+    id: string;
+    email: string;
+    email_verified: boolean;
+    banned: boolean | null;
+  };
+  "app.organization_invitations": {
+    id: string;
+    organization_id: string;
+    email: string;
+    role: IdentityDatabase["app.memberships"]["role"];
+    status: "pending" | "accepted" | "rejected" | "canceled";
+    expires_at: Date;
+  };
   "app.organizations": {
     id: string;
     name: string;
     slug: string;
+    settings: Record<string, unknown>;
     state: "active" | "suspended" | "deleted";
   };
   "app.memberships": {

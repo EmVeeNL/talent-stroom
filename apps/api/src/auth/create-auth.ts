@@ -5,6 +5,7 @@ import { Kysely, PostgresDialect } from "kysely";
 import { Pool } from "pg";
 import { mailLocale, renderMail, type MailMessage, type MailSettings, type MailTransport } from "../mail/index.ts";
 import { organizationAc, organizationRoles, platformAc, platformRoles } from "./access-control.ts";
+import { sessionPolicy } from "./auth-method.ts";
 import type { IdentityDatabase } from "./identity-db.ts";
 import { asyncStorageSeeded } from "./runtime.ts";
 import { sessionRotation } from "./session-rotation.ts";
@@ -78,6 +79,8 @@ function socialProviders(env: SocialSettings): NonNullable<BetterAuthOptions["so
 export const DISABLED_PATHS = [
   "/organization/create",
   "/organization/set-active",
+  "/organization/accept-invitation",
+  "/organization/reject-invitation",
   "/organization/delete",
   "/organization/leave",
   "/organization/remove-member",
@@ -250,7 +253,14 @@ export function createAuth(env: AuthEnv, deps: AuthDeps) {
           },
         },
         schema: {
-          organization: { modelName: "app.organizations", fields: { logo: "logo_url", createdAt: "created_at" } },
+          organization: {
+            modelName: "app.organizations",
+            fields: { logo: "logo_url", createdAt: "created_at" },
+            additionalFields: {
+              state: { type: "string", required: false, input: false, defaultValue: "active" },
+              settings: { type: "json", required: false, input: false, defaultValue: {} },
+            },
+          },
           member: {
             modelName: "app.memberships",
             fields: { organizationId: "organization_id", userId: "user_id", createdAt: "created_at" },
@@ -296,6 +306,7 @@ export function createAuth(env: AuthEnv, deps: AuthDeps) {
         },
       }),
       sessionRotation(),
+      sessionPolicy(),
     ],
   });
 

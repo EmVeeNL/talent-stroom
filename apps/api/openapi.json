@@ -10,7 +10,7 @@
             }
           }
         },
-        "description": "Email not verified, account banned, cross-origin request, or no active membership",
+        "description": "Email not verified, account banned, cross-origin request, no active membership, or MFA required (mfa-required)",
         "headers": {
           "X-Request-Id": {
             "description": "Request correlation ID",
@@ -292,6 +292,179 @@
             "$ref": "#/components/responses/InternalError"
           }
         }
+      }
+    },
+    "/v1/invitations/{invitationId}/accept": {
+      "post": {
+        "description": "Requires the recipient's verified email and an active organization. Membership, invitation status and security event commit together before session rotation. Existing memberships, including suspended memberships, are refused. Clients must drop previous organization caches.",
+        "operationId": "acceptInvitation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "invitationId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "membershipId": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "organizationId": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "role": {
+                      "enum": ["owner", "admin", "recruiter", "viewer"],
+                      "type": "string"
+                    }
+                  },
+                  "required": ["organizationId", "membershipId", "name", "role"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Accepted. A new session cookie replaces the revoked previous session.",
+            "headers": {
+              "Set-Cookie": {
+                "description": "The rotated session cookie (HttpOnly, SameSite=Lax)",
+                "required": true,
+                "schema": {
+                  "description": "The rotated session cookie (HttpOnly, SameSite=Lax)",
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "requestId": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "status": {
+                      "maximum": 599,
+                      "minimum": 400,
+                      "type": "integer"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "format": "uri",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["type", "title", "status", "requestId"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invitation no longer pending, or membership already exists (including suspended)",
+            "headers": {
+              "X-Request-Id": {
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "410": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "type": "string"
+                    },
+                    "instance": {
+                      "type": "string"
+                    },
+                    "requestId": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "status": {
+                      "maximum": 599,
+                      "minimum": 400,
+                      "type": "integer"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "format": "uri",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["type", "title", "status", "requestId"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invitation expired",
+            "headers": {
+              "X-Request-Id": {
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "summary": "Accept an invitation and rotate the session into its organization"
       }
     },
     "/v1/me/organizations": {

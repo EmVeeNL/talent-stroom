@@ -1,16 +1,20 @@
 import { createRoute, type OpenAPIHono, z } from "@hono/zod-openapi";
 import {
   CreateOrganizationRequest,
+  InvitationIdParam,
   MyOrganizationsResponse,
   OrganizationContext,
   OrganizationIdParam,
+  ProblemDetails,
 } from "@talentstroom/contracts";
 import { createDatabase, withTenant } from "@talentstroom/database/tenant";
 import { isAPIError } from "better-auth/api";
 import type { Context, MiddlewareHandler } from "hono";
 import { problem, type AppEnv } from "../problem.ts";
 import { authAttemptLimit } from "../rate-limit.ts";
+import { satisfiesMfa } from "./auth-method.ts";
 import { AUTH_BASE_PATH, SESSION_COOKIE, organizationSlug } from "./create-auth.ts";
+import { acceptInvitation } from "./invitations.ts";
 import {
   findActiveMembership,
   identity,
@@ -90,7 +94,10 @@ export function registerIdentity(app: OpenAPIHono<AppEnv>, deps: IdentityDeps): 
   });
   for (const [name, description] of [
     ["Unauthorized", "No valid session"],
-    ["Forbidden", "Email not verified, account banned, cross-origin request, or no active membership"],
+    [
+      "Forbidden",
+      "Email not verified, account banned, cross-origin request, no active membership, or MFA required (mfa-required)",
+    ],
     ["OrganizationMismatch", "X-Organization-Id differs from the session's active organization"],
   ] as const) {
     app.openAPIRegistry.registerComponent("responses", name, {
@@ -111,6 +118,7 @@ export function registerIdentity(app: OpenAPIHono<AppEnv>, deps: IdentityDeps): 
 
   const v1 = [sameOriginForUnsafeMethods, identity(deps), requireSession] as const;
   app.use("/v1/me/*", ...v1);
+  app.use("/v1/invitations/*", ...v1);
   app.use("/v1/organizations", ...v1);
   app.use("/v1/organizations/*", ...v1);
   app.use("/v1/organizations/current", requireMembership);
@@ -218,9 +226,55 @@ export function registerIdentity(app: OpenAPIHono<AppEnv>, deps: IdentityDeps): 
       const { orgId } = c.req.valid("param");
       const membership = await findActiveMembership(c.get("identity").db, c.get("principal").userId, orgId);
       if (membership === undefined) return problem(c, "forbidden");
+      if (membership.settings["requireMfa"] === true && !satisfiesMfa(c.get("principal").authMethod))
+        return problem(c, "mfaRequired");
       const context = await rotateInto(c, membership);
       await securityEvent(c, "organization.switched", membership.organizationId);
       return c.json(context, 200);
+    },
+  );
+
+  app.openapi(
+    createRoute({
+      method: "post",
+      path: "/v1/invitations/{invitationId}/accept",
+      operationId: "acceptInvitation",
+      summary: "Accept an invitation and rotate the session into its organization",
+      description:
+        "Requires the recipient's verified email and an active organization. Membership, invitation " +
+        "status and security event commit together before session rotation. Existing memberships, " +
+        "including suspended memberships, are refused. Clients must drop previous organization caches.",
+      security: sessionCookie,
+      request: { params: InvitationIdParam },
+      responses: {
+        200: {
+          description: "Accepted. A new session cookie replaces the revoked previous session.",
+          headers: setCookie,
+          content: { "application/json": { schema: OrganizationContext } },
+        },
+        ...errors,
+        404: { $ref: "#/components/responses/NotFound" },
+        409: {
+          description: "Invitation no longer pending, or membership already exists (including suspended)",
+          headers: xRequestId,
+          content: { "application/problem+json": { schema: ProblemDetails } },
+        },
+        410: {
+          description: "Invitation expired",
+          headers: xRequestId,
+          content: { "application/problem+json": { schema: ProblemDetails } },
+        },
+        422: { $ref: "#/components/responses/ValidationError" },
+      },
+    }),
+    async (c) => {
+      const result = await acceptInvitation(
+        c.get("identity").db,
+        c.get("principal").userId,
+        c.req.valid("param").invitationId,
+      );
+      if ("error" in result) return problem(c, result.error);
+      return c.json(await rotateInto(c, result.membership), 200);
     },
   );
 
