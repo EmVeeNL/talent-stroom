@@ -22,4 +22,4 @@ One file per significant decision: `NNNN-short-title.md`, numbered sequentially.
 | [0012](0012-identity-schema-placement.md)      | Identity schema placement                                  | Accepted                                  |
 | [0013](0013-redesign-design-kit.md)            | Applying the redesign design kit                           | Accepted (approved by merging PR)         |
 | [0014](0014-motion-and-animation.md)           | Motion and animation                                       | Proposed                                  |
-| [0015](0015-tanstack-web-data-layer.md)        | TanStack web data layer                                    | Proposed                                  |
+| [0015](0015-tanstack-web-data-layer.md)        | TanStack web data layer                                    | Accepted                                  |
