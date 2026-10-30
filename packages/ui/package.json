@@ -20,7 +20,8 @@
     "react": "catalog:"
   },
   "dependencies": {
-    "@tanstack/charts": "catalog:"
+    "@tanstack/charts": "catalog:",
+    "@tanstack/react-table": "catalog:"
   },
   "devDependencies": {
     "@talentstroom/config": "workspace:*",
@@ -35,8 +36,5 @@
     "react-dom": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
-  },
-  "dependencies": {
-    "@tanstack/react-table": "catalog:"
   }
 }
