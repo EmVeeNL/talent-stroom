@@ -100,4 +100,29 @@ for (const theme of ["light", "dark"] as const) {
       }
     });
   }
+
+  for (const viewport of viewports) {
+    test(`dashboard · ${theme} · ${viewport.width}`, async ({ page }) => {
+      await page.setViewportSize(viewport);
+      await page.route("**/api/**", (route) => route.abort("blockedbyclient"));
+      await page.goto(`/?preview=dashboard&theme=${theme}`);
+      await expect(page.getByRole("heading", { name: "Recruitment", level: 1 })).toBeVisible();
+      if (viewport.width >= 768) await expect(page.getByRole("navigation", { name: "Hoofdnavigatie" })).toBeVisible();
+      else await expect(page.getByRole("button", { name: "Menu openen" })).toBeVisible();
+      await page.screenshot({
+        path: `${output}/dashboard-${theme}-${viewport.width}.png`,
+        fullPage: true,
+        animations: "disabled",
+      });
+      if (viewport.width === 1440) {
+        await page.goto(`/apps/agenda?preview=dashboard&theme=${theme}`);
+        await expect(page.getByRole("heading", { name: "Agenda", level: 1 })).toBeVisible();
+        await page.screenshot({
+          path: `${output}/dashboard-nested-${theme}-${viewport.width}.png`,
+          fullPage: true,
+          animations: "disabled",
+        });
+      }
+    });
+  }
 }

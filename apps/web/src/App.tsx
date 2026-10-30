@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { DEFAULT_LOCALE, isLocale, LOCALES, t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
 import { Button, Icon, Logo, Select, ThemeToggle } from "@talentstroom/ui";
@@ -8,12 +8,21 @@ import { AuthScreens, publicRoutes, titles } from "./AuthScreens.tsx";
 import { OrganizationPicker } from "./OrganizationPicker.tsx";
 import { Workspace } from "./Workspace.tsx";
 import type { SessionUser } from "./Workspace.tsx";
+import { AuthLayout } from "./layouts/AuthLayout.tsx";
+import { authRouteTitles, findRoute, knownTitles, routes } from "./routes.ts";
+import { Skeleton } from "@talentstroom/ui";
 import "./auth.css";
 
 // Dev-only component showcase: ?gallery. Tree-shaken from production builds.
 const ComponentGallery = import.meta.env.DEV
   ? lazy(() => import("./gallery/Gallery.tsx").then((m) => ({ default: m.Gallery })))
   : null;
+const LazyPages = new Map(routes.map((route) => [route.path, lazy(route.load)]));
+const LazyNotFound = lazy(() => import("./pages/errors/NotFound.tsx"));
+function RouteView({ path, locale }: { path: string; locale: Locale }) {
+  const Page = LazyPages.get(path);
+  return Page ? React.createElement(Page, { locale }) : null;
+}
 
 export function App() {
   if (ComponentGallery && new URLSearchParams(window.location.search).has("gallery")) {
@@ -23,7 +32,57 @@ export function App() {
       </Suspense>
     );
   }
+  if (import.meta.env.DEV && new URLSearchParams(window.location.search).get("preview") === "dashboard") {
+    return <DashboardPreview />;
+  }
   return <AuthApp />;
+}
+
+function DashboardPreview() {
+  const [locale, setLocale] = useState<Locale>(DEFAULT_LOCALE);
+  const [path, setPath] = useState(window.location.pathname);
+  const transport = useState(createTransport)[0];
+  const orgId = "11111111-1111-4111-8111-111111111111";
+  const data: OrganizationList = {
+    organizations: [
+      {
+        organizationId: orgId,
+        membershipId: "22222222-2222-4222-8222-222222222222",
+        name: "TalentStroom Demo",
+        slug: "talentstroom-demo",
+        role: "owner",
+      },
+    ],
+    activeOrganizationId: orgId,
+  };
+  useEffect(() => {
+    const update = () => setPath(window.location.pathname);
+    window.addEventListener("popstate", update);
+    const theme = new URLSearchParams(window.location.search).get("theme");
+    if (theme === "light" || theme === "dark") document.documentElement.dataset["theme"] = theme;
+    return () => window.removeEventListener("popstate", update);
+  }, []);
+  const route = findRoute(path);
+  const Page = route ? LazyPages.get(route.path) : undefined;
+  return (
+    <Workspace
+      locale={locale}
+      onLocaleChange={setLocale}
+      transport={transport}
+      data={data}
+      user={{ name: "Michael de Vries", email: "michael@example.test" }}
+      signOutBusy={false}
+      onSignOut={() => undefined}
+      onChanged={() => undefined}
+      onExpired={() => undefined}
+      headingRef={{ current: null }}
+      currentPath={path}
+    >
+      <Suspense fallback={<Skeleton variant="card" lines={3} />}>
+        {Page ? React.createElement(Page, { locale }) : <LazyNotFound locale={locale} />}
+      </Suspense>
+    </Workspace>
+  );
 }
 type Context =
   | { kind: "loading" }
@@ -106,7 +165,7 @@ function AuthApp() {
   if (context.kind === "ready") {
     if (!active && !["/e-mail-bevestigen", "/wachtwoord-herstellen", "/wachtwoord-vergeten"].includes(path))
       path = "/organisatie-kiezen";
-    else if (active && (path === "/inloggen" || path === "/registreren" || !titles[path])) path = "/";
+    else if (active && (path === "/inloggen" || path === "/registreren")) path = "/";
   }
   useEffect(() => {
     if (path !== location.path) {
@@ -115,7 +174,7 @@ function AuthApp() {
   }, [path, location.path]);
   useEffect(() => {
     if (context.kind !== "loading") heading.current?.focus();
-    document.title = `${t(locale, titles[path] ?? "auth.home")} · ${t(locale, "app.name")}`;
+    document.title = `${t(locale, knownTitles[path] ?? "auth.home")} · ${t(locale, "app.name")}`;
   }, [path, context.kind, locale]);
 
   function refresh() {
@@ -159,7 +218,7 @@ function AuthApp() {
       )
         return;
       const url = new URL(link.href);
-      if (url.origin !== window.location.origin || !titles[url.pathname]) return;
+      if (url.origin !== window.location.origin || !knownTitles[url.pathname]) return;
       event.preventDefault();
       window.history.pushState(null, "", url.pathname + url.search);
       setLocation(readLocation());
@@ -199,7 +258,9 @@ function AuthApp() {
         onExpired={expire}
       />
     ) : null;
-  if (path === "/" && active && context.kind === "ready")
+  const currentRoute = findRoute(path);
+  if (active && context.kind === "ready" && currentRoute) {
+    const route = currentRoute;
     return (
       <Workspace
         locale={locale}
@@ -212,87 +273,113 @@ function AuthApp() {
         onChanged={refresh}
         onExpired={expire}
         headingRef={heading}
+        currentPath={path}
       >
         {actionError && (
           <p role="alert" className="workspace-alert">
             {tr(actionError)}
           </p>
         )}
-        <p className="workspace-intro">{tr("auth.homeIntro")}</p>
+        <Suspense fallback={<Skeleton variant="card" lines={3} />}>
+          <RouteView path={route.path} locale={locale} />
+        </Suspense>
       </Workspace>
     );
+  }
+  if (active && context.kind === "ready" && !authRouteTitles[path]) {
+    return (
+      <Workspace
+        locale={locale}
+        onLocaleChange={setLocale}
+        transport={transport}
+        data={context.data}
+        user={context.user}
+        signOutBusy={signOutBusy}
+        onSignOut={() => void signOut()}
+        onChanged={refresh}
+        onExpired={expire}
+        headingRef={heading}
+        currentPath={path}
+      >
+        <Suspense fallback={<Skeleton variant="card" lines={3} />}>
+          <LazyNotFound locale={locale} />
+        </Suspense>
+      </Workspace>
+    );
+  }
   return (
-    <div className="auth-shell">
-      <aside className="auth-brand">
-        <a href="/inloggen" className="auth-wordmark" aria-label={tr("app.name")}>
-          <Logo tone="dark" size="lg" />
-        </a>
-        <div className="auth-brand-copy">
-          <h2 className="auth-brand-title">{tr("auth.brandLine")}</h2>
-          <p>{tr("auth.brandText")}</p>
-          <ul className="auth-benefits">
-            {(
-              [
-                ["auth.valueSpeed", "task_alt"],
-                ["auth.valueShortlist", "description"],
-                ["auth.valuePipeline", "bar_chart"],
-                ["auth.valueShare", "groups"],
-              ] as const
-            ).map(([key, icon]) => (
-              <li key={key}>
-                <span className="auth-benefit-icon">
-                  <Icon name={icon} size={24} />
-                </span>
-                {tr(key)}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </aside>
-      <div className="auth-panel">
-        <div className="auth-controls">{controls}</div>
-        <main className="auth-content">
-          <section className="auth-card">
-            <Logo className="auth-card-logo" size="md" />
-            {context.kind === "loading" ? (
-              <output>{tr("auth.loading")}</output>
-            ) : (
-              <>
-                <h1 ref={heading} tabIndex={-1}>
-                  {tr(context.kind === "error" ? "auth.sessionError" : (titles[path] ?? "auth.home"))}
-                </h1>
-                {actionError && <p role="alert">{tr(actionError)}</p>}
-                {context.kind === "error" ? (
-                  <>
-                    <p role="alert">{tr(context.message)}</p>
-                    <Button onClick={refresh}>{tr("auth.retry")}</Button>
-                    <a href="/e-mail-bevestigen?error=resend">{tr("auth.resend")}</a>
-                    <Button variant="ghost" loading={signOutBusy} onClick={() => void signOut()}>
-                      {tr("auth.signOut")}
-                    </Button>
-                  </>
-                ) : publicRoutes.includes(path) ? (
-                  <AuthScreens
-                    key={location.path + location.query}
-                    path={path}
-                    query={location.query}
-                    locale={locale}
-                    transport={transport}
-                    onSignedIn={refresh}
-                  />
-                ) : (
-                  <>
-                    {picker}
-                    <Button variant="ghost" loading={signOutBusy} onClick={() => void signOut()}>
-                      {tr("auth.signOut")}
-                    </Button>
-                  </>
-                )}
-              </>
-            )}
-          </section>
-        </main>
-      </div>
-    </div>
+    <AuthLayout
+      controls={controls}
+      hero={
+        <>
+          <a href="/inloggen" className="auth-wordmark" aria-label={tr("app.name")}>
+            <Logo tone="dark" size="lg" />
+          </a>
+          <div className="auth-brand-copy">
+            <h2 className="auth-brand-title">{tr("auth.brandLine")}</h2>
+            <p>{tr("auth.brandText")}</p>
+            <ul className="auth-benefits">
+              {(
+                [
+                  ["auth.valueSpeed", "task_alt"],
+                  ["auth.valueShortlist", "description"],
+                  ["auth.valuePipeline", "bar_chart"],
+                  ["auth.valueShare", "groups"],
+                ] as const
+              ).map(([key, icon]) => (
+                <li key={key}>
+                  <span className="auth-benefit-icon">
+                    <Icon name={icon} size={24} />
+                  </span>
+                  {tr(key)}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
+      }
+    >
+      <main className="auth-content">
+        <section className="auth-card">
+          <Logo className="auth-card-logo" size="md" />
+          {context.kind === "loading" ? (
+            <output>{tr("auth.loading")}</output>
+          ) : (
+            <>
+              <h1 ref={heading} tabIndex={-1}>
+                {tr(context.kind === "error" ? "auth.sessionError" : (titles[path] ?? "auth.home"))}
+              </h1>
+              {actionError && <p role="alert">{tr(actionError)}</p>}
+              {context.kind === "error" ? (
+                <>
+                  <p role="alert">{tr(context.message)}</p>
+                  <Button onClick={refresh}>{tr("auth.retry")}</Button>
+                  <a href="/e-mail-bevestigen?error=resend">{tr("auth.resend")}</a>
+                  <Button variant="ghost" loading={signOutBusy} onClick={() => void signOut()}>
+                    {tr("auth.signOut")}
+                  </Button>
+                </>
+              ) : publicRoutes.includes(path) ? (
+                <AuthScreens
+                  key={location.path + location.query}
+                  path={path}
+                  query={location.query}
+                  locale={locale}
+                  transport={transport}
+                  onSignedIn={refresh}
+                />
+              ) : (
+                <>
+                  {picker}
+                  <Button variant="ghost" loading={signOutBusy} onClick={() => void signOut()}>
+                    {tr("auth.signOut")}
+                  </Button>
+                </>
+              )}
+            </>
+          )}
+        </section>
+      </main>
+    </AuthLayout>
   );
 }

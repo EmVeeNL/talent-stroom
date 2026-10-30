@@ -1,6 +1,7 @@
 /** Shipped Rounded ligatures. Update this list, then run scripts/subset-icons.py. */
 export const ICON_NAMES = [
   "account_circle",
+  "admin_panel_settings",
   "add",
   "apartment",
   "arrow_back",
@@ -11,9 +12,11 @@ export const ICON_NAMES = [
   "attach_file",
   "auto_awesome",
   "bar_chart",
+  "badge",
   "business",
   "calendar_month",
   "call",
+  "chat",
   "check",
   "check_circle",
   "checklist",
@@ -24,6 +27,7 @@ export const ICON_NAMES = [
   "close",
   "cloud_upload",
   "content_copy",
+  "contacts",
   "dark_mode",
   "dashboard",
   "delete",

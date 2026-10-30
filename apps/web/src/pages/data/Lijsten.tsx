@@ -1,0 +1,17 @@
+import { Breadcrumb, EmptyState, PageHeader } from "@talentstroom/ui";
+import { t } from "@talentstroom/i18n";
+import type { Locale } from "@talentstroom/i18n";
+
+export default function LijstenPage({ locale }: { locale: Locale }) {
+  const title = t(locale, "nav.data.lijsten");
+  return (
+    <>
+      <Breadcrumb
+        label={t(locale, "nav.breadcrumbs")}
+        items={[{ label: t(locale, "nav.group.data") }, { label: title }]}
+      />
+      <PageHeader title={title} />
+      <EmptyState title={title} body={t(locale, "nav.demo_building", { issue: 412 })} />
+    </>
+  );
+}

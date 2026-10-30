@@ -1,5 +1,5 @@
 import type { IconName } from "../icons.ts";
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { MouseEventHandler, ReactNode } from "react";
 import { cx } from "../classnames.ts";
 import { Icon } from "./Icon.tsx";
@@ -18,12 +18,16 @@ export interface SidebarItem {
   countLabel?: string;
   /** Destination does not exist yet: rendered as a disabled entry marked with `soonLabel`, never as a dead link. */
   soon?: boolean;
+  active?: boolean;
 }
 export interface SidebarSection {
   id: string;
   /** Uppercase group label; omit for the top entries (Dashboard). */
   label?: string;
   items: readonly SidebarItem[];
+  expandable?: boolean;
+  icon?: IconName;
+  nested?: boolean;
 }
 export interface SidebarProps {
   /** Accessible name of the navigation landmark. */
@@ -48,13 +52,27 @@ function Entry({
   active,
   collapsed,
   soonLabel,
+  hideIcon,
 }: {
   item: SidebarItem;
   active: boolean;
   collapsed: boolean;
   soonLabel: string;
+  hideIcon: boolean;
 }) {
   const [tooltipDismissed, setTooltipDismissed] = useState(false);
+  const entryRef = useRef<HTMLAnchorElement>(null);
+  useEffect(() => {
+    if (!active || collapsed || !entryRef.current) return;
+    const nav = entryRef.current.closest(".ts-sidebar__nav");
+    if (!nav) return;
+    const anchor = entryRef.current;
+    const navRect = nav.getBoundingClientRect();
+    const itemRect = anchor.getBoundingClientRect();
+    if (itemRect.top < navRect.top || itemRect.bottom > navRect.bottom) {
+      anchor.scrollIntoView({ block: "nearest" });
+    }
+  }, [active, collapsed]);
   const soon = item.soon || !item.href;
   const count =
     item.count !== undefined && item.count > 0 ? (
@@ -65,7 +83,7 @@ function Entry({
     ) : null;
   const content = (
     <>
-      <Icon name={item.icon} size={20} filled={active} />
+      {hideIcon ? null : <Icon name={item.icon} size={20} filled={active} />}
       <span className="ts-sidebar__label">{item.label}</span>
       {count}
       {soon ? (
@@ -97,6 +115,7 @@ function Entry({
   return (
     <li>
       <a
+        ref={entryRef}
         className="ts-sidebar__item"
         href={item.href}
         onClick={item.onClick}
@@ -112,6 +131,78 @@ function Entry({
         {content}
       </a>
     </li>
+  );
+}
+
+function SectionView({
+  section,
+  index,
+  uid,
+  collapsed,
+  activeId,
+  soonLabel,
+}: {
+  section: SidebarSection;
+  index: number;
+  uid: string;
+  collapsed: boolean;
+  activeId: string | undefined;
+  soonLabel: string;
+}) {
+  const activeChild = section.items.some((item) => item.active ?? item.id === activeId);
+  const [open, setOpen] = useState(activeChild);
+  const listId = `${uid}-${section.id}-items`;
+  useEffect(() => {
+    if (activeChild) setOpen(true);
+  }, [activeChild]);
+  return (
+    <div className="ts-sidebar__section">
+      {section.label ? (
+        section.expandable ? (
+          <button
+            type="button"
+            id={`${uid}-${section.id}`}
+            className={cx(
+              "ts-sidebar__heading",
+              "ts-sidebar__heading-button",
+              section.icon && "ts-sidebar__group-button",
+              activeChild && "ts-sidebar__group-button--active",
+            )}
+            aria-expanded={open}
+            aria-controls={listId}
+            onClick={() => setOpen((value) => !value)}
+          >
+            {section.icon ? <Icon name={section.icon} size={20} filled={activeChild} /> : null}
+            <span className={collapsed ? "ts-visually-hidden" : "ts-sidebar__group-label"}>{section.label}</span>
+            <Icon name={open ? "expand_less" : "expand_more"} size={16} />
+          </button>
+        ) : (
+          <p
+            id={`${uid}-${section.id}`}
+            className={cx("ts-sidebar__heading", collapsed && index > 0 && "ts-sidebar__heading--divider")}
+          >
+            <span className={collapsed ? "ts-visually-hidden" : undefined}>{section.label}</span>
+          </p>
+        )
+      ) : null}
+      <ul
+        id={listId}
+        className={section.nested ? "ts-sidebar__nested" : undefined}
+        aria-labelledby={section.label ? `${uid}-${section.id}` : undefined}
+        hidden={section.expandable && !open}
+      >
+        {section.items.map((item) => (
+          <Entry
+            key={item.id}
+            item={item}
+            active={item.active ?? activeId === item.id}
+            collapsed={collapsed}
+            soonLabel={soonLabel}
+            hideIcon={section.nested ?? false}
+          />
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -143,32 +234,17 @@ export function Sidebar({
         {headerAction}
       </div>
       <nav aria-label={label} className="ts-sidebar__nav">
-        {sections.map((section, index) => {
-          const headingId = `${uid}-${section.id}`;
-          return (
-            <div key={section.id} className="ts-sidebar__section">
-              {section.label ? (
-                <p
-                  id={headingId}
-                  className={cx("ts-sidebar__heading", collapsed && index > 0 && "ts-sidebar__heading--divider")}
-                >
-                  <span className={collapsed ? "ts-visually-hidden" : undefined}>{section.label}</span>
-                </p>
-              ) : null}
-              <ul aria-labelledby={section.label ? headingId : undefined}>
-                {section.items.map((item) => (
-                  <Entry
-                    key={item.id}
-                    item={item}
-                    active={activeId === item.id}
-                    collapsed={collapsed}
-                    soonLabel={soonLabel}
-                  />
-                ))}
-              </ul>
-            </div>
-          );
-        })}
+        {sections.map((section, index) => (
+          <SectionView
+            key={section.id}
+            section={section}
+            index={index}
+            uid={uid}
+            collapsed={collapsed}
+            activeId={activeId}
+            soonLabel={soonLabel}
+          />
+        ))}
       </nav>
       {footer ? <div className="ts-sidebar__footer">{footer}</div> : null}
     </div>
