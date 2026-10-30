@@ -1,7 +1,9 @@
 /* oxlint-disable react/no-unstable-nested-components -- render props of ui components (Dialog footer) */
+import { z } from "zod";
+import { useAppForm, FormSummary, submitForm } from "../../../forms.tsx";
 import { useEffect, useId, useRef, useState } from "react";
-import type { FormEvent, KeyboardEvent } from "react";
-import { Button, Dialog, Icon, Select, TextField, ViewSwitcher } from "@talentstroom/ui";
+import type { KeyboardEvent } from "react";
+import { Button, Dialog, Icon, ViewSwitcher } from "@talentstroom/ui";
 import type { IconName } from "@talentstroom/ui";
 import { t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
@@ -38,14 +40,29 @@ interface Draft {
 
 const emptyDraft = (date: string): Draft => ({ title: "", type: "gesprek", date, start: "09:00", end: "10:00" });
 
+const schema = z
+  .object({
+    title: z.string().trim().min(1),
+    type: z.enum(["gesprek", "intake", "deadline"]),
+    date: z.iso.date(),
+    start: z.string(),
+    end: z.string(),
+  })
+  .superRefine((value, context) => {
+    if (
+      value.type !== "deadline" &&
+      (!/^\d{2}:\d{2}$/.test(value.start) || !/^\d{2}:\d{2}$/.test(value.end) || value.end <= value.start)
+    )
+      context.addIssue({ code: "custom", path: ["end"], message: "time" });
+  });
+
 export function Calendar({ locale }: { locale: Locale }) {
   const tr = (key: MessageKey, values?: Record<string, string | number>) => t(locale, key, values);
   const [events, setEvents] = useState<readonly AgendaEvent[]>(AGENDA_EVENTS);
   const [view, setView] = useState<CalendarView>("month");
   const [focus, setFocus] = useState(DEMO_TODAY);
   const [open, setOpen] = useState(false);
-  const [draft, setDraft] = useState<Draft>(() => emptyDraft(DEMO_TODAY));
-  const [error, setError] = useState<MessageKey | undefined>();
+
   const [status, setStatus] = useState("");
   const grid = useRef<HTMLTableElement>(null);
   const moved = useRef(false);
@@ -94,30 +111,30 @@ export function Calendar({ locale }: { locale: Locale }) {
   };
 
   const openDialog = () => {
-    setDraft(emptyDraft(focus));
-    setError(undefined);
+    form.reset(emptyDraft(focus));
     setOpen(true);
   };
 
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const title = draft.title.trim();
-    if (!title) return setError("demo.apps.agenda.error.title");
-    if (!draft.date) return setError("demo.apps.agenda.error.date");
-    const allDay = draft.type === "deadline";
-    if (!allDay && draft.end <= draft.start) return setError("demo.apps.agenda.error.time");
-    const created: AgendaEvent = {
-      id: `ev-new-${events.length + 1}`,
-      title,
-      date: draft.date,
-      type: draft.type,
-      ...(allDay ? {} : { start: draft.start, end: draft.end }),
-    };
-    setEvents([...events, created]);
-    setFocus(draft.date);
-    setStatus(tr("demo.apps.agenda.added", { title, date: fmt({ day: "numeric", month: "long" }, draft.date) }));
-    setOpen(false);
-  };
+  const form = useAppForm({
+    defaultValues: emptyDraft(DEMO_TODAY),
+    validators: { onBlur: schema, onSubmit: schema },
+    onSubmit: ({ value }) => {
+      const draft = schema.parse(value);
+      const title = draft.title;
+      const allDay = draft.type === "deadline";
+      const created: AgendaEvent = {
+        id: `ev-new-${events.length + 1}`,
+        title,
+        date: draft.date,
+        type: draft.type,
+        ...(allDay ? {} : { start: draft.start, end: draft.end }),
+      };
+      setEvents([...events, created]);
+      setFocus(draft.date);
+      setStatus(tr("demo.apps.agenda.added", { title, date: fmt({ day: "numeric", month: "long" }, draft.date) }));
+      setOpen(false);
+    },
+  });
 
   const dayEvents = eventsOn(focus);
 
@@ -298,53 +315,74 @@ export function Calendar({ locale }: { locale: Locale }) {
           </>
         )}
       >
-        <form id={formId} className="ag-form" onSubmit={submit} noValidate>
-          <TextField
-            label={tr("demo.apps.agenda.form.name")}
-            required
-            value={draft.title}
-            onChange={(event) => setDraft({ ...draft, title: event.target.value })}
-            {...(error === "demo.apps.agenda.error.title" ? { error: tr(error) } : {})}
-          />
-          <Select
-            label={tr("demo.apps.agenda.form.type")}
-            value={draft.type}
-            onChange={(event) =>
-              setDraft({ ...draft, type: TYPES.find((entry) => entry.id === event.target.value)?.id ?? "gesprek" })
-            }
+        <form.AppForm>
+          <form
+            id={formId}
+            className="ag-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void submitForm(form);
+            }}
+            noValidate
           >
-            {TYPES.map((type) => (
-              <option key={type.id} value={type.id}>
-                {tr(TYPE_KEYS[type.id])}
-              </option>
-            ))}
-          </Select>
-          <TextField
-            label={tr("demo.apps.agenda.form.date")}
-            type="date"
-            required
-            value={draft.date}
-            onChange={(event) => setDraft({ ...draft, date: event.target.value })}
-            {...(error === "demo.apps.agenda.error.date" ? { error: tr(error) } : {})}
-          />
-          {draft.type !== "deadline" && (
-            <div className="ag-form__times">
-              <TextField
-                label={tr("demo.apps.agenda.form.start")}
-                type="time"
-                value={draft.start}
-                onChange={(event) => setDraft({ ...draft, start: event.target.value })}
-              />
-              <TextField
-                label={tr("demo.apps.agenda.form.end")}
-                type="time"
-                value={draft.end}
-                onChange={(event) => setDraft({ ...draft, end: event.target.value })}
-                {...(error === "demo.apps.agenda.error.time" ? { error: tr(error) } : {})}
-              />
-            </div>
-          )}
-        </form>
+            <FormSummary
+              locale={locale}
+              fields={{
+                title: { id: `${formId}-title`, label: tr("demo.apps.agenda.form.name") },
+                date: { id: `${formId}-date`, label: tr("demo.apps.agenda.form.date") },
+                end: { id: `${formId}-end`, label: tr("demo.apps.agenda.form.end") },
+              }}
+            />
+            <form.AppField name="title">
+              {(field) => (
+                <field.Text locale={locale} id={`${formId}-title`} label={tr("demo.apps.agenda.form.name")} required />
+              )}
+            </form.AppField>
+            <form.AppField name="type">
+              {(field) => (
+                <field.Choice locale={locale} label={tr("demo.apps.agenda.form.type")}>
+                  {TYPES.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {tr(TYPE_KEYS[type.id])}
+                    </option>
+                  ))}
+                </field.Choice>
+              )}
+            </form.AppField>
+            <form.AppField name="date">
+              {(field) => (
+                <field.Text
+                  locale={locale}
+                  id={`${formId}-date`}
+                  label={tr("demo.apps.agenda.form.date")}
+                  type="date"
+                  required
+                />
+              )}
+            </form.AppField>
+            <form.Subscribe selector={(state) => state.values.type}>
+              {(type) =>
+                type !== "deadline" && (
+                  <div className="ag-form__times">
+                    <form.AppField name="start">
+                      {(field) => <field.Text locale={locale} label={tr("demo.apps.agenda.form.start")} type="time" />}
+                    </form.AppField>
+                    <form.AppField name="end">
+                      {(field) => (
+                        <field.Text
+                          locale={locale}
+                          id={`${formId}-end`}
+                          label={tr("demo.apps.agenda.form.end")}
+                          type="time"
+                        />
+                      )}
+                    </form.AppField>
+                  </div>
+                )
+              }
+            </form.Subscribe>
+          </form>
+        </form.AppForm>
       </Dialog>
     </div>
   );

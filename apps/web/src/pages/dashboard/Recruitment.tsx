@@ -2,18 +2,31 @@ import { useState } from "react";
 import { Breadcrumb, Button } from "@talentstroom/ui";
 import { t } from "@talentstroom/i18n";
 import type { Locale } from "@talentstroom/i18n";
-import { Activity, Bars, Candidates, Frame, Pipeline, Stats, TaskList, tr } from "./widgets/DashboardWidgets.tsx";
+import {
+  Activity,
+  Bars,
+  Candidates,
+  DashboardBreadcrumbs,
+  Frame,
+  Pipeline,
+  Stats,
+  TaskList,
+  tr,
+} from "./widgets/DashboardWidgets.tsx";
 export default function RecruitmentPage({ locale }: { locale: Locale }) {
   const [candidateAdded, setCandidateAdded] = useState(false);
   const title = t(locale, "nav.dashboard.recruitment");
   return (
     <>
-      <Breadcrumb
-        label={t(locale, "nav.breadcrumbs")}
-        items={[{ label: t(locale, "nav.group.dashboard"), href: "/" }, { label: title }]}
-      />
       <Frame
-        locale={locale}
+        breadcrumbs={
+          <DashboardBreadcrumbs locale={locale}>
+            <Breadcrumb
+              label={t(locale, "nav.breadcrumbs")}
+              items={[{ label: t(locale, "nav.group.dashboard"), href: "/" }, { label: title }]}
+            />
+          </DashboardBreadcrumbs>
+        }
         title={tr(locale, "demo.dashboard.greeting")}
         subtitle={tr(locale, "demo.dashboard.recruitment-subtitle")}
         actions={<Button onClick={() => setCandidateAdded(true)}>{tr(locale, "demo.dashboard.new-candidate")}</Button>}

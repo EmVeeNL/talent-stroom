@@ -195,6 +195,14 @@ export function KanbanBoard({
   }, [list, columns, collapsedIds]);
   const cardNodes = useRef(new Map<string, HTMLElement>());
   const pendingFocus = useRef<string | null>(null);
+  const columnNodes = useRef(new Map<string, HTMLElement>());
+  const pendingColumnFocus = useRef<string | null>(null);
+  useLayoutEffect(() => {
+    const id = pendingColumnFocus.current;
+    if (!id) return;
+    columnNodes.current.get(id)?.querySelector<HTMLButtonElement>("button")?.focus();
+    pendingColumnFocus.current = null;
+  }, [collapsedIds]);
   const isCollapsed = (id: string) => collapsedIds.includes(id);
 
   // While a card is lifted with the keyboard, preview it in its target position.
@@ -229,6 +237,7 @@ export function KanbanBoard({
   }, [pickup]);
 
   const setCollapsed = (id: string, collapse: boolean) => {
+    pendingColumnFocus.current = id;
     const next = collapse ? [...collapsedIds, id] : collapsedIds.filter((candidate) => candidate !== id);
     if (collapsedColumnIds === undefined) setUncontrolledCollapsed(next);
     onCollapsedChange?.(next);
@@ -427,7 +436,22 @@ export function KanbanBoard({
     const collapsed = isCollapsed(column.id);
     const headingId = `${uid}-column-${column.id}`;
     const bodyId = `${headingId}-body`;
-    const menuItems = columnMenuItems?.(column) ?? [];
+    const menuItems: ContextMenuItem[] = [
+      {
+        id: "column-collapse",
+        label: labels.collapse(column.title),
+        icon: "expand_less",
+        onSelect: () => setCollapsed(column.id, true),
+      },
+      {
+        id: "column-add",
+        label: labels.addCardShort,
+        icon: "add",
+        disabled: !onAddCard,
+        onSelect: () => onAddCard?.(column.id),
+      },
+      ...(columnMenuItems?.(column) ?? []),
+    ];
     const over = dropTarget?.columnId === column.id;
     let slot = 0;
     const rows: ReactNode[] = [];
@@ -480,6 +504,10 @@ export function KanbanBoard({
         layout={!reduced}
         transition={layoutTransition}
         key={column.id}
+        ref={(node) => {
+          if (node) columnNodes.current.set(column.id, node);
+          else columnNodes.current.delete(column.id);
+        }}
         className="ts-kanban__column"
         aria-labelledby={headingId}
         data-tone={toneClass(column.tone)}
@@ -492,28 +520,35 @@ export function KanbanBoard({
         }}
         onDrop={(event) => onColumnDrop(event, column)}
       >
-        <header className="ts-kanban__header">
-          <Heading id={headingId} className="ts-kanban__title">
-            {column.title}
-          </Heading>
-          <Badge tone={column.tone ?? "neutral"} className="ts-kanban__count">
-            <span aria-hidden="true">{column.cards.length}</span>
-            <span className="ts-visually-hidden">{labels.count(column.cards.length)}</span>
-          </Badge>
-          {!collapsed && menuItems.length > 0 && (
-            <ContextMenu triggerLabel={labels.columnMenu(column.title)} items={menuItems} />
-          )}
+        {collapsed ? (
           <button
             type="button"
-            className="ts-kanban__icon-button ts-kanban__toggle"
-            aria-expanded={!collapsed}
-            aria-controls={collapsed ? undefined : bodyId}
-            aria-label={collapsed ? labels.expand(column.title) : labels.collapse(column.title)}
-            onClick={() => setCollapsed(column.id, !collapsed)}
+            className="ts-kanban__header ts-kanban__expand"
+            aria-label={labels.expand(column.title)}
+            aria-expanded={false}
+            onClick={() => setCollapsed(column.id, false)}
           >
-            <Icon name={collapsed ? "chevron_right" : "expand_more"} />
+            <Icon name="chevron_right" />
+            <span id={headingId} className="ts-kanban__title">
+              {column.title}
+            </span>
+            <Badge tone={column.tone ?? "neutral"} className="ts-kanban__count">
+              <span aria-hidden="true">{column.cards.length}</span>
+              <span className="ts-visually-hidden">{labels.count(column.cards.length)}</span>
+            </Badge>
           </button>
-        </header>
+        ) : (
+          <header className="ts-kanban__header">
+            <Heading id={headingId} className="ts-kanban__title">
+              {column.title}
+            </Heading>
+            <Badge tone={column.tone ?? "neutral"} className="ts-kanban__count">
+              <span aria-hidden="true">{column.cards.length}</span>
+              <span className="ts-visually-hidden">{labels.count(column.cards.length)}</span>
+            </Badge>
+            <ContextMenu triggerLabel={labels.columnMenu(column.title)} items={menuItems} />
+          </header>
+        )}
         {!collapsed && (
           <m.div
             key={bodyId}

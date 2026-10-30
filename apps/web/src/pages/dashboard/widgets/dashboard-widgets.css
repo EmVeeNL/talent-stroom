@@ -4,10 +4,10 @@
   min-width: 0;
 }
 .demo-dashboard__welcome {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  gap: 0 16px;
 }
 .demo-dashboard__welcome h2 {
   font: var(--ts-font-page-title);
@@ -21,12 +21,12 @@
   margin: 0;
   color: var(--ts-text-muted);
 }
-.demo-dashboard__welcome time {
+.demo-dashboard__breadcrumbs time {
   color: var(--ts-text-muted);
   white-space: nowrap;
 }
-.demo-dashboard__welcome-aside,
-.demo-dashboard__welcome-aside time {
+.demo-dashboard__breadcrumbs,
+.demo-dashboard__breadcrumbs time {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -70,9 +70,14 @@
 .demo-panel .ts-data-table td:last-child {
   width: 48px;
 }
+.demo-panel .ts-data-table th:nth-child(2),
+.demo-panel .ts-data-table td:nth-child(2) {
+  /* The name (with avatar) gets priority; secondary columns truncate first. */
+  width: 40%;
+}
 .demo-panel .ts-data-table th:nth-last-child(2),
 .demo-panel .ts-data-table td:nth-last-child(2) {
-  width: 104px;
+  width: 128px;
 }
 .demo-panel .ts-data-table caption {
   position: absolute;
@@ -110,7 +115,7 @@
 .demo-person {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--ts-space-3);
   white-space: nowrap;
 }
 .demo-task-list,
@@ -186,12 +191,11 @@
   }
   .demo-dashboard__welcome {
     align-items: flex-start;
-    flex-direction: column;
   }
   .demo-dashboard__welcome h2 {
     font-size: 24px;
   }
-  .demo-dashboard__welcome time {
+  .demo-dashboard__breadcrumbs time {
     white-space: normal;
   }
   .demo-stats {
@@ -208,10 +212,6 @@
   }
 }
 @media (max-width: 599px) {
-  .demo-dashboard__welcome-aside {
-    align-items: flex-start;
-    flex-direction: column;
-  }
   .demo-dashboard__welcome h1 {
     font-size: 24px;
   }
@@ -267,5 +267,46 @@
 @media (max-width: 767px) {
   .demo-panel .ts-data-table table {
     min-width: 0;
+  }
+}
+
+.demo-dashboard__breadcrumbs {
+  justify-content: space-between;
+}
+.demo-dashboard__breadcrumbs .ts-breadcrumb {
+  margin: 0;
+}
+/* Align the action with the title line; the subtitle occupies the following row. */
+.demo-dashboard__welcome > div:first-child {
+  display: contents;
+}
+.demo-dashboard__welcome h1 {
+  grid-column: 1;
+  grid-row: 1;
+}
+.demo-dashboard__welcome p {
+  grid-column: 1;
+  grid-row: 2;
+}
+.demo-dashboard__welcome-aside {
+  grid-column: 2;
+  grid-row: 1;
+}
+@media (max-width: 767px) {
+  .demo-dashboard__breadcrumbs {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .demo-dashboard__welcome {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--ts-space-2);
+  }
+  .demo-dashboard__welcome-aside {
+    grid-column: 1;
+    grid-row: 3;
+    width: 100%;
+  }
+  .demo-dashboard__welcome-aside > .ts-button {
+    width: 100%;
   }
 }

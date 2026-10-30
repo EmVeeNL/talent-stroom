@@ -9,7 +9,7 @@ body {
   isolation: isolate;
   display: grid;
   min-height: 100dvh;
-  place-items: center;
+  place-items: start center;
   overflow: hidden;
   min-width: 0;
   padding: 6rem 1.5rem 3rem;
@@ -136,7 +136,7 @@ body {
 .auth-panel {
   z-index: 1;
   min-width: 0;
-  width: min(100%, 440px);
+  width: min(100%, 520px);
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -153,7 +153,8 @@ body {
   color: #fff;
 }
 .auth-controls .ts-field {
-  max-width: 10rem;
+  width: 10rem;
+  flex: 0 0 10rem;
   margin: 0;
   color: #fff;
   font-size: var(--ts-font-size-xs);
@@ -192,6 +193,8 @@ body {
 /* Frosted card over the photo. Built on theme tokens (not on [data-theme]) so light, dark
    and "system" (prefers-color-scheme) always get a matching surface, fields and text. */
 .auth-card {
+  min-height: 580px;
+  box-sizing: border-box;
   padding: var(--ts-space-6);
   color: var(--ts-text);
   --auth-glass: 80%;
@@ -409,7 +412,7 @@ body {
   }
   .auth-controls {
     justify-content: flex-end;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
   .auth-card {
     padding: 1.5rem;
@@ -429,10 +432,6 @@ body {
 .auth-brand-copy .auth-benefit-icon {
   flex: 0 0 2rem;
   text-shadow: none;
-}
-.auth-panel:has(.org-picker),
-.auth-panel:has(.auth-register-form) {
-  width: min(100%, 520px);
 }
 @media (max-width: 767px) {
   .auth-shell {
@@ -454,6 +453,7 @@ body {
     gap: 0.5rem;
   }
   .auth-controls .ts-field {
+    flex: 0 1 9rem;
     width: min(9rem, calc(100vw - 5rem));
     max-width: calc(100vw - 5rem);
     min-width: 0;
@@ -484,4 +484,8 @@ body {
   .auth-wordmark {
     display: none;
   }
+}
+
+.auth-card[data-auth-route="/registreren"] {
+  min-height: 720px;
 }
