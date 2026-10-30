@@ -634,6 +634,8 @@
   }
   .gallery-auth-shell .auth-panel {
     min-height: 44rem;
+  }
+}
 
 /* Kanban page: the board fills the row; the list preview is capped to a phone-like width. */
 .gallery-pipeline {
