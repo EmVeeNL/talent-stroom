@@ -106,7 +106,7 @@ for (const theme of ["light", "dark"] as const) {
       await page.setViewportSize(viewport);
       await page.route("**/api/**", (route) => route.abort("blockedbyclient"));
       await page.goto(`/?preview=dashboard&theme=${theme}`);
-      await expect(page.getByRole("heading", { name: "Recruitment", level: 1 })).toBeVisible();
+      await expect(page.getByRole("heading", { name: /Goedemiddag/, level: 1 })).toBeVisible();
       if (viewport.width >= 768) await expect(page.getByRole("navigation", { name: "Hoofdnavigatie" })).toBeVisible();
       else await expect(page.getByRole("button", { name: "Menu openen" })).toBeVisible();
       await page.screenshot({
