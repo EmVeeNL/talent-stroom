@@ -17,10 +17,10 @@ describe("DonutChart", () => {
         ]}
       />,
     );
-    expect(screen.getByRole("img", { name: "Bronnen" })).toBeDefined();
+    expect(await screen.findByRole("img", { name: "Bronnen" })).toBeDefined();
     await user.click(screen.getByText("Gegevens", { selector: "summary" }));
     expect(screen.getByRole("table").textContent).toContain("Referral");
-    act(() => container.querySelector<SVGElement>("[data-chart-mark]")?.focus());
+    act(() => container.querySelector<SVGElement>("svg[tabindex]")?.focus());
     expect(screen.getByRole("tooltip")).toBeDefined();
     expect(await axeViolations(container)).toEqual([]);
   });

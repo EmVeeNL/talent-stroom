@@ -1,3 +1,83 @@
+.ts-chart__canvas {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  color: var(--ts-text);
+}
+.ts-chart__canvas > div {
+  max-width: 100%;
+}
+.ts-chart__canvas svg:focus-visible {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: var(--ts-focus-ring-offset);
+  border-radius: var(--ts-radius-sm);
+}
+.ts-chart__tooltip {
+  position: absolute;
+  z-index: 2;
+  top: var(--ts-space-2);
+  left: 50%;
+  max-width: calc(100% - var(--ts-space-4));
+  transform: translateX(-50%);
+  overflow-wrap: anywhere;
+  padding: var(--ts-space-2) var(--ts-space-3);
+  border: var(--ts-border-width) solid var(--ts-border-strong);
+  border-radius: var(--ts-radius-md);
+  background: var(--ts-surface-raised);
+  color: var(--ts-text);
+  box-shadow: var(--ts-shadow-popover);
+  font: var(--ts-font-caption);
+  pointer-events: none;
+}
+.ts-chart__loading {
+  aspect-ratio: 640 / 300;
+  width: 100%;
+}
+.ts-donut-chart .ts-chart__canvas {
+  padding-bottom: var(--ts-space-4);
+}
+.ts-donut-chart__total {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--ts-text);
+  font: var(--ts-font-title);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.ts-donut-chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--ts-space-2) var(--ts-space-4);
+  margin: 0;
+  padding: 0 var(--ts-space-2);
+  list-style: none;
+  color: var(--ts-text);
+  font: var(--ts-font-caption);
+}
+.ts-donut-chart__legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ts-space-2);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.ts-donut-chart__legend li > span {
+  flex: 0 0 0.7rem;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: var(--ts-radius-full);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ts-chart__canvas *,
+  .ts-chart__canvas *::before,
+  .ts-chart__canvas *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 .ts-bar-chart .ts-chart__mark:focus-visible rect {
   stroke: var(--ts-focus-ring-color);
   stroke-width: 3px;
