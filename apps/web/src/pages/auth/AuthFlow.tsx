@@ -1,8 +1,10 @@
 import { useDataLayer } from "../../QueryProvider.tsx";
 import { Link } from "../../Link.tsx";
 import { useEffect, useRef, useState } from "react";
-import type { FormEvent } from "react";
-import { Button, Checkbox, Tabs, TextField } from "@talentstroom/ui";
+import { SignInRequest, SignUpRequest, AuthEmailRequest, NewPasswordRequest } from "@talentstroom/contracts";
+import { z } from "zod";
+import { useAppForm, FormSummary, submitForm } from "../../forms.tsx";
+import { Button, Tabs } from "@talentstroom/ui";
 import { DEFAULT_LOCALE, t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
 import { errorKey, isAborted } from "../../auth.ts";
@@ -73,19 +75,36 @@ export function AuthScreens({
     return () => abort.abort();
   }, [verify, token, transport]);
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  const requestSchema = login
+    ? SignInRequest
+    : register
+      ? SignUpRequest
+      : reset
+        ? NewPasswordRequest
+        : AuthEmailRequest;
+  const schema = z.object({
+    name: register ? SignUpRequest.shape.name : z.string(),
+    email: !reset ? AuthEmailRequest.shape.email : z.string(),
+    password: login ? SignInRequest.shape.password : register || reset ? NewPasswordRequest.shape.password : z.string(),
+    terms: z.boolean().refine((accepted) => !register || accepted),
+  });
+  const form = useAppForm({
+    defaultValues: { name: "", email: "", password: "", terms: false },
+    validators: { onBlur: schema, onSubmit: schema },
+    onSubmit: async ({ value }) => submit(requestSchema.parse(value)),
+  });
+  async function submit(values: { name?: string; email?: string; password?: string }) {
     if (busy) return;
-    const form = new FormData(event.currentTarget);
-    const value = (key: string) => {
-      const entry = form.get(key);
-      return typeof entry === "string" ? entry : "";
-    };
+    const value = (key: "name" | "email" | "password") => values[key] ?? "";
     setBusy(true);
     setError(undefined);
     const callbackURL = new URL("/e-mail-bevestigen", window.location.origin).href;
     try {
       const signal = controller.current?.signal;
+      const send: Transport["auth"] = (endpoint, body, language, requestSignal) =>
+        layer
+          ? layer.authSubmit(transport, endpoint, body, language, requestSignal)
+          : transport.auth(endpoint, body, language, requestSignal);
       if (login) {
         const signIn = () =>
           transport.auth("sign-in/email", { email: value("email"), password: value("password") }, locale, signal);
@@ -98,7 +117,7 @@ export function AuthScreens({
         }
         onSignedIn();
       } else if (register) {
-        await transport.auth(
+        await send(
           "sign-up/email",
           { name: value("name"), email: value("email"), password: value("password"), callbackURL },
           locale,
@@ -106,10 +125,10 @@ export function AuthScreens({
         );
         setDone("auth.mailSent");
       } else if (reset) {
-        await transport.auth("reset-password", { token: token ?? "", newPassword: value("password") }, locale, signal);
+        await send("reset-password", { token: token ?? "", newPassword: value("password") }, locale, signal);
         setDone("auth.resetDone");
       } else {
-        await transport.auth(
+        await send(
           verify ? "send-verification-email" : "request-password-reset",
           {
             email: value("email"),
@@ -161,78 +180,118 @@ export function AuthScreens({
                 ]}
               />
             )}
-            <form
-              aria-label={tr(titles[path] ?? "auth.signIn")}
-              onSubmit={(event) => void submit(event)}
-              aria-busy={busy}
-            >
-              <fieldset disabled={busy} className="auth-fields">
-                {register && (
-                  <TextField
-                    name="name"
-                    label={tr("auth.name")}
-                    placeholder={tr("auth.namePlaceholder")}
-                    required
-                    autoComplete="name"
-                    maxLength={100}
-                  />
-                )}
-                {!reset && (
-                  <TextField
-                    name="email"
-                    label={tr("auth.email")}
-                    placeholder={tr("auth.emailPlaceholder")}
-                    type="email"
-                    leadingIcon="mail"
-                    required
-                    autoComplete="email"
-                  />
-                )}
-                {(login || register || reset) && (
-                  <>
-                    <TextField
-                      name="password"
-                      label={tr("auth.password")}
-                      placeholder={tr("auth.passwordPlaceholder")}
-                      type="password"
-                      leadingIcon="lock"
-                      visibilityLabels={{ show: tr("auth.show"), hide: tr("auth.hide") }}
-                      required
-                      minLength={login ? undefined : 12}
-                      maxLength={128}
-                      autoComplete={login ? "current-password" : "new-password"}
-                      {...(!login ? { hint: tr("auth.passwordHint") } : {})}
-                    />
-                  </>
-                )}
-                {register && <Checkbox name="terms" required label={tr("auth.terms")} />}
-                {login && (
-                  <div className="auth-login-options">
-                    <span aria-hidden="true" />
-                    <Link to="/wachtwoord-vergeten">{tr("auth.forgotLink")}</Link>
-                  </div>
-                )}
-                {verify && <p className="auth-intro">{tr("auth.verificationHelp")}</p>}
-                <Button
-                  type="submit"
-                  loading={busy}
-                  loadingLabel={tr("auth.loading")}
-                  {...(login ? { trailingIcon: "arrow_forward", className: "auth-submit" } : {})}
-                >
-                  {tr(
-                    login
-                      ? "auth.signIn"
-                      : register
-                        ? "auth.createAccount"
-                        : reset
-                          ? "auth.savePassword"
-                          : verify
-                            ? "auth.resend"
-                            : "auth.sendReset",
+            <form.AppForm>
+              <form
+                noValidate
+                aria-label={tr(titles[path] ?? "auth.signIn")}
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  if (!busy) void submitForm(form);
+                }}
+                aria-busy={busy}
+              >
+                <FormSummary
+                  locale={locale}
+                  fields={{
+                    ...(register
+                      ? {
+                          name: { id: "auth-name", label: tr("auth.name") },
+                          terms: { id: "auth-terms", label: tr("auth.terms") },
+                        }
+                      : {}),
+                    ...(!reset ? { email: { id: "auth-email", label: tr("auth.email") } } : {}),
+                    ...(login || register || reset
+                      ? { password: { id: "auth-password", label: tr("auth.password") } }
+                      : {}),
+                  }}
+                />
+                <fieldset disabled={busy} className="auth-fields">
+                  {register && (
+                    <form.AppField name="name">
+                      {(field) => (
+                        <field.Text
+                          id="auth-name"
+                          locale={locale}
+                          label={tr("auth.name")}
+                          placeholder={tr("auth.namePlaceholder")}
+                          required
+                          autoComplete="name"
+                          maxLength={100}
+                        />
+                      )}
+                    </form.AppField>
                   )}
-                </Button>
-              </fieldset>
-            </form>
+                  {!reset && (
+                    <form.AppField name="email">
+                      {(field) => (
+                        <field.Text
+                          id="auth-email"
+                          locale={locale}
+                          label={tr("auth.email")}
+                          placeholder={tr("auth.emailPlaceholder")}
+                          type="email"
+                          leadingIcon="mail"
+                          required
+                          autoComplete="email"
+                        />
+                      )}
+                    </form.AppField>
+                  )}
+                  {(login || register || reset) && (
+                    <>
+                      <form.AppField name="password">
+                        {(field) => (
+                          <field.Text
+                            id="auth-password"
+                            locale={locale}
+                            label={tr("auth.password")}
+                            placeholder={tr("auth.passwordPlaceholder")}
+                            type="password"
+                            leadingIcon="lock"
+                            visibilityLabels={{ show: tr("auth.show"), hide: tr("auth.hide") }}
+                            required
+                            minLength={login ? undefined : 12}
+                            maxLength={128}
+                            autoComplete={login ? "current-password" : "new-password"}
+                            {...(!login ? { hint: tr("auth.passwordHint") } : {})}
+                          />
+                        )}
+                      </form.AppField>
+                    </>
+                  )}
+                  {register && (
+                    <form.AppField name="terms">
+                      {(field) => <field.Check id="auth-terms" locale={locale} required label={tr("auth.terms")} />}
+                    </form.AppField>
+                  )}
+                  {login && (
+                    <div className="auth-login-options">
+                      <span aria-hidden="true" />
+                      <Link to="/wachtwoord-vergeten">{tr("auth.forgotLink")}</Link>
+                    </div>
+                  )}
+                  {verify && <p className="auth-intro">{tr("auth.verificationHelp")}</p>}
+                  <Button
+                    type="submit"
+                    loading={busy}
+                    loadingLabel={tr("auth.loading")}
+                    {...(login ? { trailingIcon: "arrow_forward", className: "auth-submit" } : {})}
+                  >
+                    {tr(
+                      login
+                        ? "auth.signIn"
+                        : register
+                          ? "auth.createAccount"
+                          : reset
+                            ? "auth.savePassword"
+                            : verify
+                              ? "auth.resend"
+                              : "auth.sendReset",
+                    )}
+                  </Button>
+                </fieldset>
+              </form>
+            </form.AppForm>
           </>
         )
       )}

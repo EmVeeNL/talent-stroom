@@ -384,6 +384,20 @@ export function createDataLayer(initialHandlers: Handlers = {}) {
     guard(captured, signal);
     return result;
   }
+  async function authSubmit(
+    transport: Transport,
+    endpoint: string,
+    body?: Record<string, string>,
+    locale: Locale = "nl-NL",
+    externalSignal?: AbortSignal,
+  ) {
+    if (blocked) aborted();
+    const captured = generation;
+    const signal = AbortSignal.any([work.signal, ...(externalSignal ? [externalSignal] : [])]);
+    const result = await mutation(["session", "auth-submit"], () => transport.auth(endpoint, body, locale, signal));
+    guard(captured, signal);
+    return result;
+  }
   return {
     client,
     bootstrap,
@@ -395,6 +409,7 @@ export function createDataLayer(initialHandlers: Handlers = {}) {
     transition,
     changeOrganization,
     signIn,
+    authSubmit,
     expire,
     reset: () => {
       lifecycle?.abort();
