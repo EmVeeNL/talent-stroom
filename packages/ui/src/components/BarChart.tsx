@@ -76,21 +76,22 @@ export function BarChart({
             })}
           </g>
         ))}
-        {series.map((s, si) => (
-          <g key={s.id}>
-            <rect
-              x="65"
-              y={294}
-              width="12"
-              height="12"
-              fill={`url(#${id}-${si})`}
-              transform={`translate(${si * 150},0)`}
-            />
-            <text x={83 + si * 150} y="305" className="ts-chart__label">
-              {s.label}
-            </text>
-          </g>
-        ))}
+        {series.length > 1 &&
+          series.map((s, si) => (
+            <g key={s.id}>
+              <rect
+                x="65"
+                y={294}
+                width="12"
+                height="12"
+                fill={`url(#${id}-${si})`}
+                transform={`translate(${si * 150},0)`}
+              />
+              <text x={83 + si * 150} y="305" className="ts-chart__label">
+                {s.label}
+              </text>
+            </g>
+          ))}
         {tooltip}
       </ChartSvg>
       <ChartTable label={tableLabel} categories={categories} series={series} locale={locale} />
