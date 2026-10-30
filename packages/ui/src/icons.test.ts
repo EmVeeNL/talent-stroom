@@ -15,6 +15,11 @@ describe("icon inventory", () => {
         for (const match of source.matchAll(/(?:<Icon\s+name|\bicon)=["']([a-z_]+)["']/g)) expected.push(match[1]);
       }
     }
+    for (const file of readdirSync(`${root}/apps/web/src/pages/paginas`, { encoding: "utf8" })) {
+      if (!file.endsWith(".tsx") || file.endsWith(".test.tsx")) continue;
+      const source = readFileSync(`${root}/apps/web/src/pages/paginas/${file}`, "utf8");
+      for (const match of source.matchAll(/<Icon(?:\s+[^>]*)?>([a-z_]+)<\/Icon>/g)) expected.push(match[1]);
+    }
     for (const name of expected) expect(ICON_NAMES).toContain(name);
     expect(new Set(ICON_NAMES).size).toBe(ICON_NAMES.length);
   });

@@ -28,6 +28,7 @@ export const ICON_NAMES = [
   "cloud_upload",
   "content_copy",
   "contacts",
+  "construction",
   "dark_mode",
   "dashboard",
   "delete",
@@ -74,6 +75,7 @@ export const ICON_NAMES = [
   "refresh",
   "schedule",
   "search",
+  "search_off",
   "send",
   "settings",
   "shield",
@@ -96,6 +98,7 @@ export const ICON_NAMES = [
   "warning",
   "work",
   "work_history",
+  "wifi_off",
 ] as const;
 
 export type IconName = (typeof ICON_NAMES)[number];
