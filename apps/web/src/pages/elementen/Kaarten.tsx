@@ -1,7 +1,8 @@
-import { Breadcrumb, EmptyState, PageHeader } from "@talentstroom/ui";
+import { Breadcrumb, PageHeader } from "@talentstroom/ui";
 import { t } from "@talentstroom/i18n";
 import type { Locale } from "@talentstroom/i18n";
-
+import { ElementsCards } from "../../kit/ElementSections.tsx";
+import "../../kit/demo-kit.css";
 export default function KaartenPage({ locale }: { locale: Locale }) {
   const title = t(locale, "nav.elementen.kaarten");
   return (
@@ -11,7 +12,7 @@ export default function KaartenPage({ locale }: { locale: Locale }) {
         items={[{ label: t(locale, "nav.group.elementen") }, { label: title }]}
       />
       <PageHeader title={title} />
-      <EmptyState title={title} body={t(locale, "nav.demo_building", { issue: 412 })} />
+      <ElementsCards locale={locale} />
     </>
   );
 }

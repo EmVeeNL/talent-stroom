@@ -40,6 +40,15 @@ development-only `?preview=dashboard&theme=light|dark` path, which supplies synt
 session context without a running API. The preview branch is removed from production
 builds; it does not change the real auth guards.
 
+### Elements, data and forms demo kit
+
+The development sidebar includes component reference pages under `/elementen/*`, data examples
+under `/data/*`, and form examples under `/formulieren/*`. These routes use synthetic content
+and the shared `@talentstroom/ui` components. The Elements overview recreates the design-kit
+composition in either theme; the icon page searches the self-hosted Material Symbols subset.
+The gallery remains available at `/?gallery` and shares the KPI row used by the Elements pages.
+The route screenshot matrix is in `visual/elements-data-forms.visual.ts`.
+
 The redesign kit in `docs/images/redesign/` is the review authority (tokens and component
 specifications take priority over historical mockup pixels). Existing UI still uses
 Material Symbols Outlined and older tokens; migrating to Rounded and the new kit is
