@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import {
   Badge,
   StatusPill,
@@ -11,6 +12,7 @@ import {
   TrendIndicator,
   Progress,
   Button,
+  ContextMenu,
 } from "@talentstroom/ui";
 import type { MessageKey } from "@talentstroom/i18n";
 import { Section } from "../Section.tsx";
@@ -19,29 +21,103 @@ const tones = ["neutral", "success", "warning", "danger", "info"] as const;
 export function Metrics() {
   const { tr, locale } = useGallery();
   const comparisonLabel = tr("gallery.metrics.comparison");
+  const [message, setMessage] = useState("");
+  const [removed, setRemoved] = useState(false);
+  const confirmation = useRef<HTMLDialogElement>(null);
+  const update = () => setMessage(tr("gallery.cards.updated"));
+  const menuItems = [
+    { id: "refresh", label: tr("gallery.cards.refresh"), icon: "refresh" as const, onSelect: update },
+    { id: "export", label: tr("gallery.cards.export"), icon: "download" as const, disabled: true, onSelect: update },
+    { id: "settings", label: tr("gallery.cards.settings"), icon: "settings" as const, onSelect: update },
+    { id: "copy", label: tr("gallery.cards.duplicate"), icon: "content_copy" as const, onSelect: update },
+    { id: "separator", separator: true as const },
+    {
+      id: "delete",
+      label: tr("gallery.cards.delete"),
+      icon: "delete" as const,
+      tone: "danger" as const,
+      onSelect: () => confirmation.current?.showModal(),
+    },
+  ];
   return (
     <>
       <Section title={tr("gallery.metrics.title")}>
-        <StatCard
-          label={tr("gallery.metrics.placements")}
-          value={24}
-          icon="handshake"
-          trend={{ value: 12.5, comparisonLabel, locale }}
-          description={tr("gallery.metrics.description")}
-          badge={<StatusPill tone="success">{tr("gallery.badges.success")}</StatusPill>}
-        />
-        <StatCard
-          label={tr("gallery.metrics.revenue")}
-          value={128450}
-          formatOptions={{ style: "currency", currency: "EUR", maximumFractionDigits: 0 }}
-          trend={{ value: 8.2, comparisonLabel, locale }}
-        />
-        <StatCard
-          label={tr("gallery.metrics.time")}
-          value={28}
-          trend={{ value: -6.7, upIsGood: false, comparisonLabel, locale }}
-        />
-        <StatCard label={tr("gallery.cards.title")} value={12} />
+        <div className="gallery-kpi-row">
+          {(
+            [
+              { label: tr("gallery.metrics.candidates"), value: 1248, icon: "person", tone: "primary", change: 12 },
+              { label: tr("gallery.metrics.vacancies"), value: 86, icon: "work", tone: "success", change: 8 },
+              { label: tr("gallery.metrics.placements"), value: 34, icon: "handshake", tone: "violet", change: 21 },
+              { label: tr("gallery.metrics.clients"), value: 48, icon: "business", tone: "accent", change: 5 },
+            ] as const
+          ).map((stat) => (
+            <StatCard
+              key={stat.label}
+              {...stat}
+              locale={locale}
+              trend={{ value: stat.change, comparisonLabel, locale }}
+              sparkline={{ values: [2, 1, 3, 5, 4, 6, 7], label: tr("gallery.metrics.sparkline") }}
+            />
+          ))}
+        </div>
+      </Section>
+      <Section title={tr("gallery.cards")}>
+        <div className="gallery-card-examples">
+          {!removed && (
+            <Card
+              as="section"
+              variant="widget"
+              title={tr("gallery.cards.title")}
+              subtitle={tr("gallery.metrics.description")}
+              menuLabel={tr("gallery.cards.more")}
+              menuItems={menuItems}
+            >
+              {tr("gallery.cards.body")}
+            </Card>
+          )}
+          <Card
+            title={tr("gallery.cards.menu")}
+            headerActions={<ContextMenu triggerLabel={tr("gallery.cards.more")} items={menuItems} defaultOpen />}
+          >
+            {tr("gallery.cards.body")}
+          </Card>
+          <Card
+            variant="data"
+            selected
+            title={tr("gallery.cards.selected")}
+            headerActions={
+              <Button size="sm" variant="ghost" onClick={update}>
+                {tr("gallery.cards.action")}
+              </Button>
+            }
+          >
+            <div className="gallery-card-data">{tr("gallery.cards.body")}</div>
+          </Card>
+          <Card title={tr("gallery.cards.loading")} loading />
+          <Card>{tr("gallery.cards.plain")}</Card>
+        </div>
+        <output className="gallery-wide" aria-live="polite">
+          {message}
+        </output>
+        <dialog ref={confirmation} className="ts-dialog ts-dialog--sm" aria-labelledby="widget-confirm-title">
+          <div className="ts-dialog__body">
+            <h2 id="widget-confirm-title">{tr("gallery.cards.confirm")}</h2>
+          </div>
+          <div className="ts-dialog__footer">
+            <Button autoFocus variant="secondary" onClick={() => confirmation.current?.close()}>
+              {tr("gallery.cards.cancel")}
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => {
+                setRemoved(true);
+                confirmation.current?.close();
+              }}
+            >
+              {tr("gallery.cards.delete")}
+            </Button>
+          </div>
+        </dialog>
       </Section>
       <Section title={tr("gallery.metrics.comparison")}>
         <TrendIndicator value={12.5} comparisonLabel={comparisonLabel} locale={locale} />
@@ -83,20 +159,6 @@ export function Metrics() {
         <Badge tone="danger" variant="solid" dot>
           {tr("gallery.badges.danger")}
         </Badge>
-      </Section>
-      <Section title={tr("gallery.cards")}>
-        <Card
-          as="section"
-          title={tr("gallery.cards.title")}
-          actions={
-            <Button variant="ghost" size="sm">
-              {tr("gallery.cards.action")}
-            </Button>
-          }
-        >
-          {tr("gallery.cards.body")}
-        </Card>
-        <Card>{tr("gallery.cards.plain")}</Card>
       </Section>
     </>
   );

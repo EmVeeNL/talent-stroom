@@ -13,6 +13,8 @@ export interface StatCardProps {
   trend?: TrendIndicatorProps;
   description?: string;
   badge?: ReactNode;
+  tone?: "primary" | "success" | "violet" | "accent";
+  sparkline?: { values: readonly number[]; label: string };
 }
 export function StatCard({
   label,
@@ -23,21 +25,56 @@ export function StatCard({
   trend,
   description,
   badge,
+  tone = "primary",
+  sparkline,
 }: StatCardProps) {
   const formatted = new Intl.NumberFormat(locale, formatOptions).format(value);
+  const values = sparkline?.values ?? [];
+  const valid = values.length > 1 && values.every(Number.isFinite);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const points = valid
+    ? values
+        .map(
+          (point, index) =>
+            `${2 + (index / (values.length - 1)) * 76},${max === min ? 18 : 34 - ((point - min) / (max - min)) * 32}`,
+        )
+        .join(" ")
+    : "";
   return (
-    <Card className="ts-stat-card">
+    <Card variant="kpi" className={`ts-stat-card ts-stat-card--${tone}`}>
       <p className="ts-visually-hidden">
         {[label, formatted, trend ? trendText(trend) : undefined, description].filter(Boolean).join(". ")}
       </p>
-      <div aria-hidden="true" className="ts-stat-card__content">
-        <span className="ts-stat-card__label">
-          {label}
-          {icon && <Icon name={icon} />}
-        </span>
-        <strong className="ts-stat-card__value">{formatted}</strong>
-        {trend && <TrendIndicator {...trend} />}
-        {description && <span className="ts-stat-card__description">{description}</span>}
+      <div className="ts-stat-card__layout">
+        {icon && (
+          <span aria-hidden="true" className="ts-stat-card__icon">
+            <Icon name={icon} size={32} />
+          </span>
+        )}
+        <div aria-hidden="true" className="ts-stat-card__content">
+          <span className="ts-stat-card__label">{label}</span>
+          <strong className="ts-stat-card__value">{formatted}</strong>
+          {trend && (
+            <>
+              <TrendIndicator {...trend} compact />
+              <span className="ts-stat-card__description">{trend.comparisonLabel}</span>
+            </>
+          )}
+          {description && <span className="ts-stat-card__description">{description}</span>}
+        </div>
+        {valid && sparkline && (
+          <svg className="ts-stat-card__sparkline" viewBox="0 0 80 36" role="img" aria-label={sparkline.label}>
+            <polyline
+              points={points}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+          </svg>
+        )}
       </div>
       {badge}
     </Card>

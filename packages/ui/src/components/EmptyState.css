@@ -1,0 +1,29 @@
+.ts-empty-state {
+  flex: 1 1 260px;
+  min-width: min(100%, 260px);
+  padding: var(--ts-space-8) var(--ts-space-6);
+  text-align: center;
+}
+.ts-empty-state__icon {
+  display: inline-flex;
+  padding: var(--ts-space-4);
+  border-radius: var(--ts-radius-full);
+  background: var(--ts-primary-subtle);
+  color: var(--ts-primary-text);
+}
+.ts-empty-state--error .ts-empty-state__icon {
+  background: var(--ts-danger-subtle);
+  color: var(--ts-danger-text);
+}
+.ts-empty-state h3 {
+  margin: var(--ts-space-4) 0 var(--ts-space-2);
+  font: var(--ts-font-card-title);
+}
+.ts-empty-state p {
+  max-width: 40ch;
+  margin: 0 auto;
+  color: var(--ts-text-muted);
+}
+.ts-empty-state__action {
+  margin-top: var(--ts-space-5);
+}

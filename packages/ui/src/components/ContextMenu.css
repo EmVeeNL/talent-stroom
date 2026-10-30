@@ -1,0 +1,58 @@
+.ts-context-menu-anchor {
+  display: inline-flex;
+}
+.ts-context-menu-anchor > .ts-button {
+  min-width: 44px;
+  padding: var(--ts-space-2);
+}
+.ts-context-menu {
+  position: fixed;
+  z-index: 50;
+  inset: auto;
+  margin: 0;
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 220px;
+  max-width: calc(100vw - 16px);
+  padding: var(--ts-space-1);
+  border: 1px solid var(--ts-border);
+  border-radius: var(--ts-radius-md);
+  background: var(--ts-surface-raised);
+  color: var(--ts-text);
+  box-shadow: var(--ts-shadow-popover);
+}
+.ts-context-menu button {
+  display: flex;
+  align-items: center;
+  gap: var(--ts-space-3);
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--ts-radius-sm);
+  padding: var(--ts-space-2) var(--ts-space-3);
+  background: transparent;
+  color: inherit;
+  font: var(--ts-font-compact);
+  text-align: start;
+  cursor: pointer;
+}
+.ts-context-menu button:hover,
+.ts-context-menu button:focus-visible {
+  background: var(--ts-surface-muted);
+}
+.ts-context-menu button:focus-visible {
+  outline: 2px solid var(--ts-focus-ring-color);
+  outline-offset: -2px;
+}
+.ts-context-menu button[data-tone="danger"] {
+  color: var(--ts-danger-text);
+}
+.ts-context-menu button[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: default;
+}
+.ts-context-menu__separator {
+  height: 1px;
+  background: var(--ts-border);
+  margin: var(--ts-space-1) var(--ts-space-2);
+}

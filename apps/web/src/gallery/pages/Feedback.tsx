@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertBanner, Button, Skeleton, Switch, Toaster, useToast } from "@talentstroom/ui";
+import { AlertBanner, EmptyState, Button, Skeleton, Switch, Toaster, useToast } from "@talentstroom/ui";
 import type { FeedbackTone } from "@talentstroom/ui";
 import { useGallery } from "../context.ts";
 import { Section } from "../Section.tsx";
@@ -12,6 +12,27 @@ function FeedbackExamples() {
   const notify = (tone: FeedbackTone) => toast({ tone, message: tr(`gallery.overlays.${tone}`) });
   return (
     <>
+      <Section title={tr("gallery.empty.title")}>
+        {(["records", "results", "error"] as const).map((kind) => (
+          <EmptyState
+            key={kind}
+            variant={kind === "records" ? "no-records" : kind === "results" ? "no-results" : "error"}
+            title={tr(`gallery.empty.${kind}`)}
+            body={tr(`gallery.empty.${kind}Body`)}
+            action={
+              <Button variant={kind === "records" ? "primary" : "secondary"} onClick={() => notify("success")}>
+                {tr(
+                  kind === "records"
+                    ? "gallery.empty.add"
+                    : kind === "results"
+                      ? "gallery.empty.clear"
+                      : "gallery.empty.retry",
+                )}
+              </Button>
+            }
+          />
+        ))}
+      </Section>
       <Section title={tr("gallery.overlays.notifications")}>
         <p className="gallery-overlay-intro">{tr("gallery.overlays.noticeHint")}</p>
         {tones.map((tone) => (

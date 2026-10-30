@@ -151,3 +151,7 @@ export type { ActivityItem } from "./components/ActivityFeed.tsx";
 export type { DonutDatum } from "./components/DonutChart.tsx";
 export type { FacetOption } from "./components/FacetedFilter.tsx";
 export type { ViewOption } from "./components/ViewSwitcher.tsx";
+export { ContextMenu } from "./components/ContextMenu.tsx";
+export type { ContextMenuProps, ContextMenuItem } from "./components/ContextMenu.tsx";
+export { EmptyState } from "./components/EmptyState.tsx";
+export type { EmptyStateProps } from "./components/EmptyState.tsx";

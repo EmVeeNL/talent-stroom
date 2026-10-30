@@ -27,3 +27,24 @@ describe("Card", () => {
     expect(await axeViolations(container)).toEqual([]);
   });
 });
+
+it("only exposes caller-supplied actions and replaces loading content with skeletons", () => {
+  const { container, rerender } = render(<Card title="Statisch">Inhoud</Card>);
+  expect(screen.queryByRole("button")).toBeNull();
+  rerender(
+    <Card
+      variant="widget"
+      selected
+      loading
+      title="Pipeline"
+      menuLabel="Meer acties"
+      menuItems={[{ id: "refresh", label: "Vernieuwen", onSelect: () => {} }]}
+    >
+      Inhoud
+    </Card>,
+  );
+  expect(container.querySelector('[aria-busy="true"]')).toBeTruthy();
+  expect(container.querySelector(".ts-skeleton")).toBeTruthy();
+  expect(screen.queryByText("Inhoud")).toBeNull();
+  expect(screen.getByRole("button", { name: "Meer acties" })).toBeTruthy();
+});

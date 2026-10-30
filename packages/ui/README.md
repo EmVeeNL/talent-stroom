@@ -162,3 +162,53 @@ The forms gallery (`/?gallery&theme=light#forms`, also `theme=dark`) presents ea
 - Radius is 10px; button sizes use 32/40/48px tokens. Subtle field fills keep the ≥3:1 strong border. Success/warning buttons use navy text; contrast and other deliberate deviations are recorded in ADR 0013. No new runtime dependency.
 
 Last successful Chrome screenshot artifacts for issue #376: `/tmp/rd-forms-{light,dark}-{1440,390}.png` (full page) and `/tmp/rd-forms-{light,dark}-{1440,390}-viewport.png`. These captures precede the final focus-ring cleanup, shorter button label, disabled-zone annotation and calendar icon overlay. A final screenshot refresh was attempted but Chrome and Chromium exited during macOS app/Mach-port registration with permission denied. Owner review and a refreshed capture on an unrestricted host are still required. Browser inspection covers Chromium; Firefox/WebKit and assistive-technology review remain follow-ups. This change does not touch authentication, encryption, tenancy, or data storage.
+
+### Cards and action menus (issue #378)
+
+`Card` supports `default`, `kpi`, `data` (edge-to-edge body), and `widget` variants,
+`subtitle`, `headerActions` (`actions` remains compatible), `selected`, and `loading`.
+Loading replaces the body with a decorative Skeleton and marks the card busy.
+Cards are structural containers; they do not become keyboard controls on hover.
+Supply `menuItems` **and a translated `menuLabel`** (Dutch: “Meer acties”) to opt into
+an action menu. Static panels have no implicit actions.
+
+`ContextMenu` is also usable in `DataTable` cell renderers. Items have a stable `id`,
+`label`, optional Icon name, `disabled`, optional `tone: "danger"`, and `onSelect`;
+separators use `{ id, separator: true }`. Disabled items remain focusable for
+keyboard discovery but cannot execute. Arrow keys wrap, Home/End jump, printable
+keys search labels, and Escape/outside click close and return focus. Tab closes
+and continues normal navigation. `onOpenChange` reports user changes;
+`defaultOpen` supports interactive gallery examples.
+
+Callers filter items using permissions, and the server must authorize every action.
+A danger tone is presentation, not authorization or confirmation: its callback must
+request a confirmation dialog before any destructive mutation. The metrics gallery
+demonstrates cancellation and confirmation with synthetic widget data.
+
+`StatCard` keeps localized number formatting and adds `tone` (primary, success,
+violet, accent), a tinted Icon tile and `sparkline: { values, label }`. The label is
+the SVG text alternative; the caller supplies a meaningful localized summary.
+Non-finite or fewer than two samples omit the sparkline; constant series remain
+flat. Trend chips retain signed values and direction independently of color.
+
+`EmptyState` takes `title`, `body`, optional `icon` and `action`, and a variant of
+`no-records`, `no-results`, or `error`. Only errors use `role="alert"`; icons and
+copy distinguish the recovery paths. All copy comes from the caller's i18n keys.
+
+The kit's tokens and ADR 0013 determine colors, 14 px radii and typography. Status
+text uses the accessible `-text` colors rather than the lower contrast decorative
+fills. No new design deviations or dependencies were introduced.
+
+Visual review artifacts (Chrome, light/dark, desktop/mobile):
+
+- `/tmp/rd-cards-metrics-light-1440.png`
+- `/tmp/rd-cards-metrics-dark-1440.png`
+- `/tmp/rd-cards-metrics-light-390.png`
+- `/tmp/rd-cards-metrics-dark-390.png`
+- `/tmp/rd-cards-feedback-light-1440.png`
+- `/tmp/rd-cards-feedback-dark-1440.png`
+- `/tmp/rd-cards-feedback-light-390.png`
+- `/tmp/rd-cards-feedback-dark-390.png`
+
+Owner visual approval remains a review step. Browser interaction and screenshots
+were checked in Chrome; Firefox and WebKit review remains follow-up work.

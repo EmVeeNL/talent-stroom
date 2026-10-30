@@ -3,6 +3,7 @@ import {
   ActivityFeed,
   Avatar,
   Card,
+  ContextMenu,
   DataTable,
   FacetedFilter,
   Pagination,
@@ -90,7 +91,14 @@ export function Tables() {
       {statuses.find((o) => o.value === r.status)?.label}
     </StatusPill>
   );
+  const renderActions = (r: Candidate) => (
+    <ContextMenu
+      triggerLabel={`${tr("gallery.cards.more")} · ${r.name}`}
+      items={[{ id: "select", label: tr("gallery.cards.action"), onSelect: () => setSelected([r.id]) }]}
+    />
+  );
   const columns: DataColumn<Candidate>[] = [
+    { id: "actions", label: tr("gallery.cards.more"), cell: renderActions },
     {
       id: "name",
       label: tr("gallery.tables.name"),
