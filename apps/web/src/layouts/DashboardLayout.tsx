@@ -1,3 +1,4 @@
+import { useDataLayer } from "../QueryProvider.tsx";
 import { useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 import type { ReactNode, Ref } from "react";
@@ -121,6 +122,7 @@ export function DashboardLayout({
   currentPath?: string;
   children: ReactNode;
 }) {
+  const layer = useDataLayer();
   const tr = (key: MessageKey) => t(locale, key);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<MessageKey>();
@@ -130,9 +132,14 @@ export function DashboardLayout({
     if (busy) return;
     setBusy(true);
     setError(undefined);
-    transport.cancel();
+    if (!layer) transport.cancel();
     const signal = transport.signal;
     try {
+      if (layer) {
+        await layer.changeOrganization(transport, { orgId });
+        onChanged();
+        return;
+      }
       const result = await transport.api.POST("/v1/organizations/{orgId}/switch", {
         params: { path: { orgId } },
         signal,

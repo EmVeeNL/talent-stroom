@@ -1,3 +1,4 @@
+import type { QueryClient } from "@tanstack/react-query";
 import { createContext, createElement, useContext, useEffect, Suspense } from "react";
 import type { ReactNode } from "react";
 import {
@@ -23,6 +24,7 @@ export type SessionContext =
   | { kind: "ready"; data: OrganizationList; user: SessionUser }
   | { kind: "error"; message: MessageKey };
 export interface RouterContext {
+  queryClient?: QueryClient;
   session: SessionContext;
   resolveSession?: () => Promise<SessionContext>;
 }
@@ -118,7 +120,8 @@ export function createAppRouter({
   history,
   demoEnabled = demoPagesEnabled,
   demoAuthEnabled = true,
-}: { history?: RouterHistory; demoEnabled?: boolean; demoAuthEnabled?: boolean } = {}) {
+  queryClient,
+}: { history?: RouterHistory; demoEnabled?: boolean; demoAuthEnabled?: boolean; queryClient?: QueryClient } = {}) {
   const root = createRootRouteWithContext<RouterContext>()({
     validateSearch: validateRouteSearch,
     errorComponent: RouteError,
@@ -293,7 +296,7 @@ export function createAppRouter({
   return createRouter({
     routeTree: tree,
     search: { strict: true },
-    context: { session: { kind: "loading" } },
+    context: { session: { kind: "loading" }, ...(queryClient ? { queryClient } : {}) },
     ...(history ? { history } : {}),
     defaultPendingComponent: Pending,
     defaultPendingMs: 0,

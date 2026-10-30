@@ -1,3 +1,4 @@
+import { useDataLayer } from "../../QueryProvider.tsx";
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Button, RadioGroup, TextField } from "@talentstroom/ui";
@@ -26,6 +27,7 @@ export function OrganizationPicker({
   onChanged: () => void;
   onExpired: () => void;
 }) {
+  const layer = useDataLayer();
   const tr = (key: MessageKey) => t(locale, key);
   const [selected, setSelected] = useState("");
   const [busy, setBusy] = useState(false);
@@ -34,9 +36,14 @@ export function OrganizationPicker({
     if (busy) return;
     setBusy(true);
     setError(undefined);
-    transport.cancel();
+    if (!layer) transport.cancel();
     const signal = transport.signal;
     try {
+      if (layer) {
+        await layer.changeOrganization(transport, name !== undefined ? { name } : { orgId: selected });
+        onChanged();
+        return;
+      }
       const result =
         name !== undefined
           ? await transport.api.POST("/v1/organizations", { body: { name }, signal })

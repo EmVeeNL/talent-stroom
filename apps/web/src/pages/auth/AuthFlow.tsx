@@ -1,3 +1,4 @@
+import { useDataLayer } from "../../QueryProvider.tsx";
 import { Link } from "../../Link.tsx";
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
@@ -38,6 +39,7 @@ export function AuthScreens({
   onSignedIn: () => void;
   previewError?: boolean;
 }) {
+  const layer = useDataLayer();
   const tr = (key: MessageKey) => t(locale, key);
   const [busy, setBusy] = useState(() => path === "/e-mail-bevestigen" && new URLSearchParams(query).has("token"));
   const [error, setError] = useState<MessageKey | undefined>(() => (previewError ? "auth.loginError" : undefined));
@@ -85,12 +87,11 @@ export function AuthScreens({
     try {
       const signal = controller.current?.signal;
       if (login) {
-        const result = await transport.auth(
-          "sign-in/email",
-          { email: value("email"), password: value("password") },
-          locale,
-          signal,
-        );
+        const signIn = () =>
+          transport.auth("sign-in/email", { email: value("email"), password: value("password") }, locale, signal);
+        const result = layer
+          ? await layer.signIn(transport, { email: value("email"), password: value("password") }, locale, signal)
+          : await signIn();
         if (result && typeof result === "object" && "twoFactorRedirect" in result && result.twoFactorRedirect) {
           setError("auth.loginError");
           return;

@@ -18,7 +18,9 @@
     "@talentstroom/ui": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "@tanstack/react-router": "catalog:"
+    "@tanstack/react-router": "catalog:",
+    "@tanstack/react-query": "catalog:",
+    "@talentstroom/contracts": "workspace:*"
   },
   "devDependencies": {
     "@playwright/test": "catalog:",
@@ -34,6 +36,7 @@
     "jsdom": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "@tanstack/react-query-devtools": "catalog:"
   }
 }
