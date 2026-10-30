@@ -1,3 +1,4 @@
+import { NavigationLink } from "./NavigationLink.tsx";
 import { useEffect, useId, useRef, useState } from "react";
 import type { MouseEventHandler } from "react";
 import { cx } from "../classnames.ts";
@@ -206,10 +207,10 @@ export function OrganizationSwitcher({
             </p>
           ) : null}
           {createHref ? (
-            <a className="ts-org-switcher__create" href={createHref} onClick={onCreate}>
+            <NavigationLink className="ts-org-switcher__create" href={createHref} onClick={onCreate}>
               <Icon name="add" size={20} />
               {labels.create}
-            </a>
+            </NavigationLink>
           ) : null}
         </div>
       ) : null}

@@ -4,6 +4,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import userEvent from "@testing-library/user-event";
 import axe from "axe-core";
 import { App } from "./App.tsx";
+import * as routing from "./router.tsx";
 
 const org = {
   organizationId: "11111111-1111-4111-8111-111111111111",
@@ -394,4 +395,63 @@ describe("verification callback stability", () => {
     await screen.findByText("Your email address is verified. You can now sign in.");
     expect(requests.filter((request) => request.url === "/api/auth/verify-email").length).toBe(attempts);
   });
+});
+
+describe("router previews and 404", () => {
+  it("keeps dashboard preview context across sidebar navigation without API calls", async () => {
+    setup("/?preview=dashboard");
+    await userEvent.click(await screen.findByRole("link", { name: "Chat" }));
+    const heading = await screen.findByRole("heading", { name: "Chat", level: 1 });
+    await waitFor(() => expect(document.activeElement).toBe(heading));
+    expect(window.location.pathname).toBe("/apps/chat");
+    expect(screen.getByRole("link", { name: "Chat" }).getAttribute("aria-current")).toBe("page");
+    expect(requests).toEqual([]);
+  });
+  it("keeps guest preview transport isolated after navigating to another auth screen", async () => {
+    setup("/inloggen?preview=guest");
+    await userEvent.click(await screen.findByRole("link", { name: "Registreren" }));
+    await screen.findByRole("heading", { name: "Maak je account aan" });
+    expect(requests).toEqual([]);
+  });
+  it("renders dashboard 404 for an unknown preview path", async () => {
+    setup("/unknown?preview=dashboard");
+    await screen.findByRole("heading", { name: "Pagina niet gevonden", level: 1 });
+    expect(screen.getByRole("navigation", { name: "Hoofdnavigatie" })).toBeTruthy();
+    expect(requests).toEqual([]);
+  });
+  it("renders enabled demo auth without a session request, including guest preview", async () => {
+    setup("/paginas/authenticatie/gelukt?preview=guest");
+    await screen.findByRole("status");
+    expect(requests).toEqual([]);
+  });
+  it("gives dashboard preview precedence over demo auth", async () => {
+    setup("/paginas/authenticatie/gelukt?preview=dashboard");
+    await screen.findByRole("heading", { name: "Pagina niet gevonden", level: 1 });
+    expect(requests).toEqual([]);
+  });
+});
+
+it("captures callback credentials before Router sees them and discards them on navigation", async () => {
+  const factory = vi.spyOn(routing, "createAppRouter");
+  try {
+    setup("/wachtwoord-herstellen?token=synthetic-private-callback&error=expired");
+    await screen.findByRole("alert");
+    expect(window.location.search).toBe("");
+    const created = factory.mock.results.filter((result) => result.type === "return").map((result) => result.value);
+    expect(created.length).toBeGreaterThan(0);
+    for (const current of created) {
+      expect(JSON.stringify(current.state)).not.toContain("synthetic-private-callback");
+      expect(JSON.stringify(current.state)).not.toContain("expired");
+      expect(current.options.context).not.toHaveProperty("authProps");
+    }
+    const router = factory.mock.results.at(-1)?.value;
+    if (!router) throw new Error("Missing test router");
+    await router.navigate({ to: "/inloggen" });
+    await screen.findByRole("heading", { name: "Welkom terug" });
+    await router.navigate({ to: "/wachtwoord-herstellen" });
+    await screen.findByRole("alert");
+    expect(screen.queryByRole("button", { name: "Wachtwoord opslaan" })).toBeNull();
+  } finally {
+    factory.mockRestore();
+  }
 });

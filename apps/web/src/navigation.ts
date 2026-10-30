@@ -3,7 +3,7 @@ import type { IconName, SidebarSection } from "@talentstroom/ui";
 import { routes, visibleRoutes } from "./routes.ts";
 
 export interface NavigationEntry {
-  path: string;
+  path: (typeof routes)[number]["path"];
   labelKey: MessageKey;
   icon: IconName;
   section: string;
@@ -139,9 +139,9 @@ const sectionLabels: Record<string, MessageKey> = {
   formulieren: "nav.group.formulieren",
   paginas: "nav.group.paginas",
 };
-const routePaths = new Set(routes.map((route) => route.path));
+const routePaths = new Set<string>(routes.map((route) => route.path));
 export function navigationSections(tr: (key: MessageKey) => string, path: string, enabled?: boolean): SidebarSection[] {
-  const enabledPaths = new Set(visibleRoutes(enabled).map((route) => route.path));
+  const enabledPaths = new Set<string>(visibleRoutes(enabled).map((route) => route.path));
   const groups = Object.keys(sectionLabels)
     .map((section) => {
       const group: SidebarSection = {

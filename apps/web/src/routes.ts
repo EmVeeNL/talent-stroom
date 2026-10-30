@@ -10,7 +10,7 @@ export interface RouteDef {
   load: () => Promise<{ default: ComponentType<{ locale: Locale }> }>;
 }
 
-export const routes: readonly RouteDef[] = [
+export const routes = [
   {
     path: "/",
     titleKey: "nav.dashboard.recruitment",
@@ -298,9 +298,9 @@ export const routes: readonly RouteDef[] = [
     demo: true,
     load: () => import("./pages/paginas/Contact.tsx"),
   },
-];
+] as const satisfies readonly RouteDef[];
 
-export const demoAuthRoutes: readonly RouteDef[] = [
+export const demoAuthRoutes = [
   {
     path: "/paginas/authenticatie/tweestaps",
     titleKey: "auth.login",
@@ -333,16 +333,16 @@ export const demoAuthRoutes: readonly RouteDef[] = [
     demo: true,
     load: () => import("./pages/auth/Success.tsx"),
   },
-];
+] as const satisfies readonly RouteDef[];
 
-export const authRouteTitles: Record<string, MessageKey> = {
+export const authRouteTitles = {
   "/inloggen": "auth.login",
   "/registreren": "auth.register",
   "/e-mail-bevestigen": "auth.verify",
   "/wachtwoord-vergeten": "auth.forgot",
   "/wachtwoord-herstellen": "auth.reset",
   "/organisatie-kiezen": "auth.picker",
-};
+} as const satisfies Record<string, MessageKey>;
 const demoDefault = import.meta.env.DEV;
 export const demoPagesEnabled =
   import.meta.env["VITE_DEMO_PAGES"] === undefined ? demoDefault : import.meta.env["VITE_DEMO_PAGES"] === "true";
@@ -370,7 +370,7 @@ export const routeTitles = Object.fromEntries(
 ) as Record<string, MessageKey>;
 export const knownTitles = { ...authRouteTitles, ...routeTitles };
 export function visibleRoutes(enabled = demoPagesEnabled): readonly RouteDef[] {
-  return routes.filter((route) => !route.demo || enabled);
+  return routes.filter((route) => !("demo" in route && route.demo) || enabled);
 }
 export function findRoute(path: string, enabled = demoPagesEnabled): RouteDef | undefined {
   return visibleRoutes(enabled).find((route) => route.path === path);

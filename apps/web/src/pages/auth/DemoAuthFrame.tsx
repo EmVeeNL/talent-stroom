@@ -1,3 +1,4 @@
+import { Link } from "../../Link.tsx";
 import type { ReactNode } from "react";
 import { t } from "@talentstroom/i18n";
 import type { Locale } from "@talentstroom/i18n";
@@ -43,9 +44,9 @@ function DemoAuthContent({
       hero={
         <>
           <AuthHero />
-          <a href="/inloggen" className="auth-wordmark" aria-label={t(locale, "app.name")}>
+          <Link to="/inloggen" className="auth-wordmark" aria-label={t(locale, "app.name")}>
             <Logo tone="dark" size="lg" />
-          </a>
+          </Link>
           <div className="auth-brand-copy">
             <h2 className="auth-brand-title">{t(locale, "auth.brandLine")}</h2>
             <p>{t(locale, "auth.brandText")}</p>

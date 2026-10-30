@@ -38,7 +38,12 @@ job out of required branch checks.
 The visual harness captures the dashboard and a nested demo route through the
 development-only `?preview=dashboard&theme=light|dark` path, which supplies synthetic
 session context without a running API. The preview branch is removed from production
-builds; it does not change the real auth guards.
+builds; it does not change the real auth guards. `?preview=guest` supplies the
+guest transport for auth screenshots. Both modes keep context across Router link
+navigation and block API requests from synthetic interactions. The same pathname
+is matched, including 404 for unknown/disabled routes. Entry precedence remains
+gallery, dashboard preview, enabled demo auth, then normal/guest-preview auth.
+Production ignores both preview modes, including demo-enabled production builds.
 
 The redesign kit in `docs/images/redesign/` is the review authority (tokens and component
 specifications take priority over historical mockup pixels). Existing UI still uses
@@ -64,12 +69,27 @@ light, dark and system themes through the shared ThemeToggle.
 | `/organisatie-kiezen`    | List, confirm/switch or create an organization                             |
 | `/`                      | Signed-in home in the app shell (sidebar, navbar, org switcher, user menu) |
 
-History API navigation preserves normal links, modified clicks and browser
-back/forward. The production host must serve the SPA for these paths.
+TanStack Router 1.170.46 owns navigation, browser back/forward and replace
+redirects. `src/router.tsx` builds an inferred, code-based tree with a root,
+pathless auth and dashboard layouts, lazy pages, Skeleton pending UI and a
+localized dashboard `notFoundComponent`. `src/routes.ts` retains the Dutch path,
+title/access/demo inventory used by navigation. There is no file generator,
+router plugin, Query cache or Router devtools in this migration.
+
+`Link.tsx` is a thin Router link wrapper, with native anchors for downloads and
+standalone gallery examples. Shared UI anchors use `NavigationLinkContext` so
+sidebar, breadcrumb and organization-switcher links keep modified clicks,
+targets, downloads and hashes. Sidebar active state reads Router state. The
+production host must serve the SPA for all these paths.
 Guests on protected routes go to `/inloggen`. Signed-in users without a verified
 active organization go to `/organisatie-kiezen`. Sign-in and registration redirect
 existing signed-in users to their workspace or picker. Verification and recovery
-remain accessible.
+remain accessible. The root `beforeLoad` waits for the existing session and
+membership bootstrap; the dashboard guard requires an active ID matching a
+returned membership. Loading and session errors retain their recovery UI.
+Redirects discard the intended target, as before: there is no return-URL or
+open-redirect feature. These guards provide UX only; the API must verify every
+organization-owned request's membership and organization scope.
 
 The dev-only component gallery remains at `/?gallery`; it bypasses auth and is
 excluded from production.
@@ -101,8 +121,11 @@ Use Node 26 and pnpm 12. From the repository root:
 Vite proxies `/api/auth/*` unchanged to the API on port 8787 and strips `/api`
 for our `/api/v1/*` calls. Production routing must preserve the same mapping.
 Cookies are HttpOnly and same-origin; no token or tenant context goes into
-localStorage. Callback tokens are retained only in component memory and removed
-from the current address/history entry after capture.
+localStorage. Callback tokens and callback errors are captured in component memory and removed
+from the current address/history entry before Router initializes. They are never
+passed into Router context, search state or loader caches. Ordinary search state
+uses an allowlisted validator; no personal data or free-text filters belong in
+route search parameters.
 
 ## Implementation and limits
 
@@ -113,7 +136,7 @@ photograph is bundled. The email/password flow does not currently support a
 remember-me session option, so the login screen omits that checkbox. Social
 buttons are omitted because provider discovery is not configured by the API.
 
-No router or auth runtime dependency is added. Better Auth calls use plain fetch;
+TanStack Router is pinned in the workspace catalog under ADR 0015. Better Auth calls use plain fetch;
 organization operations use `@talentstroom/api-client`. The only retained server
 data is the app's in-memory membership context. Switching/creating aborts outstanding
 scope requests; success discards context and reloads the session and memberships
