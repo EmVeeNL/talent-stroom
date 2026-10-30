@@ -32,5 +32,8 @@
     "react-dom": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
+  },
+  "dependencies": {
+    "@tanstack/react-table": "catalog:"
   }
 }

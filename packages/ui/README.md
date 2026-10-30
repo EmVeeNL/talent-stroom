@@ -219,6 +219,15 @@ were checked in Chrome; Firefox and WebKit review remains follow-up work.
 
 ### Tables, overlays and feedback (issue #379)
 
+`DataTable<Row>` uses TanStack Table v9.3.1 internally for sorting, selection,
+optional pagination and column visibility. Its `DataColumn<Row>` API and native
+table markup remain the public boundary. Sorting, selection and visibility can
+be controlled through the existing sort and selection props and the additive
+`columnVisibility` props. Supply `pagination` only when the table should paginate;
+without it every supplied row and column remains visible. Density and the
+loading, error, empty and mobile scroll states remain presentation concerns of
+the UI component. Pagination labels are provided by the caller for localization.
+
 - `DataTable density="comfortable"` (default) uses 64px body rows; `compact`
   uses 48px rows. Headers are 48px and use the muted surface and 14/20 type.
   These are minimum heights: wrapped/custom content may expand a row. Checkbox,

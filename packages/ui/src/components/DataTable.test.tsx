@@ -101,4 +101,102 @@ describe("DataTable", () => {
     expect(change).toHaveBeenCalledWith({ id: "name", direction: "descending" });
     expect(await axeViolations(container)).toEqual([]);
   });
+  it("keeps controlled sorting until the caller supplies the next sort", async () => {
+    const user = userEvent.setup();
+    const change = vi.fn<(sort: DataTableSort) => void>();
+    const props = {
+      caption: "Kandidaten",
+      columns: [
+        {
+          id: "name",
+          label: "Naam",
+          cell: (r: { name: string }) => r.name,
+          sortValue: (r: { name: string }) => r.name,
+        },
+      ],
+      rows: [{ name: "Zara" }, { name: "Sam" }],
+      rowKey: (r: { name: string }) => r.name,
+      emptyLabel: "Leeg",
+      loadingLabel: "Laden",
+      sort: { id: "name", direction: "ascending" as const },
+      onSortChange: change,
+    };
+    const { rerender } = render(<DataTable {...props} />);
+    await user.click(screen.getByRole("button", { name: /Naam/ }));
+    expect(change).toHaveBeenCalledWith({ id: "name", direction: "descending" });
+    expect(screen.getAllByRole("row")[1]?.textContent).toContain("Sam");
+    rerender(<DataTable {...props} sort={{ id: "name", direction: "descending" }} />);
+    expect(screen.getAllByRole("row")[1]?.textContent).toContain("Zara");
+  });
+  it("allows callers to control selected rows", async () => {
+    const user = userEvent.setup();
+    const change = vi.fn<(ids: string[]) => void>();
+    render(
+      <DataTable
+        caption="Kandidaten"
+        columns={[{ id: "name", label: "Naam", cell: (r: { id: string }) => r.id }]}
+        rows={[{ id: "a" }, { id: "b" }]}
+        rowKey={(r) => r.id}
+        selectedIds={["a"]}
+        onSelectionChange={change}
+        selectAllLabel="Alles"
+        selectRowLabel={(n) => `Selecteer ${n}`}
+        emptyLabel="Leeg"
+        loadingLabel="Laden"
+      />,
+    );
+    await user.click(screen.getByRole("checkbox", { name: "Selecteer b" }));
+    expect(change).toHaveBeenCalledWith(["a", "b"]);
+    expect(screen.getByRole<HTMLInputElement>("checkbox", { name: "Selecteer b" }).checked).toBe(false);
+  });
+  it("supports controlled column visibility without changing the column definitions", async () => {
+    const user = userEvent.setup();
+    const change = vi.fn<(visibility: Record<string, boolean>) => void>();
+    const props = {
+      caption: "Kandidaten",
+      columns: [
+        { id: "name", label: "Naam", cell: (r: { name: string; city: string }) => r.name },
+        { id: "city", label: "Plaats", cell: (r: { name: string; city: string }) => r.city },
+      ],
+      rows: [{ name: "Sam", city: "Utrecht" }],
+      rowKey: (r: { name: string }) => r.name,
+      emptyLabel: "Leeg",
+      loadingLabel: "Laden",
+      columnVisibility: { city: false },
+      onColumnVisibilityChange: change,
+      columnVisibilityLabel: "Kolommen",
+      columnVisibilityOptions: [{ id: "city", label: "Plaats" }],
+    };
+    const { rerender } = render(<DataTable {...props} />);
+    expect(screen.queryByRole("columnheader", { name: "Plaats" })).toBeNull();
+    await user.click(screen.getByRole("checkbox", { name: "Plaats" }));
+    expect(change).toHaveBeenCalledWith({ city: true });
+    rerender(<DataTable {...props} columnVisibility={{ city: true }} />);
+    expect(screen.getByRole("columnheader", { name: "Plaats" })).toBeTruthy();
+  });
+  it("paginates only when pagination is explicitly enabled", async () => {
+    const user = userEvent.setup();
+    render(
+      <DataTable
+        caption="Kandidaten"
+        columns={[{ id: "name", label: "Naam", cell: (r: { name: string }) => r.name }]}
+        rows={[{ name: "Sam" }, { name: "Zara" }, { name: "Noor" }]}
+        rowKey={(r) => r.name}
+        emptyLabel="Leeg"
+        loadingLabel="Laden"
+        pagination={{
+          pageSize: 2,
+          label: "Paginering",
+          previousLabel: "Vorige",
+          nextLabel: "Volgende",
+          pageLabel: (page) => "Pagina " + page,
+          pageSizeLabel: "Per pagina",
+        }}
+      />,
+    );
+    expect(screen.getAllByRole("row")).toHaveLength(3);
+    await user.click(screen.getByRole("button", { name: "Volgende" }));
+    expect(screen.getAllByRole("row")).toHaveLength(2);
+    expect(screen.getAllByRole("row")[1]?.textContent).toContain("Noor");
+  });
 });
