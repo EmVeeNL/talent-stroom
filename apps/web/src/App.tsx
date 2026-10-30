@@ -1,7 +1,15 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { DEFAULT_LOCALE, isLocale, LOCALES, t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
-import { Button, Icon, Logo, Select, ThemeToggle, NavigationLinkContext } from "@talentstroom/ui";
+import {
+  Button,
+  Icon,
+  Logo,
+  Select,
+  NavigationLinkContext,
+  getThemePreference,
+  setThemePreference,
+} from "@talentstroom/ui";
 import { createTransport, errorKey, isAborted, RequestError } from "./auth.ts";
 import { RouterProvider, useRouterState } from "@tanstack/react-router";
 import { createAppRouter, activeMembership, ViewContext } from "./router.tsx";
@@ -26,6 +34,25 @@ const OrganizationPicker = lazy(() =>
 const ComponentGallery = import.meta.env.DEV
   ? lazy(() => import("./gallery/Gallery.tsx").then((m) => ({ default: m.Gallery })))
   : null;
+
+function AuthThemeButton({ label, labels }: { label: string; labels: Record<"system" | "light" | "dark", string> }) {
+  const [theme, setTheme] = useState(getThemePreference);
+  return (
+    <button
+      className="auth-theme-button"
+      type="button"
+      aria-label={`${label}: ${labels[theme]}`}
+      title={`${label}: ${labels[theme]}`}
+      onClick={() => {
+        const next = theme === "system" ? "light" : theme === "light" ? "dark" : "system";
+        setThemePreference(next);
+        setTheme(next);
+      }}
+    >
+      <Icon name={theme === "dark" ? "dark_mode" : "light_mode"} size={16} />
+    </button>
+  );
+}
 export function App() {
   if (ComponentGallery && new URLSearchParams(window.location.search).has("gallery")) {
     return (
@@ -284,7 +311,7 @@ function AuthApp() {
           </option>
         ))}
       </Select>
-      <ThemeToggle
+      <AuthThemeButton
         label={tr("auth.theme")}
         labels={{ system: tr("auth.system"), light: tr("auth.light"), dark: tr("auth.dark") }}
       />
