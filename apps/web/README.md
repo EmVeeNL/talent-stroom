@@ -50,3 +50,82 @@ Material Symbols Outlined and older tokens; migrating to Rounded and the new kit
 separate work. The harness checks the actual icon font so it also supports Rounded once
 that migration lands. DPR 2/3, 200% zoom, interaction states and accessibility audits remain
 separate checks from this initial screenshot matrix.
+
+# TalentStroom web app
+
+Dutch-first React app with English available through the language selector and
+light, dark and system themes through the shared ThemeToggle.
+
+## Routes
+
+| Route                    | Purpose                                                                    |
+| ------------------------ | -------------------------------------------------------------------------- |
+| `/inloggen`              | Email/password sign-in                                                     |
+| `/registreren`           | Name, email, password and terms; then check your email                     |
+| `/e-mail-bevestigen`     | Better Auth verification callback; resend verification                     |
+| `/wachtwoord-vergeten`   | Request a password reset email                                             |
+| `/wachtwoord-herstellen` | Set a new password using the emailed token                                 |
+| `/organisatie-kiezen`    | List, confirm/switch or create an organization                             |
+| `/`                      | Signed-in placeholder with active organization, switch dialog and sign-out |
+
+History API navigation preserves normal links, modified clicks and browser
+back/forward. The production host must serve the SPA for these paths.
+Guests on protected routes go to `/inloggen`. Signed-in users without a verified
+active organization go to `/organisatie-kiezen`. Sign-in and registration redirect
+existing signed-in users to their workspace or picker. Verification and recovery
+remain accessible.
+
+The dev-only component gallery remains at `/?gallery`; it bypasses auth and is
+excluded from production.
+
+## Try locally
+
+Use Node 26 and pnpm 12. From the repository root:
+
+1. `pnpm install`
+2. `pnpm db:up && pnpm db:migrate && pnpm db:dev-passwords`
+3. Copy `apps/api/.env.example` to `apps/api/.env`, set a random
+   `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL=http://localhost:5173` and
+   `MAIL_TRANSPORT=mailpit` (see the API README for database setup).
+4. `pnpm dev`
+5. Open http://localhost:5173/registreren and register with synthetic data.
+6. Open Mailpit at http://localhost:8025, follow the verification link, then sign in.
+7. Create your first organization. Open the header switcher to pick another
+   organization; confirm with “Organisatie openen”.
+8. Sign out and use “Wachtwoord vergeten?” to exercise password recovery through
+   Mailpit.
+
+Vite proxies `/api/auth/*` unchanged to the API on port 8787 and strips `/api`
+for our `/api/v1/*` calls. Production routing must preserve the same mapping.
+Cookies are HttpOnly and same-origin; no token or tenant context goes into
+localStorage. Callback tokens are retained only in component memory and removed
+from the current address/history entry after capture.
+
+## Implementation and limits
+
+No router or auth runtime dependency is added. Better Auth calls use plain fetch;
+organization operations use `@talentstroom/api-client`. The only retained server
+data is the app's in-memory membership context. Switching/creating aborts outstanding
+scope requests; success discards context and reloads the session and memberships
+before opening the workspace. Future tenant caches must join this invalidation
+boundary. There is no service-worker or persistent tenant cache.
+
+Errors use translated safe messages; raw problem details, email addresses,
+passwords and tokens are never logged or rendered in errors. HTML form constraints
+check required fields, email format, password length (12–128), organization name
+length (2–100) and terms acceptance. The API remains authoritative for access and
+validation. Terms acceptance is currently a UI requirement; this task adds no
+server-side consent record or legal-document route.
+
+Social buttons are omitted because the API exposes no provider-discovery endpoint.
+Passkey and MFA challenge screens are follow-ups beyond the requested email/password
+flow; a two-factor redirect response never opens the workspace.
+
+## Verification
+
+`pnpm --filter @talentstroom/web test` runs Vitest component tests with mocked fetch
+and jsdom, covering routes, forms, safe problem responses, verification/reset
+callbacks, keyboard-accessible controls and organization creation/switching.
+The login form also has an axe accessibility check. Native dialog focus containment,
+screen-reader interoperability and rendered contrast still need manual verification.
+Run `pnpm check` and `pnpm build` at the root before review.
