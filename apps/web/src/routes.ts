@@ -300,6 +300,41 @@ export const routes: readonly RouteDef[] = [
   },
 ];
 
+export const demoAuthRoutes: readonly RouteDef[] = [
+  {
+    path: "/paginas/authenticatie/tweestaps",
+    titleKey: "auth.login",
+    layout: "auth",
+    access: "public",
+    demo: true,
+    load: () => import("./pages/auth/TwoStep.tsx"),
+  },
+  {
+    path: "/paginas/authenticatie/vergrendeld",
+    titleKey: "auth.login",
+    layout: "auth",
+    access: "public",
+    demo: true,
+    load: () => import("./pages/auth/LockScreen.tsx"),
+  },
+  {
+    path: "/paginas/authenticatie/uitgelogd",
+    titleKey: "auth.login",
+    layout: "auth",
+    access: "public",
+    demo: true,
+    load: () => import("./pages/auth/Logout.tsx"),
+  },
+  {
+    path: "/paginas/authenticatie/gelukt",
+    titleKey: "auth.login",
+    layout: "auth",
+    access: "public",
+    demo: true,
+    load: () => import("./pages/auth/Success.tsx"),
+  },
+];
+
 export const authRouteTitles: Record<string, MessageKey> = {
   "/inloggen": "auth.login",
   "/registreren": "auth.register",
@@ -308,6 +343,9 @@ export const authRouteTitles: Record<string, MessageKey> = {
   "/wachtwoord-herstellen": "auth.reset",
   "/organisatie-kiezen": "auth.picker",
 };
+const demoDefault = import.meta.env.DEV;
+export const demoPagesEnabled =
+  import.meta.env["VITE_DEMO_PAGES"] === undefined ? demoDefault : import.meta.env["VITE_DEMO_PAGES"] === "true";
 const AuthRouteMarker: ComponentType<{ locale: Locale }> = () => null;
 export const routeTable: readonly RouteDef[] = [
   ...Object.entries(authRouteTitles).map(([path, titleKey]) => ({
@@ -318,6 +356,7 @@ export const routeTable: readonly RouteDef[] = [
     load: async () => ({ default: AuthRouteMarker }),
   })),
   ...routes,
+  ...(demoPagesEnabled ? demoAuthRoutes : []),
   {
     path: "*",
     titleKey: "nav.not_found.title",
@@ -330,9 +369,6 @@ export const routeTitles = Object.fromEntries(
   routeTable.filter(({ path }) => path !== "*").map(({ path, titleKey }) => [path, titleKey]),
 ) as Record<string, MessageKey>;
 export const knownTitles = { ...authRouteTitles, ...routeTitles };
-const demoDefault = import.meta.env.DEV;
-export const demoPagesEnabled =
-  import.meta.env["VITE_DEMO_PAGES"] === undefined ? demoDefault : import.meta.env["VITE_DEMO_PAGES"] === "true";
 export function visibleRoutes(enabled = demoPagesEnabled): readonly RouteDef[] {
   return routes.filter((route) => !route.demo || enabled);
 }
