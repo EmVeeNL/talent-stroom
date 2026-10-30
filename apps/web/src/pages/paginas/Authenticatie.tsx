@@ -20,8 +20,11 @@ const paths = [
   "/wachtwoord-herstellen",
   "/e-mail-bevestigen",
   "/organisatie-kiezen",
-  ...["tweestaps", "vergrendeld", "uitgelogd", "gelukt"].map((x) => `/paginas/authenticatie/${x}`),
-];
+  "/paginas/authenticatie/tweestaps",
+  "/paginas/authenticatie/vergrendeld",
+  "/paginas/authenticatie/uitgelogd",
+  "/paginas/authenticatie/gelukt",
+] as const;
 export default function AuthenticatiePage({ locale }: { locale: Locale }) {
   return (
     <PageFrame locale={locale} titleKey="nav.paginas.authenticatie" subtitle={t(locale, "demo.pages.auth.subtitle")}>
