@@ -1,6 +1,6 @@
 # 0015 — TanStack web data layer
 
-- **Status:** Proposed
+- **Status:** Accepted (owner, 2026-10-30; Charts decision amended by the owner)
 - **Date:** 2026-10-30
 - **Resolves:** —
 - **Issue:** #422 (epic #421; implementation #423–#427)
@@ -36,8 +36,8 @@ Checked **2026-10-30** against the npm registry and official documentation. Date
 | `@tanstack/react-table`          | 9.3.1 / 2026-10-12                 | **9.3.1** / 2026-10-12    | `>=18`; adopt v9, not v8 examples                                          |
 | `@tanstack/react-form`           | 1.33.5 / 2026-08-11                | **1.33.5** / 2026-08-11   | `^17.0.0 \|\| ^18.0.0 \|\| ^19.0.0`; adopt stable v1                       |
 | `@tanstack/zod-form-adapter`     | 0.42.1 / 2025-02-20                | 0.42.1 / 2025-02-20       | Zod `^3.x`, form-core 0.42.1; incompatible with our Zod 4 / Form 1, reject |
-| `@tanstack/charts`               | 1.1.0 / 2026-10-09                 | 1.1.0 / 2026-10-09        | React/DOM `^18.0.0 \|\| ^19.0.0` as optional framework peers; defer        |
-| `@tanstack/react-charts`         | 1.1.0 / 2026-10-09                 | 1.1.0 / 2026-10-09        | React/DOM `^18.0.0 \|\| ^19.0.0`, charts 1.1.0; defer                      |
+| `@tanstack/charts`               | 1.1.0 / 2026-10-09                 | 1.1.0 / 2026-10-09        | React/DOM `^18.0.0 \|\| ^19.0.0` as optional framework peers; adopt        |
+| `@tanstack/react-charts`         | 1.1.0 / 2026-10-09                 | 1.1.0 / 2026-10-09        | React/DOM `^18.0.0 \|\| ^19.0.0`, charts 1.1.0; adopt                      |
 
 Registry sources: [Router](https://registry.npmjs.org/@tanstack/react-router), [plugin](https://registry.npmjs.org/@tanstack/router-plugin), [Query](https://registry.npmjs.org/@tanstack/react-query), [devtools](https://registry.npmjs.org/@tanstack/react-query-devtools), [Table](https://registry.npmjs.org/@tanstack/react-table), [Form](https://registry.npmjs.org/@tanstack/react-form), [old adapter](https://registry.npmjs.org/@tanstack/zod-form-adapter), [Charts core](https://registry.npmjs.org/@tanstack/charts), [React adapter](https://registry.npmjs.org/@tanstack/react-charts). Each exposes `time`, `dist-tags`, and version manifests with licence, peers and dependencies.
 
@@ -79,7 +79,7 @@ The Zod variant is +21.62 KiB over Form alone. It is not an incremental cost if 
 
 ## Decision
 
-**Option 2: adopt Router, Query, Table and Form; keep our SVG charts now.** Dependencies are added only in their implementation issues, exactly pinned in the catalog. No TanStack Start, SSR, replacement API transport or backend changes.
+**Adopt Router, Query, Table and Form (option 2), and — by owner decision — TanStack Charts behind our chart API.** Dependencies are added only in their implementation issues, exactly pinned in the catalog. No TanStack Start, SSR, replacement API transport or backend changes.
 
 ### Router — code-based route tree (#423)
 
@@ -153,11 +153,15 @@ Validate on blur and submit; use targeted subscriptions to avoid rerendering who
 
 Map Zod issue code/path and allowlisted server validation errors to `@talentstroom/i18n` keys (Dutch source, English parity); do not display default English Zod text or echo submitted values. Use an error summary pattern (there is no existing exported `ErrorSummary` component): after an invalid submit focus the summary, link each error to its input, preserve entered values, and wire `aria-invalid`/`aria-describedby` to stable field-error IDs. Announce async submission errors without duplicate live announcements. Cover keyboard submission, field focus, transformed values, localized errors and screen-reader semantics. Keep passwords/tokens/form values out of devtools, logs and query keys. Auth-form changes wait for ADR acceptance and security review.
 
-### Charts — retain SVG now (#427)
+### Charts — adopt TanStack Charts behind our chart API (#427)
 
-**Do not add a chart dependency in this epic.** Keep and extend `BarChart`, `LineChart`, `DonutChart`, `ChartLegend` and shared `chart.tsx` behind `@talentstroom/ui`'s public exports. Their current feature set covers the dashboards; the measured TanStack bar costs about **33.52 KiB more** than our bar example and would need parity work for tokens, legends, focus tooltips and data tables.
+**Owner decision (2026-10-30): use TanStack Charts.** The spike recommended keeping our SVG charts (TanStack bar ≈ +33.5 KiB gzip versus our bar, and stable 1.x is less than a month old). The owner chose TanStack Charts for consistency with the rest of the TanStack data layer; this section records that decision and its guard rails.
 
-Historical 0.x pre-alpha adoption would have accepted breaking APIs without stable guarantees; we reject that path. Stable 1.1.0 removes that specific objection, but has less than a month's stable history at this decision date. Re-evaluate the current stable release when a real requirement exceeds our SVG implementation (large datasets, zoom/brush or complex composition), measuring it in that route and checking keyboard/a11y and reduced motion. Any future adapter stays behind our chart API, lazy in the routes that need it. No speculative adapter scaffold now. #427 documents this choice and closes dashboard accessibility/edge-case gaps; it is useful work without a dependency migration.
+- Pin the current stable 1.x release that passes the 7-day rule (1.1.0 at the time of writing) in the catalog, with its React adapter.
+- Keep `@talentstroom/ui` as the only entry point: `BarChart`, `LineChart`, `DonutChart`, `ChartLegend` and sparklines keep their public props and are reimplemented on TanStack Charts, so pages do not import the library directly.
+- Parity before replacing each chart: design tokens for colours (light/dark), keyboard focus and tooltips, the accessible data-table alternative, reduced motion, and deterministic rendering for the screenshot harness.
+- Lazy-load chart code in the routes that use it, so the auth pages and the shell do not pay for it; measure the real route bundle in #427.
+- Rollback: the wrapper API lets us return to the SVG implementation without touching pages.
 
 ### Migration order and suggested issue edits
 
@@ -169,7 +173,7 @@ These are recommendations for the existing issues; this spike does not edit them
 | #424 Query  | Explicitly depends on #423 and accepted ADR; pin Query/devtools 5.104.5. Test empty caches on switch/sign-out/expiry, aborted and late responses/mutations, failed transitions, mismatch and bootstrap refresh. Check organization and authentication sensitivity boxes; require security review. Preserve API and auth transports.              |
 | #425 Table  | After #424, can proceed independently of #426/#427; pin v9 9.3.1, update implementation notes to its API. Tighten “unchanged or migrated” to existing public API preserved, additive pagination/visibility only; test sorting/selection/a11y and real-build size.                                                                                |
 | #426 Form   | After #424 and ADR acceptance; pin 1.33.5, native Standard Schema with existing Zod 4.6.7. Inventory missing shared schemas; reject old adapter. Preserve auth requests, i18n/error summary and demo-local submits; mark auth sensitivity, retain auth regression/security review.                                                               |
-| #427 Charts | After #424; explicitly keep SVG, correct pre-alpha wording to historical status / stable 1.1.0 evidence, no catalog entry. Audit chart/table alternatives, focus/tooltip/legend, empty/zero data, contrast and reduced motion on merged dashboards. Reconsider only for a concrete unmet requirement.                                            |
+| #427 Charts | After #424. Adopt TanStack Charts (stable 1.x, >= 7 days old) behind the existing `@talentstroom/ui` chart components with parity for tokens, focus/tooltips, data-table alternatives, reduced motion and deterministic screenshots; lazy per route; measure the route bundle.                                                                   |
 
 Router then Query are sequential because Query integrates with Router context/loaders. Table, Form and Charts may then proceed in parallel worktrees. Implementation follows AGENTS.md's failing BDD test first; keep each PR small and AI-labelled, with human review, security implications and uncertainty stated. All issues should use **`pnpm check`** (format, type-aware lint, typecheck, tests), plus the applicable existing Playwright harness on dedicated permitted ports. No changes to CI/CD, backend scope checks or migrations are part of this plan.
 
