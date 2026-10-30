@@ -12,8 +12,13 @@
   line-height: var(--ts-line-height-heading);
   cursor: pointer;
   transition:
-    background-color var(--ts-duration-fast) ease,
-    border-color var(--ts-duration-fast) ease;
+    background-color var(--ts-duration-fast) var(--ts-ease-standard),
+    border-color var(--ts-duration-fast) var(--ts-ease-standard),
+    transform var(--ts-duration-fast) var(--ts-ease-standard);
+}
+
+.ts-button:is(:active, [data-state="active"]):not(:disabled, [aria-disabled="true"]) {
+  transform: scale(0.98);
 }
 
 .ts-button--sm {

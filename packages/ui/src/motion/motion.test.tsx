@@ -71,6 +71,18 @@ describe("motion foundation", () => {
     expect(screen.getByRole("status").textContent).toBe("reduced");
   });
 
+  it("removes transform-based motion in reduced-motion presets", () => {
+    for (const name of ["slideUp", "slideDown", "slideLeft", "slideRight", "scaleIn", "listItem"] as const) {
+      const preset = getMotionPreset(name, true);
+      expect(preset.variants["initial"]).not.toHaveProperty("x");
+      expect(preset.variants["initial"]).not.toHaveProperty("y");
+      expect(preset.variants["initial"]).not.toHaveProperty("scale");
+      expect(preset.variants["animate"]).not.toHaveProperty("x");
+      expect(preset.variants["animate"]).not.toHaveProperty("y");
+      expect(preset.variants["animate"]).not.toHaveProperty("scale");
+    }
+  });
+
   it("provides the shared Motion configuration around children", () => {
     render(
       <MotionProvider>

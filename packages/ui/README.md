@@ -315,6 +315,35 @@ animation decisions. Reduced motion removes translate, scale and layout changes,
 brief opacity fade where it helps continuity. Tests set `MotionGlobalConfig.skipAnimations`,
 and the Playwright harness continues to emulate reduced motion and disable animations.
 
+### Control, navigation and metric feedback
+
+Buttons press inward; switches slide their thumb; checkbox/radio selection and card elevation
+use fast CSS token transitions. Progress fills scale from the left (no width reflow). Both OS
+reduced motion and `data-motion="reduce"` make these changes instant and stop indeterminate progress.
+
+Tabs measure on selection and resize, then translate/scale one decorative indicator using the
+base tokens. Selection, panels and keyboard focus update immediately. The sidebar uses the slow
+width token with a fast label fade; AppShell reserves the destination width immediately so content
+does not reflow on each animation frame. Nested groups use the Motion expand/collapse preset and
+a rotating chevron. Closed groups are immediately inert and hidden from assistive technology.
+
+StatCard observes its first viewport intersection, then counts and draws its sparkline once within
+the slow token (320 ms). The final formatted value is always DOM text and reserves the number's
+width; the accessible summary never counts. Data changes, unmount and reduced-motion changes
+cancel the effect. Reduced motion and browsers without IntersectionObserver show final values
+and complete sparklines immediately. The `animate` helper is re-exported for cancellable numeric
+and SVG animation; it honours the shared test skip flag.
+
+FilterChip supplies enter/exit variants. Wrap changing **keyed** chips in `AnimatePresence` from
+`@talentstroom/ui` (see Elementen › Filters); removal updates filter state immediately and exiting
+chips are inert and absent from the accessibility tree. The helper `useIsPresent` supports this
+immediate exit policy. Do not wait for animation completion to apply filters or move focus.
+
+Component regressions cover first-view observation, cancellation, repeated toggles and both
+reduced-motion sources. `apps/web/visual/micro-interactions.visual.ts` checks real CSS transitions,
+keyboard focus, indicator geometry and chip presence with full motion, OS reduction and the
+HTML override. Run it through the existing Playwright harness; use port 5200 in isolated worktrees.
+
 Overlays use the token-backed `dialog`, `sheetLeft`, `sheetRight`, `popover` and `toast`
 presets. Native dialogs retain their browser focus trap and synchronous close/focus return;
 CSS animates their entrance and backdrop. Tooltips use `motionDelay.tooltip` before appearing.

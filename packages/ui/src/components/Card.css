@@ -5,6 +5,10 @@
   border: var(--ts-border-width) solid var(--ts-border);
   border-radius: var(--ts-radius-lg);
   box-shadow: var(--ts-shadow-card);
+  transition: box-shadow var(--ts-duration-fast) var(--ts-ease-standard);
+}
+.ts-card:hover {
+  box-shadow: var(--ts-shadow-popover);
 }
 
 .ts-card__header {

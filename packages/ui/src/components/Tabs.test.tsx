@@ -1,7 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { axeViolations } from "../test-utils.ts";
+import { MotionProvider } from "../motion/index.ts";
 import { Tabs } from "./Tabs.tsx";
 
 const tabs = [
@@ -82,3 +83,46 @@ describe("Tabs", () => {
     expect(await axeViolations(container)).toEqual([]);
   });
 });
+
+it.each([false, true])(
+  "aligns the indicator after selection and resize without delaying focus (reduced=%s)",
+  async (reduced) => {
+    if (reduced) document.documentElement.dataset["motion"] = "reduce";
+    let resize: ResizeObserverCallback | undefined;
+    const disconnect = vi.fn<() => void>();
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: ResizeObserverCallback) {
+          resize = callback;
+        }
+        observe = vi.fn<() => void>();
+        unobserve = vi.fn<() => void>();
+        disconnect = disconnect;
+      },
+    );
+    let width = 100;
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+      return new DOMRect(this.textContent === "Twee" ? 100 : 0, 0, width, 40);
+    });
+    const { container, unmount } = render(
+      <MotionProvider>
+        <Tabs tabs={tabs} label="Kandidaat" />
+      </MotionProvider>,
+    );
+    await userEvent.click(screen.getByRole("tab", { name: "Twee" }));
+    expect(document.activeElement).toBe(screen.getByRole("tab", { name: "Twee" }));
+    expect(screen.getByRole("tabpanel").textContent).toBe("Paneel 2");
+    expect(container.querySelector(".ts-tabs__indicator")?.getAttribute("aria-hidden")).toBe("true");
+    width = 150;
+    act(() => resize?.([], { observe() {}, unobserve() {}, disconnect() {} }));
+    await waitFor(() =>
+      expect(container.querySelector<HTMLElement>(".ts-tabs__indicator")?.style.transform).toContain("scaleX(150)"),
+    );
+    unmount();
+    expect(disconnect).toHaveBeenCalled();
+    document.documentElement.removeAttribute("data-motion");
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  },
+);

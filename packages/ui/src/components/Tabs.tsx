@@ -1,8 +1,10 @@
 import type { IconName } from "../icons.ts";
-import { useId, useRef, useState } from "react";
+import { useId, useLayoutEffect, useRef, useState } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
 import { cx } from "../classnames.ts";
 import { Icon } from "./Icon.tsx";
+import { m, useReducedMotion } from "../motion/index.ts";
+import { motionDurations, motionEasings } from "../tokens.ts";
 
 export interface TabItem {
   id: string;
@@ -30,6 +32,32 @@ export function Tabs({ tabs, label, selectedId, defaultSelectedId, onChange, cla
   const [internalId, setInternalId] = useState(defaultSelectedId ?? firstEnabled);
   const currentId = selectedId ?? internalId;
   const buttons = useRef(new Map<string, HTMLButtonElement>());
+  const list = useRef<HTMLDivElement>(null);
+  const [indicator, setIndicator] = useState<{ x: number; width: number }>();
+  const reducedMotion = useReducedMotion();
+  useLayoutEffect(() => {
+    const parent = list.current;
+    if (!parent) return undefined;
+    const measure = () => {
+      const button = buttons.current.get(currentId ?? "");
+      if (!button) {
+        setIndicator(undefined);
+        return;
+      }
+      const rect = button.getBoundingClientRect();
+      const parentRect = parent.getBoundingClientRect();
+      setIndicator({ x: rect.left - parentRect.left + parent.scrollLeft, width: rect.width });
+    };
+    measure();
+    const observer = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(measure);
+    observer?.observe(parent);
+    for (const button of buttons.current.values()) observer?.observe(button);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [currentId, tabs]);
 
   const select = (id: string) => {
     if (selectedId === undefined) setInternalId(id);
@@ -65,7 +93,8 @@ export function Tabs({ tabs, label, selectedId, defaultSelectedId, onChange, cla
   return (
     <div className={cx("ts-tabs", className)}>
       <div
-        className="ts-tabs__list"
+        ref={list}
+        className={cx("ts-tabs__list", indicator && "ts-tabs__list--measured")}
         role="tablist"
         aria-label={label}
         aria-orientation="horizontal"
@@ -95,6 +124,16 @@ export function Tabs({ tabs, label, selectedId, defaultSelectedId, onChange, cla
             </button>
           );
         })}
+        {indicator && (
+          <m.span
+            aria-hidden="true"
+            className="ts-tabs__indicator"
+            initial={false}
+            style={{ width: 1, originX: 0 }}
+            animate={{ x: indicator.x, scaleX: indicator.width }}
+            transition={{ duration: reducedMotion ? 0 : motionDurations.base / 1000, ease: motionEasings.standard }}
+          />
+        )}
       </div>
       {tabs.map((tab) => (
         <div

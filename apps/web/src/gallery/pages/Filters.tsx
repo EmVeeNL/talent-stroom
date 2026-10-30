@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { SearchInput, Combobox, DateRangePicker, FacetedFilter, ViewSwitcher, FilterChip } from "@talentstroom/ui";
+import {
+  SearchInput,
+  Combobox,
+  DateRangePicker,
+  FacetedFilter,
+  ViewSwitcher,
+  FilterChip,
+  AnimatePresence,
+} from "@talentstroom/ui";
 import type { DateRange } from "@talentstroom/ui";
 import { Section } from "../Section.tsx";
 import { useGallery } from "../context.ts";
@@ -131,19 +139,21 @@ export function Filters() {
         <FilterChip kind="dropdown" onClick={() => {}}>
           {tr("gallery.filters.activeCount")}
         </FilterChip>
-        {visibleChips.map((chip) => {
-          const label = tr(chip === "function" ? "gallery.filters.function" : "gallery.filters.location");
-          return (
-            <FilterChip
-              key={chip}
-              kind="removable"
-              removeLabel={tr("gallery.filters.removeFilter").replace("{name}", label)}
-              onRemove={() => setVisibleChips((current) => current.filter((value) => value !== chip))}
-            >
-              {label}
-            </FilterChip>
-          );
-        })}
+        <AnimatePresence>
+          {visibleChips.map((chip) => {
+            const label = tr(chip === "function" ? "gallery.filters.function" : "gallery.filters.location");
+            return (
+              <FilterChip
+                key={chip}
+                kind="removable"
+                removeLabel={tr("gallery.filters.removeFilter").replace("{name}", label)}
+                onRemove={() => setVisibleChips((current) => current.filter((value) => value !== chip))}
+              >
+                {label}
+              </FilterChip>
+            );
+          })}
+        </AnimatePresence>
         <FilterChip
           kind="add"
           onClick={() =>
