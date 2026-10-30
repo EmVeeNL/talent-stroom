@@ -567,6 +567,7 @@ export const enGB = {
   "gallery.empty.error": "Could not load candidates",
   "gallery.empty.errorBody": "The data is currently unavailable. Please try again.",
   "gallery.empty.retry": "Try again",
+  "shell.loading": "Loading page",
   "shell.navigation": "Main navigation",
   "shell.home": "TalentStroom, go to dashboard",
   "shell.soon": "Coming soon",

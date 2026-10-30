@@ -190,3 +190,5 @@ export type { DatePickerProps } from "./components/DatePicker.tsx";
 export { NavigationLinkContext } from "./components/NavigationLink.tsx";
 export { ErrorSummary } from "./components/ErrorSummary.tsx";
 export type { ErrorSummaryProps } from "./components/ErrorSummary.tsx";
+
+export { TopLoadingBar } from "./components/TopLoadingBar.tsx";

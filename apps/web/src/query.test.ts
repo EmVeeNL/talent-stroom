@@ -8,6 +8,7 @@ const orgA = "11111111-1111-4111-8111-111111111111";
 const orgB = "33333333-3333-4333-8333-333333333333";
 function setup() {
   let active = orgA;
+  const ids = [orgA, orgB];
   vi.stubGlobal(
     "fetch",
     vi.fn<typeof fetch>(async (input) => {
@@ -15,7 +16,7 @@ function setup() {
       if (url.endsWith("get-session")) return Response.json({ user: {} });
       return Response.json({
         activeOrganizationId: active,
-        organizations: [orgA, orgB].map((organizationId) => ({
+        organizations: ids.map((organizationId) => ({
           organizationId,
           membershipId: orgB,
           name: "Synthetic agency",
@@ -32,6 +33,7 @@ function setup() {
     layer,
     transport,
     expired,
+    addOrganization: (id: string) => ids.push(id),
     switchToB: () => {
       active = orgB;
     },
@@ -261,4 +263,69 @@ describe("auth form mutation privacy", () => {
     expect(auth).toHaveBeenCalledTimes(1);
     expect(layer.client.getMutationCache().getAll()).toEqual([]);
   });
+});
+describe("background context checks", () => {
+  it.each(["identity", "membership", "role"])("clears scope before reporting a changed %s", async (change) => {
+    const { layer, transport } = setup();
+    await layer.bootstrap(transport);
+    layer.client.setQueryData(queryKeys.org(orgA, "vacancies", "list"), ["Synthetic vacancy"]);
+    const onLoaded = vi.fn<() => void>();
+    const onScopeChanged = vi.fn<() => void>(() => {
+      expect(layer.client.getQueryCache().getAll()).toEqual([]);
+      expect(() => layer.orgQuery(orgA, "vacancies", "list", async () => [])).toThrow("Aborted");
+    });
+    layer.setHandlers({ onLoaded, onScopeChanged });
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockImplementation(async (input) => {
+      const url = input instanceof Request ? input.url : String(input);
+      if (url.endsWith("get-session"))
+        return Response.json({ user: change === "identity" ? { id: "synthetic-user-b" } : {} });
+      return Response.json({
+        activeOrganizationId: orgA,
+        organizations:
+          change === "membership"
+            ? []
+            : [orgA, orgB].map((organizationId) => ({
+                organizationId,
+                membershipId: orgB,
+                name: "Synthetic agency",
+                slug: "synthetic",
+                role: change === "role" ? "member" : "owner",
+              })),
+      });
+    });
+    await layer.revalidate(transport);
+    expect(onScopeChanged).toHaveBeenCalledOnce();
+    expect(onLoaded).not.toHaveBeenCalled();
+  });
+  it("ignores a late session result after reset", async () => {
+    const { layer, transport } = setup();
+    await layer.bootstrap(transport);
+    const loaded = vi.fn<() => void>();
+    const changed = vi.fn<() => void>();
+    layer.setHandlers({ onLoaded: loaded, onScopeChanged: changed });
+    const response = Promise.withResolvers<Response>();
+    vi.mocked(fetch).mockImplementationOnce(async () => response.promise);
+    const checking = layer.revalidate(transport).catch(() => undefined);
+    await layer.reset();
+    response.resolve(Response.json({ user: { id: "synthetic-user-b" } }));
+    await checking;
+    expect(loaded).not.toHaveBeenCalled();
+    expect(changed).not.toHaveBeenCalled();
+    expect(layer.client.getQueryCache().getAll()).toEqual([]);
+  });
+});
+
+it("silently accepts an added membership and allows switching to it", async () => {
+  const { layer, transport, addOrganization } = setup();
+  await layer.bootstrap(transport);
+  const added = "44444444-4444-4444-8444-444444444444";
+  addOrganization(added);
+  const loaded = vi.fn<() => void>();
+  const changed = vi.fn<() => void>();
+  layer.setHandlers({ onLoaded: loaded, onScopeChanged: changed });
+  await layer.revalidate(transport);
+  expect(loaded).toHaveBeenCalledOnce();
+  expect(changed).not.toHaveBeenCalled();
+  await expect(layer.changeOrganization(transport, { orgId: added })).resolves.toBeUndefined();
 });

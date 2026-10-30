@@ -569,6 +569,7 @@ export const nlNL = {
   "gallery.empty.error": "Kandidaten laden mislukt",
   "gallery.empty.errorBody": "De gegevens zijn nu niet beschikbaar. Probeer het opnieuw.",
   "gallery.empty.retry": "Opnieuw proberen",
+  "shell.loading": "Pagina laden",
   "shell.navigation": "Hoofdnavigatie",
   "shell.home": "TalentStroom, naar dashboard",
   "shell.soon": "Binnenkort",

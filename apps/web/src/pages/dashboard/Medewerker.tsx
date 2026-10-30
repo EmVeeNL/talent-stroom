@@ -1,18 +1,29 @@
-import { Breadcrumb, PageHeader } from "@talentstroom/ui";
+import { Breadcrumb } from "@talentstroom/ui";
 import { t } from "@talentstroom/i18n";
 import type { Locale } from "@talentstroom/i18n";
-import { Activity, Bars, Frame, Panel, Stats, TaskList, tr } from "./widgets/DashboardWidgets.tsx";
+import {
+  Activity,
+  Bars,
+  DashboardBreadcrumbs,
+  Frame,
+  Panel,
+  Stats,
+  TaskList,
+  tr,
+} from "./widgets/DashboardWidgets.tsx";
 export default function MedewerkerPage({ locale }: { locale: Locale }) {
   const title = t(locale, "nav.dashboard.medewerker");
   return (
     <>
-      <Breadcrumb
-        label={t(locale, "nav.breadcrumbs")}
-        items={[{ label: t(locale, "nav.group.dashboard") }, { label: title }]}
-      />
-      <PageHeader title={title} />
       <Frame
-        locale={locale}
+        breadcrumbs={
+          <DashboardBreadcrumbs locale={locale}>
+            <Breadcrumb
+              label={t(locale, "nav.breadcrumbs")}
+              items={[{ label: t(locale, "nav.group.dashboard") }, { label: title }]}
+            />
+          </DashboardBreadcrumbs>
+        }
         title={tr(locale, "demo.dashboard.employee-greeting")}
         subtitle={tr(locale, "demo.dashboard.employee-subtitle")}
       >
