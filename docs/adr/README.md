@@ -21,3 +21,4 @@ One file per significant decision: `NNNN-short-title.md`, numbered sequentially.
 | [0011](0011-envelope-encryption-format.md)     | Envelope encryption format                                 | Accepted                                  |
 | [0012](0012-identity-schema-placement.md)      | Identity schema placement                                  | Accepted                                  |
 | [0013](0013-redesign-design-kit.md)            | Applying the redesign design kit                           | Accepted (approved by merging PR)         |
+| [0014](0014-motion-and-animation.md)           | Motion and animation                                       | Proposed                                  |
