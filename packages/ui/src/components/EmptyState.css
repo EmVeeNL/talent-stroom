@@ -27,3 +27,18 @@
 .ts-empty-state__action {
   margin-top: var(--ts-space-5);
 }
+.ts-empty-state--compact {
+  flex-basis: auto;
+  min-width: 0;
+  padding: var(--ts-space-6) var(--ts-space-4);
+}
+.ts-empty-state--compact .ts-empty-state__icon {
+  padding: var(--ts-space-3);
+}
+.ts-empty-state--compact h3 {
+  margin: var(--ts-space-3) 0 var(--ts-space-1);
+  font: var(--ts-font-label);
+}
+.ts-empty-state--compact p {
+  font: var(--ts-font-compact);
+}

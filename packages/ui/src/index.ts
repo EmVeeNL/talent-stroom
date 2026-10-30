@@ -174,5 +174,14 @@ export type { ContextMenuProps, ContextMenuItem } from "./components/ContextMenu
 export { EmptyState } from "./components/EmptyState.tsx";
 export type { EmptyStateProps } from "./components/EmptyState.tsx";
 
+export { KanbanBoard, moveKanbanCard } from "./components/Kanban.tsx";
+export type {
+  KanbanBoardProps,
+  KanbanCardData,
+  KanbanColumnData,
+  KanbanLabels,
+  KanbanMove,
+  KanbanAnnouncement,
+} from "./components/Kanban.tsx";
 export { DatePicker } from "./components/DatePicker.tsx";
 export type { DatePickerProps } from "./components/DatePicker.tsx";
