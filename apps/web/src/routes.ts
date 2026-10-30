@@ -256,7 +256,7 @@ export const routes = [
     layout: "dashboard",
     access: "member",
     demo: true,
-    load: () => import("./pages/paginas/FoutpaginaS.tsx"),
+    load: () => import("./pages/paginas/Foutpaginas.tsx"),
   },
   {
     path: "/paginas/start",
