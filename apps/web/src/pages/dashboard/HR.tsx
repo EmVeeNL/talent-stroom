@@ -1,18 +1,20 @@
-import { Breadcrumb, PageHeader } from "@talentstroom/ui";
+import { Breadcrumb } from "@talentstroom/ui";
 import { t } from "@talentstroom/i18n";
 import type { Locale } from "@talentstroom/i18n";
-import { Bars, Frame, Panel, Stats, tr } from "./widgets/DashboardWidgets.tsx";
+import { Bars, DashboardBreadcrumbs, Frame, Panel, Stats, tr } from "./widgets/DashboardWidgets.tsx";
 export default function HRPage({ locale }: { locale: Locale }) {
   const title = t(locale, "nav.dashboard.hr");
   return (
     <>
-      <Breadcrumb
-        label={t(locale, "nav.breadcrumbs")}
-        items={[{ label: t(locale, "nav.group.dashboard") }, { label: title }]}
-      />
-      <PageHeader title={title} />
       <Frame
-        locale={locale}
+        breadcrumbs={
+          <DashboardBreadcrumbs locale={locale}>
+            <Breadcrumb
+              label={t(locale, "nav.breadcrumbs")}
+              items={[{ label: t(locale, "nav.group.dashboard") }, { label: title }]}
+            />
+          </DashboardBreadcrumbs>
+        }
         title={tr(locale, "demo.dashboard.hr-title")}
         subtitle={tr(locale, "demo.dashboard.hr-subtitle")}
       >

@@ -1,0 +1,15 @@
+.ts-top-loading-bar {
+  position: fixed;
+  z-index: 10000;
+  inset: 0 0 auto;
+  height: 3px;
+  pointer-events: none;
+  color: var(--ts-primary);
+}
+.ts-top-loading-bar > span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: currentColor;
+  transform-origin: left;
+}

@@ -23,13 +23,13 @@ export const tr = (
   values?: Record<string, string | number>,
 ) => t(locale, key, values);
 export function Frame({
-  locale,
+  breadcrumbs,
   title,
   subtitle,
   children,
   actions,
 }: {
-  locale: Locale;
+  breadcrumbs: ReactNode;
   title: string;
   subtitle: string;
   children: ReactNode;
@@ -37,20 +37,26 @@ export function Frame({
 }) {
   return (
     <div className="demo-dashboard">
+      {breadcrumbs}
       <div className="demo-dashboard__welcome">
         <div>
           <h1>{title}</h1>
           <p>{subtitle}</p>
         </div>
-        <div className="demo-dashboard__welcome-aside">
-          <time dateTime="2026-10-30T14:32:00+01:00">
-            <Icon name="calendar_month" size={16} />
-            {tr(locale, "demo.dashboard.date")}, 14:32
-          </time>
-          {actions}
-        </div>
+        {actions && <div className="demo-dashboard__welcome-aside">{actions}</div>}
       </div>
       {children}
+    </div>
+  );
+}
+export function DashboardBreadcrumbs({ locale, children }: { locale: Locale; children: ReactNode }) {
+  return (
+    <div className="demo-dashboard__breadcrumbs">
+      {children}
+      <time dateTime="2026-10-30T14:32:00+01:00">
+        <Icon name="calendar_month" size={16} />
+        {tr(locale, "demo.dashboard.date")}, 14:32
+      </time>
     </div>
   );
 }

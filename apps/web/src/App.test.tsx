@@ -22,7 +22,12 @@ let lastBody: unknown;
 let intercept: ((request: Request) => Promise<Response> | undefined) | undefined;
 const requests: { url: string; method: string }[] = [];
 
-function setup(path = "/inloggen", authenticated = false, activeOrg: string | null = null) {
+function setup(
+  path = "/inloggen",
+  authenticated = false,
+  activeOrg: string | null = null,
+  interceptor?: (request: Request) => Promise<Response> | undefined,
+) {
   signedIn = authenticated;
   active = activeOrg;
   status = 200;
@@ -30,7 +35,7 @@ function setup(path = "/inloggen", authenticated = false, activeOrg: string | nu
   organizations = [org];
   requests.length = 0;
   lastBody = undefined;
-  intercept = undefined;
+  intercept = interceptor;
   window.history.replaceState(null, "", path);
   vi.stubGlobal(
     "fetch",
@@ -444,13 +449,115 @@ it("captures callback credentials before Router sees them and discards them on n
       expect(JSON.stringify(current.state)).not.toContain("expired");
       expect(current.options.context).not.toHaveProperty("authProps");
     }
-    const router = factory.mock.results.at(-1)?.value;
+    const router = factory.mock.results.find((result) => result.type === "return")?.value;
     if (!router) throw new Error("Missing test router");
     await router.navigate({ to: "/inloggen" });
     await screen.findByRole("heading", { name: "Welkom terug" });
     await router.navigate({ to: "/wachtwoord-herstellen" });
     await screen.findByRole("alert");
     expect(screen.queryByRole("button", { name: "Wachtwoord opslaan" })).toBeNull();
+  } finally {
+    factory.mockRestore();
+  }
+});
+
+describe("background cookie revalidation", () => {
+  it("keeps the workspace mounted while an unchanged session is checked, and throttles focus", async () => {
+    setup("/", true, org.organizationId);
+    const navigation = await screen.findByRole("navigation", { name: "Hoofdnavigatie" });
+    let complete: ((response: Response) => void) | undefined;
+    intercept = (request) =>
+      request.url.endsWith("get-session")
+        ? new Promise<Response>((resolve) => {
+            complete = resolve;
+          })
+        : undefined;
+    const reads = requests.filter((r) => r.url.endsWith("get-session")).length;
+    fireEvent.focus(window);
+    await waitFor(() => expect(complete).toBeTruthy());
+    expect(screen.getByRole("navigation", { name: "Hoofdnavigatie" })).toBe(navigation);
+    expect(document.querySelector(".auth-shell")).toBeNull();
+    complete?.(
+      Response.json({
+        user: { emailVerified: true, name: "Robin Voorbeeld", email: "robin@example.test" },
+        session: {},
+      }),
+    );
+    await waitFor(() => expect(requests.filter((r) => r.url.endsWith("organizations")).length).toBeGreaterThan(1));
+    expect(screen.getByRole("navigation", { name: "Hoofdnavigatie" })).toBe(navigation);
+    fireEvent.focus(window);
+    fireEvent(document, new Event("visibilitychange"));
+    expect(requests.filter((r) => r.url.endsWith("get-session"))).toHaveLength(reads + 1);
+    fireEvent.online(window);
+    await waitFor(() => expect(requests.filter((r) => r.url.endsWith("get-session"))).toHaveLength(reads + 2));
+  });
+  it("expires when focus discovers sign-out in another tab", async () => {
+    setup("/", true, org.organizationId);
+    await screen.findByRole("navigation", { name: "Hoofdnavigatie" });
+    signedIn = false;
+    fireEvent.focus(window);
+    await screen.findByRole("heading", { name: "Welkom terug" });
+    expect(screen.queryByRole("navigation", { name: "Hoofdnavigatie" })).toBeNull();
+  });
+  it("resets when focus discovers a different active organization", async () => {
+    setup("/", true, org.organizationId);
+    await screen.findByRole("navigation", { name: "Hoofdnavigatie" });
+    const second = { ...org, organizationId: "33333333-3333-4333-8333-333333333333", name: "Tweede testbureau" };
+    organizations = [org, second];
+    active = second.organizationId;
+    fireEvent.focus(window);
+    await screen.findByRole("button", { name: "Switch organisatie: Tweede testbureau" });
+    expect(requests.filter((r) => r.url.endsWith("organizations")).length).toBeGreaterThanOrEqual(3);
+  });
+});
+
+it("keeps the first-paint auth shell and hero mounted through bootstrap and auth navigation", async () => {
+  const { container } = setup();
+  const shell = container.querySelector(".auth-shell");
+  const photo = container.querySelector(".auth-hero-photo img");
+  expect(shell).toBeTruthy();
+  expect(photo).toBeTruthy();
+  await screen.findByRole("heading", { name: "Welkom terug" });
+  expect(container.querySelector(".auth-shell")).toBe(shell);
+  await userEvent.click(screen.getByRole("link", { name: "Registreren" }));
+  await screen.findByRole("heading", { name: "Maak je account aan" });
+  expect(container.querySelector(".auth-shell")).toBe(shell);
+  expect(container.querySelector(".auth-hero-photo img")).toBe(photo);
+});
+
+it("shows delayed loading feedback and marks main busy during session bootstrap", async () => {
+  const session = Promise.withResolvers<Response>();
+  setup("/inloggen", false, null, (request) => (request.url.endsWith("get-session") ? session.promise : undefined));
+  expect(screen.getByRole("main").getAttribute("aria-busy")).toBe("true");
+  expect(screen.queryByRole("progressbar")).toBeNull();
+  await screen.findByRole("progressbar", { name: "Pagina laden" });
+  session.resolve(Response.json(null));
+  await screen.findByRole("form", { name: "Welkom terug" });
+  await waitFor(() => expect(screen.getByRole("main").getAttribute("aria-busy")).toBe("false"));
+  await waitFor(() => expect(screen.queryByRole("progressbar")).toBeNull());
+});
+
+it("shows the bar while a router beforeLoad is pending without rebuilding the auth shell", async () => {
+  const factory = vi.spyOn(routing, "createAppRouter");
+  try {
+    const { container } = setup();
+    await screen.findByRole("form", { name: "Welkom terug" });
+    const shell = container.querySelector(".auth-shell");
+    const router = factory.mock.results.find((result) => result.type === "return")?.value;
+    if (!router) throw new Error("Missing test router");
+    const session = Promise.withResolvers<void>();
+    router.routeTree.options.beforeLoad = async () => {
+      await session.promise;
+      return { session: { kind: "guest" as const } };
+    };
+    const navigating = router.navigate({ to: "/registreren" });
+    await screen.findByRole("progressbar", { name: "Pagina laden" });
+    expect(screen.getByRole("main").getAttribute("aria-busy")).toBe("true");
+    expect(container.querySelector(".auth-shell")).toBe(shell);
+    session.resolve();
+    await navigating;
+    await screen.findByRole("form", { name: "Maak je account aan" });
+    await waitFor(() => expect(screen.getByRole("main").getAttribute("aria-busy")).toBe("false"));
   } finally {
     factory.mockRestore();
   }
