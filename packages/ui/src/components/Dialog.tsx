@@ -4,6 +4,8 @@ import { cx } from "../classnames.ts";
 import { Button } from "./Button.tsx";
 import { focusable } from "./floating.ts";
 export interface DialogProps {
+  /** Always-visible, nonmodal gallery example without focus management. */
+  inline?: boolean;
   title: string;
   triggerLabel: string;
   closeLabel: string;
@@ -16,6 +18,7 @@ export interface DialogProps {
   role?: "dialog" | "alertdialog";
 }
 export function Dialog({
+  inline = false,
   title,
   triggerLabel,
   closeLabel,
@@ -31,6 +34,7 @@ export function Dialog({
   const trigger = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
   const close = () => {
+    if (inline) return;
     dialog.current?.close();
     setOpen(false);
     trigger.current?.focus();
@@ -45,22 +49,26 @@ export function Dialog({
   };
   return (
     <>
-      <Button
-        ref={trigger}
-        variant="secondary"
-        aria-haspopup="dialog"
-        aria-controls={id}
-        aria-expanded={open}
-        onClick={show}
-      >
-        {triggerLabel}
-      </Button>
+      {!inline && (
+        <Button
+          ref={trigger}
+          variant="secondary"
+          aria-haspopup="dialog"
+          aria-controls={id}
+          aria-expanded={open}
+          onClick={show}
+        >
+          {triggerLabel}
+        </Button>
+      )}
       <dialog
+        style={inline ? { position: "static", margin: 0, width: "100%", maxHeight: "none" } : undefined}
+        open={inline || undefined}
         ref={dialog}
         id={id}
         role={role}
         aria-labelledby={`${id}-title`}
-        aria-modal="true"
+        aria-modal={inline ? undefined : true}
         aria-describedby={role === "alertdialog" ? `${id}-body` : undefined}
         tabIndex={-1}
         className={cx("ts-dialog", `ts-dialog--${size}`, className)}
@@ -75,11 +83,7 @@ export function Dialog({
       >
         <header className="ts-dialog__header">
           <h2 id={`${id}-title`}>{title}</h2>
-          {role !== "alertdialog" && (
-            <Button variant="ghost" onClick={close}>
-              {closeLabel}
-            </Button>
-          )}
+          {role !== "alertdialog" && <Button variant="ghost" icon="close" aria-label={closeLabel} onClick={close} />}
         </header>
         <div id={`${id}-body`} className="ts-dialog__body">
           {typeof children === "function" ? children(close) : children}

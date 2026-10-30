@@ -8,9 +8,13 @@ import {
   FacetedFilter,
   Pagination,
   SearchInput,
+  Select,
   StatusPill,
   ViewSwitcher,
+  KanbanBoard,
 } from "@talentstroom/ui";
+import type { KanbanColumnData } from "@talentstroom/ui";
+import { createLabels } from "./Kanban.tsx";
 import type { DataColumn, DataTableSort } from "@talentstroom/ui";
 import { Section } from "../Section.tsx";
 import { useGallery } from "../context.ts";
@@ -40,6 +44,7 @@ export function Tables() {
     [selected, setSelected] = useState<string[]>([]),
     [page, setPage] = useState(1),
     [size, setSize] = useState(10);
+  const [density, setDensity] = useState<"comfortable" | "compact">("comfortable");
   const [sort, setSort] = useState<DataTableSort>({ id: "name", direction: "ascending" });
   const names = [
     tr("gallery.data.sam"),
@@ -98,7 +103,6 @@ export function Tables() {
     />
   );
   const columns: DataColumn<Candidate>[] = [
-    { id: "actions", label: tr("gallery.cards.more"), cell: renderActions },
     {
       id: "name",
       label: tr("gallery.tables.name"),
@@ -119,6 +123,7 @@ export function Tables() {
       cell: (r) => sources.find((o) => o.value === r.source)?.label,
     },
   ];
+  columns.push({ id: "actions", label: tr("gallery.cards.more"), cell: renderActions });
   const sortColumn = columns.find((c) => c.id === sort.id);
   const ordered = filtered.toSorted((a, b) => {
     const av = sortColumn?.sortValue?.(a) ?? "",
@@ -129,11 +134,23 @@ export function Tables() {
     shown = ordered.slice((currentPage - 1) * size, currentPage * size);
   const tableProps = {
     caption: tr("gallery.tables.candidates"),
+    density,
+    scrollLabel: tr("gallery.tables.scroll"),
     columns,
     rowKey: (r: Candidate) => r.id,
     emptyLabel: tr("gallery.tables.empty"),
     loadingLabel: tr("gallery.tables.loading"),
   };
+  const [moved, setMoved] = useState<Record<string, string>>({});
+  const pipelineTones = ["info", "warning", "success"] as const;
+  const pipelineColumns: KanbanColumnData[] = statuses.map((stage, index) => ({
+    id: stage.value,
+    title: stage.label,
+    tone: pipelineTones[index],
+    cards: shown
+      .filter((r) => (moved[r.id] ?? r.status) === stage.value)
+      .map((r) => ({ id: r.id, name: r.name, role: r.role, meta: r.source })),
+  }));
   const card = (r: Candidate) => (
     <Card key={r.id} title={r.name}>
       <div className="gallery-candidate-card">
@@ -195,6 +212,14 @@ export function Tables() {
                 emptyLabel={tr("gallery.filters.noOptions")}
               />
             ))}
+            <Select
+              label={tr("gallery.tables.density")}
+              value={density}
+              onChange={(event) => setDensity(event.target.value === "compact" ? "compact" : "comfortable")}
+            >
+              <option value="comfortable">{tr("gallery.tables.comfortable")}</option>
+              <option value="compact">{tr("gallery.tables.compact")}</option>
+            </Select>
             <ViewSwitcher
               label={tr("gallery.filters.view")}
               value={view}
@@ -230,14 +255,11 @@ export function Tables() {
               {shown.length === 0 && <p>{tr("gallery.tables.empty")}</p>}
             </div>
           ) : (
-            <div className="gallery-kanban">
-              {statuses.map((s) => (
-                <section key={s.value} aria-label={s.label}>
-                  <h3>{s.label}</h3>
-                  {shown.filter((r) => r.status === s.value).map(card)}
-                </section>
-              ))}
-            </div>
+            <KanbanBoard
+              columns={pipelineColumns}
+              labels={createLabels(locale)}
+              onMove={(move) => setMoved((previous) => ({ ...previous, [move.cardId]: move.toColumnId }))}
+            />
           )}
           <Pagination
             label={tr("gallery.tables.pagination")}

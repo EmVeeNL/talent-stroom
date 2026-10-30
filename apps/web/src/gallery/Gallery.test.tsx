@@ -41,3 +41,17 @@ describe("gallery URL theme override", () => {
     expect(screen.getByRole("radio", { name: "Systeem" })).toBeDefined();
   });
 });
+
+it("shows bounded overlay previews without interaction or taking focus", () => {
+  window.history.replaceState(null, "", "/?gallery#overlays");
+  render(<Gallery />);
+  expect(screen.getByRole("alertdialog", { name: "Kandidaat verwijderen?" }).getAttribute("aria-modal")).not.toBe(
+    "true",
+  );
+  expect(screen.getByRole("dialog", { name: "Kandidaatacties" })).toBeDefined();
+  expect(screen.getByRole("tooltip")).toBeDefined();
+  expect(screen.getByRole("listbox")).toBeDefined();
+  expect(screen.getByRole("grid", { name: "oktober 2026" })).toBeDefined();
+  expect(screen.getByPlaceholderText("Kies een opdrachtgever")).toBeDefined();
+  expect(document.activeElement).toBe(document.body);
+});

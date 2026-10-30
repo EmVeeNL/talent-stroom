@@ -5,14 +5,16 @@ import { useFloating, usePreview } from "./floating.ts";
 export interface TooltipProps {
   /** One focusable element; essential information must remain available without this preview. */
   children: ReactElement<HTMLAttributes<HTMLElement>>;
+  /** Always-visible in-flow gallery example. */
+  inline?: boolean;
   content: ReactNode;
   delay?: number;
   className?: string;
 }
-export function Tooltip({ children, content, delay = 300, className }: TooltipProps) {
+export function Tooltip({ children, content, delay = 300, className, inline = false }: TooltipProps) {
   const id = useId();
   const preview = usePreview(delay);
-  const { anchor, panel, position } = useFloating(preview.open);
+  const { anchor, panel, position } = useFloating(preview.open && !inline);
   return (
     <span
       ref={anchor}
@@ -26,15 +28,16 @@ export function Tooltip({ children, content, delay = 300, className }: TooltipPr
     >
       {cloneElement(children, {
         "aria-describedby":
-          [children.props["aria-describedby"], preview.open ? id : undefined].filter(Boolean).join(" ") || undefined,
+          [children.props["aria-describedby"], inline || preview.open ? id : undefined].filter(Boolean).join(" ") ||
+          undefined,
       })}
-      {preview.open && (
+      {(inline || preview.open) && (
         <div
           ref={panel}
           id={id}
           role="tooltip"
           className={cx("ts-tooltip", className)}
-          style={position}
+          style={inline ? { position: "static" } : position}
           onMouseEnter={preview.enter}
           onMouseLeave={preview.leave}
         >

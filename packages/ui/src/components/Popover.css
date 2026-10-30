@@ -5,7 +5,7 @@
   z-index: 30;
   box-sizing: border-box;
   max-width: calc(100vw - 16px);
-  max-height: calc(100vh - 16px);
+  max-height: calc(100dvh - 16px);
   overflow: auto;
   min-width: min(16rem, calc(100vw - 16px));
   padding: var(--ts-space-4);
@@ -13,6 +13,7 @@
   border-radius: var(--ts-radius-md);
   background: var(--ts-surface-raised);
   color: var(--ts-text);
+  font: var(--ts-font-body);
   box-shadow: var(--ts-shadow-popover);
 }
 .ts-popover:focus-visible {

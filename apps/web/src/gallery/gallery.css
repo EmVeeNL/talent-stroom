@@ -184,22 +184,6 @@
 .gallery-wide {
   width: 100%;
 }
-.gallery-kanban {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(15rem, 1fr));
-  gap: var(--ts-space-4);
-  overflow: auto;
-  padding: var(--ts-space-1);
-}
-.gallery-kanban section {
-  display: grid;
-  align-content: start;
-  gap: var(--ts-space-3);
-}
-.gallery-kanban h3 {
-  margin: 0;
-  font-size: var(--ts-font-size-md);
-}
 .gallery-brand {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
@@ -650,5 +634,85 @@
   }
   .gallery-auth-shell .auth-panel {
     min-height: 44rem;
+
+/* Kanban page: the board fills the row; the list preview is capped to a phone-like width. */
+.gallery-pipeline {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+.gallery-pipeline--narrow {
+  flex: 0 1 390px;
+  max-width: 100%;
+}
+.gallery-feedback-board {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ts-space-6);
+  width: 100%;
+}
+.gallery-picker-board {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ts-space-6);
+  width: 100%;
+  align-items: end;
+}
+.gallery-picker-board .ts-preview-anchor {
+  display: flex;
+}
+.gallery-skeleton-examples > div {
+  min-width: 0;
+}
+@media (max-width: 767px) {
+  .gallery-feedback-board,
+  .gallery-picker-board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* In-flow, always-open examples share the production components and theme tokens. */
+.gallery-overlay-board {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ts-space-6);
+  width: 100%;
+}
+.gallery-overlay-preview {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  padding: var(--ts-space-4);
+  gap: var(--ts-space-5);
+  border: var(--ts-border-width) solid var(--ts-border);
+  border-radius: var(--ts-radius-lg);
+  background: var(--ts-surface);
+}
+.gallery-overlay-preview .ts-preview-anchor {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: var(--ts-space-3);
+  min-width: 0;
+}
+.gallery-overlay-preview .ts-popover,
+.gallery-overlay-preview .ts-field,
+.gallery-overlay-preview .ts-date-range {
+  width: 100%;
+  min-width: 0;
+}
+.gallery-overlay-preview .ts-popover {
+  display: grid;
+  gap: var(--ts-space-4);
+  max-height: none;
+}
+.gallery-overlay-preview .ts-tooltip {
+  max-width: 100%;
+}
+.gallery-overlay-preview .ts-combobox__popup {
+  box-sizing: border-box;
+}
+@media (max-width: 767px) {
+  .gallery-overlay-board {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

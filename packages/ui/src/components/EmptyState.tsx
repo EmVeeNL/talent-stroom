@@ -8,18 +8,20 @@ export interface EmptyStateProps {
   title: string;
   body: string;
   action?: ReactNode;
+  /** Dense variant for use inside a column or panel. */
+  compact?: boolean;
 }
-export function EmptyState({ variant = "no-records", icon, title, body, action }: EmptyStateProps) {
+export function EmptyState({ variant = "no-records", icon, title, body, action, compact = false }: EmptyStateProps) {
   const id = useId();
   return (
     <section
-      className={`ts-empty-state ts-empty-state--${variant}`}
+      className={`ts-empty-state ts-empty-state--${variant}${compact ? " ts-empty-state--compact" : ""}`}
       role={variant === "error" ? "alert" : undefined}
       aria-labelledby={id}
     >
       <span className="ts-empty-state__icon">
         <Icon
-          size={32}
+          size={compact ? 24 : 32}
           name={icon ?? (variant === "error" ? "error" : variant === "no-results" ? "person_search" : "group_add")}
         />
       </span>
