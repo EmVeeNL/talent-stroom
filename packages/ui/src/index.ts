@@ -1,6 +1,7 @@
 export { ICON_NAMES } from "./icons.ts";
 export type { IconName } from "./icons.ts";
 export * from "./tokens.ts";
+export * from "./motion/index.ts";
 export { contrastRatio } from "./contrast.ts";
 export { Badge, StatusPill } from "./components/Badge.tsx";
 export { StageBadge } from "./components/Badge.tsx";

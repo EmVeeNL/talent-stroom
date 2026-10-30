@@ -287,3 +287,30 @@ permits browser launch.** Expected capture paths are
 capture targets, not existing artifacts. Also verify an open dialog/calendar,
 scrolled row actions, 200% zoom and Firefox/WebKit. No authentication, encryption,
 tenant scope, migrations, CI/CD or data storage code changes are included.
+
+## Motion foundation
+
+Import the motion foundation from the public `@talentstroom/ui` entry point. `MotionProvider`
+wraps the app once; it loads Motion's `domAnimation` feature bundle asynchronously. Use the
+`m`, `AnimatePresence` and `motionPresets` / `getMotionPreset` exports from the same package
+for animated UI. Pages must not import `motion/react` directly. Use `MotionLayout` only around
+Kanban or a reorderable-list route that needs layout animation; it loads `domMax` asynchronously
+and keeps that feature bundle out of ordinary routes.
+
+Choose `fade` for content replacement when direction is not meaningful, a directional slide
+for short popovers and toasts, `scaleIn` for compact surfaces, and `collapse` / `expand` for
+disclosure. `listItem` is for enter/exit in keyed collections. Keep movement small and input
+available throughout; state and focus changes happen immediately. The Beweging example in
+Elementen › Geavanceerd demonstrates every preset and the reduced-motion override.
+
+Use `motionDurations.fast` (120 ms) for control feedback, `base` (200 ms) for menus and
+notifications, and `slow` (320 ms) for larger surfaces and layout. Tooltip delay is 500 ms.
+Standard, emphasised and exit easings are exported in `motionEasings`; the `springs.snappy`
+preset is for settling drag or swipe interactions. CSS token values remain mirrored by
+`tokens.ts` and checked by the token sync test.
+
+`MotionProvider` respects `prefers-reduced-motion`; setting `data-motion="reduce"` on `<html>`
+forces the same policy. Use `useReducedMotion` and `getMotionPreset(name, true)` for custom
+animation decisions. Reduced motion removes translate, scale and layout changes, with only a
+brief opacity fade where it helps continuity. Tests set `MotionGlobalConfig.skipAnimations`,
+and the Playwright harness continues to emulate reduced motion and disable animations.

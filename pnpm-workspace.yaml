@@ -9,6 +9,7 @@ catalog:
   "@tanstack/react-query-devtools": 5.104.5
   "@tanstack/react-router": 1.170.46
   "@tanstack/react-table": 9.3.1
+  motion: 14.6.0
   "@better-auth/core": 1.7.12
   # TypeScript 7 (native compiler) builds and typechecks; see docs/adr/0003-typescript-7-toolchain.md
   typescript: 7.0.2
