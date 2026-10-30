@@ -8,6 +8,7 @@ import {
   FacetedFilter,
   Pagination,
   SearchInput,
+  Select,
   StatusPill,
   ViewSwitcher,
   KanbanBoard,
@@ -43,6 +44,7 @@ export function Tables() {
     [selected, setSelected] = useState<string[]>([]),
     [page, setPage] = useState(1),
     [size, setSize] = useState(10);
+  const [density, setDensity] = useState<"comfortable" | "compact">("comfortable");
   const [sort, setSort] = useState<DataTableSort>({ id: "name", direction: "ascending" });
   const names = [
     tr("gallery.data.sam"),
@@ -101,7 +103,6 @@ export function Tables() {
     />
   );
   const columns: DataColumn<Candidate>[] = [
-    { id: "actions", label: tr("gallery.cards.more"), cell: renderActions },
     {
       id: "name",
       label: tr("gallery.tables.name"),
@@ -122,6 +123,7 @@ export function Tables() {
       cell: (r) => sources.find((o) => o.value === r.source)?.label,
     },
   ];
+  columns.push({ id: "actions", label: tr("gallery.cards.more"), cell: renderActions });
   const sortColumn = columns.find((c) => c.id === sort.id);
   const ordered = filtered.toSorted((a, b) => {
     const av = sortColumn?.sortValue?.(a) ?? "",
@@ -132,6 +134,8 @@ export function Tables() {
     shown = ordered.slice((currentPage - 1) * size, currentPage * size);
   const tableProps = {
     caption: tr("gallery.tables.candidates"),
+    density,
+    scrollLabel: tr("gallery.tables.scroll"),
     columns,
     rowKey: (r: Candidate) => r.id,
     emptyLabel: tr("gallery.tables.empty"),
@@ -208,6 +212,14 @@ export function Tables() {
                 emptyLabel={tr("gallery.filters.noOptions")}
               />
             ))}
+            <Select
+              label={tr("gallery.tables.density")}
+              value={density}
+              onChange={(event) => setDensity(event.target.value === "compact" ? "compact" : "comfortable")}
+            >
+              <option value="comfortable">{tr("gallery.tables.comfortable")}</option>
+              <option value="compact">{tr("gallery.tables.compact")}</option>
+            </Select>
             <ViewSwitcher
               label={tr("gallery.filters.view")}
               value={view}

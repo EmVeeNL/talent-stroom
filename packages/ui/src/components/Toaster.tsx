@@ -4,7 +4,9 @@ import type { FeedbackTone } from "./AlertBanner.tsx";
 import { Toast } from "./Toast.tsx";
 export interface ToastNotification {
   message: ReactNode;
-  tone?: FeedbackTone;
+  tone?: FeedbackTone | "error";
+  title?: string;
+  action?: ReactNode;
   duration?: number;
 }
 interface ToastContextValue {
@@ -41,6 +43,8 @@ export function Toaster({ children, label, closeLabel, maxVisible = 3 }: Toaster
           <Toast
             key={item.id}
             tone={item.tone ?? "info"}
+            {...(item.title ? { title: item.title } : {})}
+            action={item.action}
             duration={item.duration ?? 6000}
             closeLabel={closeLabel}
             onDismiss={() => dismiss(item.id)}

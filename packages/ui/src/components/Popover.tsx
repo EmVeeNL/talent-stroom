@@ -3,6 +3,8 @@ import type { ButtonHTMLAttributes, ReactElement, ReactNode } from "react";
 import { cx } from "../classnames.ts";
 import { focusable, useFloating } from "./floating.ts";
 export interface PopoverProps {
+  /** Always-visible in-flow gallery example; does not capture focus. */
+  inline?: boolean;
   trigger: ReactElement<ButtonHTMLAttributes<HTMLButtonElement>>;
   label: string;
   children: ReactNode;
@@ -10,12 +12,12 @@ export interface PopoverProps {
   /** Selector inside the panel to focus on opening; defaults to the first control. */
   initialFocus?: string;
 }
-export function Popover({ trigger, label, children, className, initialFocus }: PopoverProps) {
+export function Popover({ trigger, label, children, className, initialFocus, inline = false }: PopoverProps) {
   const id = useId();
   const [open, setOpen] = useState(false);
-  const { anchor, panel, position } = useFloating(open);
+  const { anchor, panel, position } = useFloating(open && !inline);
   useEffect(() => {
-    if (!open) return undefined;
+    if (!open || inline) return undefined;
     const node = panel.current;
     node?.showPopover?.();
     (node?.querySelector<HTMLElement>(initialFocus ?? focusable) ?? node)?.focus();
@@ -41,11 +43,11 @@ export function Popover({ trigger, label, children, className, initialFocus }: P
       document.removeEventListener("keydown", key);
       document.removeEventListener("click", outside);
     };
-  }, [open, anchor, panel, initialFocus]);
+  }, [open, anchor, panel, initialFocus, inline]);
   return (
     <span ref={anchor} className="ts-preview-anchor">
       {cloneElement(trigger, {
-        "aria-expanded": open,
+        "aria-expanded": inline || open,
         "aria-controls": id,
         "aria-haspopup": "dialog",
         onClick: (event) => {
@@ -53,16 +55,20 @@ export function Popover({ trigger, label, children, className, initialFocus }: P
           if (!event.defaultPrevented) setOpen(!open);
         },
       })}
-      {open && (
+      {(inline || open) && (
         <div
           ref={panel}
           id={id}
-          popover={typeof HTMLElement !== "undefined" && "showPopover" in HTMLElement.prototype ? "manual" : undefined}
+          popover={
+            !inline && typeof HTMLElement !== "undefined" && "showPopover" in HTMLElement.prototype
+              ? "manual"
+              : undefined
+          }
           role="dialog"
           aria-label={label}
           tabIndex={-1}
           className={cx("ts-popover", className)}
-          style={position}
+          style={inline ? { position: "static" } : position}
         >
           {children}
         </div>

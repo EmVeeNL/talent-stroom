@@ -216,3 +216,64 @@ Visual review artifacts (Chrome, light/dark, desktop/mobile):
 
 Owner visual approval remains a review step. Browser interaction and screenshots
 were checked in Chrome; Firefox and WebKit review remains follow-up work.
+
+### Tables, overlays and feedback (issue #379)
+
+- `DataTable density="comfortable"` (default) uses 64px body rows; `compact`
+  uses 48px rows. Headers are 48px and use the muted surface and 14/20 type.
+  These are minimum heights: wrapped/custom content may expand a row. Checkbox,
+  sort and row-menu targets remain 44px in both densities. Existing sorting,
+  indeterminate page selection and selection across pages are unchanged.
+- At 390px the table remains a native table in a focusable horizontal scroll
+  region. Supply localized `scrollLabel` (shown below 768px and connected with
+  `aria-describedby`). The gallery does so in every table state. The instruction includes
+  directional icons; arrow keys scroll the focused region. Keeping all
+  columns avoids hiding status and actions behind a second disclosure model.
+  Every row of the current page is visible without an internal vertical scroll
+  box; empty messages wrap below the horizontal scroll region.
+  Render existing `StatusPill`/`Badge` and `ContextMenu` in column cells; the tables
+  gallery places actions at the trailing edge and demonstrates both densities.
+- Pagination retains page numbers, gaps, previous/next and native page size
+  selection, with 44px page buttons and a tinted current page.
+- Dialog/AlertDialog/Sheet keep native focus trapping, cancellation and focus
+  return. Modal radius is 20px, spacing 24px (16px mobile), elevated semantic
+  surface and modal shadow. Destructive confirmation stays danger red, rather
+  than the older board's blue. Popover uses 10px radius/elevated surface; Tooltip
+  keeps navy ink with readable light text in both themes. ADR 0013 contrast
+  corrections take precedence over decorative mockup strokes and fills.
+- `Toast` adds optional `title`, `action` and `tone="error"` (alias for `danger`).
+  `Toaster.toast` accepts the same additions. Existing `children`/`message` APIs,
+  queue behavior, duration and hover/focus pause logic are unchanged. The kit's
+  neutral subtle surface, semantic border/icon, and icon close are used; border
+  and meaningful icons use accessible `-text` colors. The feedback gallery shows
+  all four tones with `duration={0}` and working dismiss/restore/retry controls.
+- `Skeleton variant="table" | "card" | "profile"` adds decorative presets while
+  preserving `shape` and `lines`. Parent regions own `aria-busy` and completion.
+- `DatePicker` shares `DateRangePicker`'s calendar and popover implementation:
+  default Dutch locale, Monday first, arrows by day/week, Home/End by week,
+  PageUp/PageDown by month (Shift by year), clamped month ends, today shortcut,
+  selection closes and returns focus. Labels are supplied through i18n.
+  Single-date fields place the label above the trigger and show only the hint
+  or localized long date inside it. Searchable `Combobox` accepts a localized
+  `placeholder` and retains its existing single/multiple keyboard behavior.
+- The overlays gallery includes always-visible bounded examples alongside its
+  interactive triggers. `Dialog`/`AlertDialog`, `Popover`, `Tooltip` and the date
+  pickers accept `inline` for these examples (no modal/floating focus handling).
+  `Combobox previewQuery` keeps a filtered list visible in flow. The gallery
+  calendar uses 30 October 2026 for deterministic captures. Avatar initials
+  explicitly use the UI font, including image-error fallbacks.
+- No new dependencies or animation are introduced. Previous toast/sheet entry
+  animations and skeleton shimmer are removed pending #397/#398; stable keys and
+  floating-panel mount/unmount remain available for that work.
+
+Verification URLs: `/?gallery&theme=light#tables`, `#overlays`, `#feedback` and
+`theme=dark`. Target capture matrix: both themes at 1440×1000 and 390×1000.
+Chrome and bundled Chromium were attempted on port 5181 in this worktree, but
+macOS denied Mach-port registration (`bootstrap_check_in … Permission denied`).
+No connected browser was available as a fallback. **No final screenshots were
+produced; visual comparison and owner approval remain required on a host that
+permits browser launch.** Expected capture paths are
+`/tmp/rd-tables-{tables,overlays,feedback}-{light,dark}-{1440,390}.png`; these are
+capture targets, not existing artifacts. Also verify an open dialog/calendar,
+scrolled row actions, 200% zoom and Firefox/WebKit. No authentication, encryption,
+tenant scope, migrations, CI/CD or data storage code changes are included.

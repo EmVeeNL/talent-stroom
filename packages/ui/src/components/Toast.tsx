@@ -7,12 +7,15 @@ import { feedbackIcons } from "./AlertBanner.tsx";
 import type { FeedbackTone } from "./AlertBanner.tsx";
 export interface ToastProps {
   children: ReactNode;
-  tone?: FeedbackTone;
+  tone?: FeedbackTone | "error";
+  title?: string;
+  action?: ReactNode;
   closeLabel: string;
   onDismiss: () => void;
   duration?: number;
 }
-export function Toast({ children, tone = "info", closeLabel, onDismiss, duration = 6000 }: ToastProps) {
+export function Toast({ children, tone = "info", title, action, closeLabel, onDismiss, duration = 6000 }: ToastProps) {
+  const feedbackTone = tone === "error" ? "danger" : tone;
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const remaining = useRef(duration);
@@ -31,7 +34,7 @@ export function Toast({ children, tone = "info", closeLabel, onDismiss, duration
   }, [hovered, focused, duration]);
   return (
     <div
-      className={cx("ts-toast", `ts-toast--${tone}`)}
+      className={cx("ts-toast", `ts-toast--${feedbackTone}`)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setFocused(true)}
@@ -39,13 +42,15 @@ export function Toast({ children, tone = "info", closeLabel, onDismiss, duration
         if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false);
       }}
     >
-      <div role={tone === "danger" ? "alert" : "status"} aria-atomic="true" className="ts-toast__message">
-        <Icon name={feedbackIcons[tone]} />
-        {children}
+      <div role={feedbackTone === "danger" ? "alert" : "status"} aria-atomic="true" className="ts-toast__message">
+        <Icon name={feedbackIcons[feedbackTone]} />
+        <div className="ts-toast__content">
+          {title && <strong>{title}</strong>}
+          <div>{children}</div>
+        </div>
       </div>
-      <Button variant="ghost" onClick={onDismiss}>
-        {closeLabel}
-      </Button>
+      {action && <div className="ts-toast__action">{action}</div>}
+      <Button variant="ghost" icon="close" aria-label={closeLabel} onClick={onDismiss} />
     </div>
   );
 }

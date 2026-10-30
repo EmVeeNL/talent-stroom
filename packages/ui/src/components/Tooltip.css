@@ -3,12 +3,14 @@
 }
 .ts-tooltip {
   position: fixed;
+  box-sizing: border-box;
   z-index: 30;
   max-width: min(24rem, calc(100vw - 16px));
   padding: var(--ts-space-2) var(--ts-space-3);
-  background: var(--ts-text);
-  color: var(--ts-surface);
+  background: var(--ts-sidebar-bg);
+  color: var(--ts-sidebar-text);
   border-radius: var(--ts-radius-sm);
-  font-size: var(--ts-font-size-sm);
+  font: var(--ts-font-compact);
+  border: 1px solid var(--ts-border);
   box-shadow: var(--ts-shadow-popover);
 }
