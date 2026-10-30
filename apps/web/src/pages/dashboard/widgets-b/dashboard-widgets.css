@@ -1,0 +1,218 @@
+.demo-b-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.demo-b-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+.demo-b-panel {
+  min-width: 0;
+}
+.demo-b-panel .ts-card__body {
+  padding: var(--ts-space-4) var(--ts-space-5) var(--ts-space-5);
+}
+.demo-b-deals-bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+.demo-b-deals-bottom > * {
+  min-width: 0;
+}
+.demo-b-table th:nth-child(4),
+.demo-b-table td:nth-child(4) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.demo-b-calendar td {
+  color: var(--ts-text);
+  font-weight: 600;
+}
+.demo-b-calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 12px;
+  color: var(--ts-text-muted);
+  font-size: var(--ts-font-size-sm);
+}
+.demo-b-calendar-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.demo-b-calendar-legend i {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+.demo-b-calendar-legend [data-level="1"] {
+  background: color-mix(in srgb, var(--ts-success) 20%, var(--ts-surface));
+}
+.demo-b-calendar-legend [data-level="2"] {
+  background: color-mix(in srgb, var(--ts-success) 44%, var(--ts-surface));
+}
+.demo-b-calendar-legend [data-level="3"] {
+  background: color-mix(in srgb, var(--ts-success) 70%, var(--ts-surface));
+}
+.demo-b-panel--wide {
+  grid-column: 1/-1;
+}
+.demo-b-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+.demo-b-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+  line-height: 20px;
+}
+.demo-b-table th,
+.demo-b-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ts-border, var(--ts-line));
+  white-space: nowrap;
+}
+.demo-b-table th {
+  font-weight: 600;
+  color: var(--ts-text-muted);
+}
+.demo-b-table tr:last-child td {
+  border-bottom: 0;
+}
+.demo-b-table__amount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.demo-b-table-wrap:focus-visible {
+  outline: 2px solid var(--ts-primary);
+  outline-offset: 2px;
+}
+.demo-b-progress {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: var(--ts-surface-subtle);
+}
+.demo-b-progress span {
+  display: block;
+  height: 100%;
+  background: var(--ts-primary);
+  border-radius: inherit;
+}
+.demo-b-funnel {
+  display: grid;
+  gap: 12px;
+}
+.demo-b-funnel-row {
+  display: grid;
+  grid-template-columns: minmax(90px, 1fr) 2fr 42px;
+  align-items: center;
+  gap: 12px;
+}
+.demo-b-funnel-row strong {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.demo-b-actions {
+  display: flex;
+  gap: 8px;
+}
+.demo-b-calendar {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 4px;
+  text-align: center;
+  font-size: 13px;
+}
+.demo-b-calendar-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+.demo-b-calendar {
+  min-width: 640px;
+}
+.demo-b-calendar th,
+.demo-b-calendar td {
+  padding: 8px 4px;
+  border-radius: 6px;
+}
+.demo-b-calendar td[data-level="1"] {
+  background: color-mix(in srgb, var(--ts-success) 20%, var(--ts-surface));
+}
+.demo-b-calendar td[data-level="2"] {
+  background: color-mix(in srgb, var(--ts-success) 44%, var(--ts-surface));
+}
+.demo-b-calendar td[data-level="3"] {
+  background: color-mix(in srgb, var(--ts-success) 70%, var(--ts-surface));
+  color: var(--ts-text);
+}
+.demo-b-run {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.demo-b-run strong {
+  font-size: 20px;
+}
+.demo-b-muted {
+  color: var(--ts-text-muted);
+}
+.demo-b-panel .ts-chart__svg {
+  min-height: 260px;
+}
+.demo-b-panel .ts-chart__data {
+  margin-top: 8px;
+}
+.demo-b-panel .ts-chart__data summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px 4px;
+  color: var(--ts-text-muted);
+  font-size: var(--ts-font-size-xs);
+}
+.demo-b-panel .ts-chart__data summary::marker {
+  color: var(--ts-text-muted);
+}
+@media (max-width: 1199px) {
+  .demo-b-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 599px) {
+  .demo-b-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .demo-b-kpis {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .demo-b-panel--wide {
+    grid-column: auto;
+  }
+  .demo-b-deals-bottom {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .demo-b-table {
+    min-width: 560px;
+  }
+  .demo-b-funnel-row {
+    grid-template-columns: 82px 1fr 38px;
+    gap: 8px;
+  }
+}
