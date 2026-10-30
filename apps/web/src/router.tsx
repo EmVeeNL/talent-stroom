@@ -32,7 +32,7 @@ export interface AppView {
   session: SessionContext;
   locale: Locale;
   authProps: (path: string) => AuthScreenProps;
-  renderFrame: (path: string, children: ReactNode) => ReactNode;
+  renderCard: (path: string, children: ReactNode) => ReactNode;
 }
 declare module "@tanstack/react-router" {
   interface StaticDataRouteOption {
@@ -84,33 +84,25 @@ function PageFocus() {
 }
 function SessionPending() {
   const context = useView();
-  const path = useRouterState({ select: (state) => state.location.pathname });
-  return context.session.kind === "loading" || context.session.kind === "error" ? (
-    context.renderFrame(path, null)
-  ) : (
-    <Pending />
-  );
+  return context.session.kind === "loading" || context.session.kind === "error" ? null : <Pending />;
 }
 function Root() {
   const context = useView();
-  const path = useRouterState({ select: (state) => state.location.pathname });
-  if (context.session.kind === "loading" || context.session.kind === "error") return context.renderFrame(path, null);
+  if (context.session.kind === "loading" || context.session.kind === "error") return null;
   return <Outlet />;
 }
 function Layout() {
   const context = useView();
   const path = useRouterState({ select: (state) => state.location.pathname });
-  return <Suspense fallback={<Pending />}>{context.renderFrame(path, <Outlet />)}</Suspense>;
+  return <Suspense fallback={<Pending />}>{context.renderCard(path, <Outlet />)}</Suspense>;
 }
 function NotFound() {
   const context = useView();
-  const path = useRouterState({ select: (state) => state.location.pathname });
-  return context.renderFrame(
-    path,
+  return (
     <Suspense fallback={<Pending />}>
       <LazyNotFound locale={context.locale} />
       <PageFocus />
-    </Suspense>,
+    </Suspense>
   );
 }
 function RouteError({ reset }: ErrorComponentProps) {
@@ -122,6 +114,9 @@ export function createAppRouter({
   demoAuthEnabled = true,
   queryClient,
 }: { history?: RouterHistory; demoEnabled?: boolean; demoAuthEnabled?: boolean; queryClient?: QueryClient } = {}) {
+  // Start the public auth chunks alongside session bootstrap, rather than after the guard resolves.
+  void import("./pages/auth/Login.tsx").catch(() => undefined);
+  void import("./pages/auth/Register.tsx").catch(() => undefined);
   const root = createRootRouteWithContext<RouterContext>()({
     validateSearch: validateRouteSearch,
     errorComponent: RouteError,
@@ -227,7 +222,12 @@ export function createAppRouter({
       wrapInSuspense: false,
       staticData: { titleKey: authRouteTitles[path] ?? "auth.home", layout: "auth", access: "public" },
       component: function AuthPage() {
-        return <Page {...useView().authProps(path)} />;
+        return (
+          <>
+            <Page {...useView().authProps(path)} />
+            <PageFocus />
+          </>
+        );
       },
     });
   }

@@ -150,27 +150,6 @@
   background: color-mix(in srgb, var(--ts-surface) 55%, transparent);
 }
 
-.ts-kanban__icon-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  inline-size: 32px;
-  block-size: 32px;
-  flex: none;
-  border: 0;
-  border-radius: var(--ts-radius-sm);
-  background: transparent;
-  color: var(--ts-kanban-ink);
-  cursor: pointer;
-}
-.ts-kanban__icon-button:hover {
-  background: color-mix(in srgb, var(--ts-surface) 55%, transparent);
-}
-.ts-kanban__icon-button:focus-visible {
-  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
-  outline-offset: 0;
-}
-
 /* Collapsed board column: a narrow strip with a vertical title. */
 .ts-kanban--board .ts-kanban__column[data-collapsed] .ts-kanban__header {
   flex: 1;
@@ -185,10 +164,6 @@
 }
 .ts-kanban--board .ts-kanban__column[data-collapsed] .ts-kanban__count {
   order: 2;
-  margin: 0;
-}
-.ts-kanban--board .ts-kanban__column[data-collapsed] .ts-kanban__toggle {
-  order: 1;
   margin: 0;
 }
 
@@ -324,8 +299,23 @@
 }
 
 @media (pointer: coarse) {
-  .ts-kanban__icon-button {
-    inline-size: 44px;
-    block-size: 44px;
+  .ts-kanban__header .ts-context-menu-anchor > .ts-button {
+    min-width: 44px;
+    min-height: 44px;
   }
+}
+
+.ts-kanban__expand {
+  width: 100%;
+  border: 0;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.ts-kanban__expand:hover {
+  background: color-mix(in srgb, var(--ts-kanban-tint) 80%, var(--ts-surface));
+}
+.ts-kanban__expand:focus-visible {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: calc(-1 * var(--ts-focus-ring-offset));
 }

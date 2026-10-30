@@ -67,12 +67,14 @@ describe("KanbanBoard rendering", () => {
 
   it("collapses and expands a column, keeping the toggle accessible", () => {
     setup();
-    const toggle = screen.getByRole("button", { name: "Nieuw inklappen" });
-    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    const toggle = screen.getByRole("button", { name: "Acties voor Nieuw" });
     fireEvent.click(toggle);
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    fireEvent.click(screen.getByRole("menuitem", { name: "Nieuw inklappen" }));
     expect(screen.queryByText("Sanne Willems")).toBeNull();
     const expand = screen.getByRole("button", { name: "Nieuw uitklappen" });
     expect(expand.getAttribute("aria-expanded")).toBe("false");
+    expect(document.activeElement).toBe(expand);
     expect(screen.getByRole("region", { name: "Nieuw" }).hasAttribute("data-collapsed")).toBe(true);
     fireEvent.click(expand);
     expect(screen.getByText("Sanne Willems")).toBeTruthy();
@@ -278,4 +280,14 @@ describe("moveKanbanCard", () => {
       columns,
     );
   });
+});
+
+it("offers collapse, add and caller actions from the column menu using the keyboard", () => {
+  const onAddCard = vi.fn<(columnId: string) => void>();
+  setup({ onAddCard });
+  const trigger = screen.getByRole("button", { name: "Acties voor Nieuw" });
+  fireEvent.keyDown(trigger, { key: "ArrowDown" });
+  expect(screen.getByRole("menuitem", { name: "Nieuw inklappen" })).toBeTruthy();
+  fireEvent.click(screen.getByRole("menuitem", { name: "Kandidaat toevoegen" }));
+  expect(onAddCard).toHaveBeenCalledWith("nieuw");
 });

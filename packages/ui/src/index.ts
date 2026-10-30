@@ -188,3 +188,5 @@ export { DatePicker } from "./components/DatePicker.tsx";
 export type { DatePickerProps } from "./components/DatePicker.tsx";
 
 export { NavigationLinkContext } from "./components/NavigationLink.tsx";
+
+export { TopLoadingBar } from "./components/TopLoadingBar.tsx";
