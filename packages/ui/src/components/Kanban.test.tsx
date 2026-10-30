@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { axeViolations } from "../test-utils.ts";
@@ -290,4 +291,40 @@ it("offers collapse, add and caller actions from the column menu using the keybo
   expect(screen.getByRole("menuitem", { name: "Nieuw inklappen" })).toBeTruthy();
   fireEvent.click(screen.getByRole("menuitem", { name: "Kandidaat toevoegen" }));
   expect(onAddCard).toHaveBeenCalledWith("nieuw");
+});
+
+function Board() {
+  const [value, setValue] = useState(columns);
+  return (
+    <KanbanBoard
+      columns={value}
+      labels={labels}
+      onMove={(move) => setValue(moveKanbanCard(value, move))}
+      view="board"
+    />
+  );
+}
+describe("Kanban motion accessibility", () => {
+  it("keeps focus and announcements immediate when reduced motion moves a card between columns", () => {
+    document.documentElement.dataset["motion"] = "reduce";
+    const { container } = render(<Board />);
+    const first = card("Sanne Willems");
+    first.focus();
+    fireEvent.keyDown(first, { key: " " });
+    fireEvent.keyDown(first, { key: "ArrowRight" });
+    expect(document.activeElement).toBe(card("Sanne Willems"));
+    expect(status()).toContain("in Gesprek");
+    fireEvent.keyDown(card("Sanne Willems"), { key: " " });
+    expect(document.activeElement).toBe(card("Sanne Willems"));
+    expect(status()).toContain("verplaatst naar Gesprek");
+    for (const node of container.querySelectorAll<HTMLElement>(
+      ".ts-kanban__column, .ts-kanban__item, .ts-kanban-card",
+    )) {
+      expect(node.style.transform).toBe("");
+    }
+    // Collapsing moved into the column's action menu (#442); focus lands on the expand strip.
+    fireEvent.keyDown(screen.getByRole("button", { name: "Acties voor Nieuw" }), { key: "ArrowDown" });
+    fireEvent.click(screen.getByRole("menuitem", { name: "Nieuw inklappen" }));
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Nieuw uitklappen" }));
+  });
 });

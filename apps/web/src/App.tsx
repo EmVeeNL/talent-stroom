@@ -4,6 +4,9 @@ import type { Locale, MessageKey } from "@talentstroom/i18n";
 import {
   TopLoadingBar,
   Button,
+  m,
+  getMotionPreset,
+  useReducedMotion,
   Icon,
   Logo,
   Select,
@@ -39,7 +42,7 @@ const OrganizationPicker = lazy(() =>
 
 // Dev-only component showcase: ?gallery. Tree-shaken from production builds.
 const ComponentGallery = import.meta.env.DEV
-  ? lazy(() => import("./gallery/Gallery.tsx").then((m) => ({ default: m.Gallery })))
+  ? lazy(() => import("./gallery/Gallery.tsx").then((module) => ({ default: module.Gallery })))
   : null;
 
 function AuthThemeButton({ label, labels }: { label: string; labels: Record<"system" | "light" | "dark", string> }) {
@@ -358,6 +361,7 @@ function AuthApp() {
         onExpired={expire}
       />
     ) : null;
+  const reducedMotion = useReducedMotion();
   return (
     <QueryProvider layer={layer} synthetic={!!harness}>
       <ViewContext value={routerContext}>
@@ -376,7 +380,12 @@ function AuthApp() {
                   : renderFrame(currentPath, children, pending)
               }
             >
-              <div>
+              {/* AppFrame hides scoped content during the switch barrier; the new organization fades in. */}
+              <m.div
+                initial={false}
+                animate={{ opacity: transitioning ? 0 : 1 }}
+                transition={getMotionPreset("fade", reducedMotion).transition}
+              >
                 {router && (
                   <RouterProvider
                     router={router}
@@ -388,7 +397,7 @@ function AuthApp() {
                     }}
                   />
                 )}
-              </div>
+              </m.div>
             </AppFrame>
           </RouterContextProvider>
         </NavigationLinkContext>

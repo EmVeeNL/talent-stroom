@@ -314,3 +314,24 @@ forces the same policy. Use `useReducedMotion` and `getMotionPreset(name, true)`
 animation decisions. Reduced motion removes translate, scale and layout changes, with only a
 brief opacity fade where it helps continuity. Tests set `MotionGlobalConfig.skipAnimations`,
 and the Playwright harness continues to emulate reduced motion and disable animations.
+
+Dashboard content uses `MotionContent` keyed by organization and route. It animates only the
+incoming content and never retains an outgoing route. The Query barrier keeps the router tree
+`hidden` and `inert` immediately during organization changes; only a neutral loading message
+fades during the barrier, followed by the new organization's content. Never wrap scoped content
+in exit presence across that barrier.
+
+`MotionCollection` and keyed `MotionListItem` / `MotionTableRow` preserve native list/table markup,
+skip initial-load animation, and animate later insertions, removals and position changes. Exiting
+items become inert and hidden from assistive technology immediately. Keep the collection mounted
+when it becomes empty so its last exit can finish. Use `reorder={false}` for collections whose
+positions never change, avoiding the lazy `domMax` bundle there. List entrances and layout moves
+use bounded token tweens (320 ms), with shorter exits, rather than an unbounded settling spring.
+Reduced motion disables FLIP and translation entirely.
+
+Kanban uses board-local shared card positions for pointer, keyboard and menu moves, an opacity
+entrance for the drop placeholder, and transform layout animation for column collapse/expand.
+Disclosure removes its body immediately, leaving toggle focus and keyboard announcements intact.
+The auth photo and other auth-layout surfaces have no route transition. Vitest uses the public
+`MotionGlobalConfig.skipAnimations` export; visual review remains the reduced-motion Playwright
+harness plus a normal-motion keyboard/drag pass (performance tracing is tracked in #402).

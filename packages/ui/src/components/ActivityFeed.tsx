@@ -1,3 +1,4 @@
+import { MotionCollection, MotionListItem } from "../motion/collections.tsx";
 import { useEffect, useState } from "react";
 import { Avatar } from "./Avatar.tsx";
 export interface ActivityItem {
@@ -42,24 +43,26 @@ export function ActivityFeed({ label, items, now, locale = "nl" }: ActivityFeedP
   return (
     <div role="region" aria-label={label} tabIndex={0} className="ts-activity-feed">
       <ol>
-        {[...items]
-          .toSorted((a, b) => b.date.getTime() - a.date.getTime())
-          .map((item) => (
-            <li key={item.id}>
-              <Avatar name={item.actor} {...(item.avatar ? { src: item.avatar } : {})} size="sm" />
-              <div>
-                <p>
-                  <strong>{item.actor}</strong> {item.action}
-                </p>
-                <time
-                  dateTime={item.date.toISOString()}
-                  title={new Intl.DateTimeFormat(locale, { dateStyle: "long", timeStyle: "short" }).format(item.date)}
-                >
-                  {relative(item.date, now ?? clock, locale)}
-                </time>
-              </div>
-            </li>
-          ))}
+        <MotionCollection>
+          {[...items]
+            .toSorted((a, b) => b.date.getTime() - a.date.getTime())
+            .map((item) => (
+              <MotionListItem key={item.id}>
+                <Avatar name={item.actor} {...(item.avatar ? { src: item.avatar } : {})} size="sm" />
+                <div>
+                  <p>
+                    <strong>{item.actor}</strong> {item.action}
+                  </p>
+                  <time
+                    dateTime={item.date.toISOString()}
+                    title={new Intl.DateTimeFormat(locale, { dateStyle: "long", timeStyle: "short" }).format(item.date)}
+                  >
+                    {relative(item.date, now ?? clock, locale)}
+                  </time>
+                </div>
+              </MotionListItem>
+            ))}
+        </MotionCollection>
       </ol>
     </div>
   );

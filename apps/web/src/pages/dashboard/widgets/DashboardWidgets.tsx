@@ -2,6 +2,8 @@ import { createElement, useState } from "react";
 import type { ReactNode } from "react";
 import {
   Avatar,
+  MotionCollection,
+  MotionListItem,
   Badge,
   Card,
   ContextMenu,
@@ -189,19 +191,21 @@ export function TaskList({ locale }: { locale: Locale }) {
   return (
     <Panel title={tr(locale, "demo.dashboard.tasks-today")}>
       <ul className="demo-task-list">
-        {tasks.map((key, i) => (
-          <li key={key}>
-            <label>
-              <input
-                type="checkbox"
-                checked={checked[i]}
-                onChange={() => setChecked(checked.map((v, j) => (j === i ? !v : v)))}
-              />
-              <span>{tr(locale, key)}</span>
-            </label>
-            <time>{["09:00", "10:30", "13:00", "15:00"][i]}</time>
-          </li>
-        ))}
+        <MotionCollection reorder={false}>
+          {tasks.map((key, i) => (
+            <MotionListItem key={key}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={checked[i]}
+                  onChange={() => setChecked(checked.map((v, j) => (j === i ? !v : v)))}
+                />
+                <span>{tr(locale, key)}</span>
+              </label>
+              <time>{["09:00", "10:30", "13:00", "15:00"][i]}</time>
+            </MotionListItem>
+          ))}
+        </MotionCollection>
       </ul>
     </Panel>
   );
