@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { DEFAULT_LOCALE, isLocale, LOCALES, t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
-import { Button, Select, ThemeToggle } from "@talentstroom/ui";
+import { Button, Icon, Logo, Select, ThemeToggle } from "@talentstroom/ui";
 import { createTransport, errorKey, isAborted, listOrganizations, RequestError } from "./auth.ts";
 import type { OrganizationList } from "./auth.ts";
 import { AuthScreens, publicRoutes, titles } from "./AuthScreens.tsx";
@@ -224,53 +224,73 @@ function AuthApp() {
   return (
     <div className="auth-shell">
       <aside className="auth-brand">
-        <a href="/inloggen" className="auth-wordmark">
-          {tr("app.name")}
+        <a href="/inloggen" className="auth-wordmark" aria-label={tr("app.name")}>
+          <Logo tone="dark" size="lg" />
         </a>
-        <div>
-          <p className="auth-brand-title">{tr("auth.brandLine")}</p>
+        <div className="auth-brand-copy">
+          <h2 className="auth-brand-title">{tr("auth.brandLine")}</h2>
           <p>{tr("auth.brandText")}</p>
+          <ul className="auth-benefits">
+            {(
+              [
+                ["auth.valueSpeed", "task_alt"],
+                ["auth.valueShortlist", "description"],
+                ["auth.valuePipeline", "bar_chart"],
+                ["auth.valueShare", "groups"],
+              ] as const
+            ).map(([key, icon]) => (
+              <li key={key}>
+                <span className="auth-benefit-icon">
+                  <Icon name={icon} size={24} />
+                </span>
+                {tr(key)}
+              </li>
+            ))}
+          </ul>
         </div>
       </aside>
       <div className="auth-panel">
         <div className="auth-controls">{controls}</div>
         <main className="auth-content">
-          {context.kind === "loading" ? (
-            <output>{tr("auth.loading")}</output>
-          ) : (
-            <>
-              <h1 ref={heading} tabIndex={-1}>
-                {tr(context.kind === "error" ? "auth.sessionError" : (titles[path] ?? "auth.home"))}
-              </h1>
-              {actionError && <p role="alert">{tr(actionError)}</p>}
-              {context.kind === "error" ? (
-                <>
-                  <p role="alert">{tr(context.message)}</p>
-                  <Button onClick={refresh}>{tr("auth.retry")}</Button>
-                  <a href="/e-mail-bevestigen?error=resend">{tr("auth.resend")}</a>
-                  <Button variant="ghost" loading={signOutBusy} onClick={() => void signOut()}>
-                    {tr("auth.signOut")}
-                  </Button>
-                </>
-              ) : publicRoutes.includes(path) ? (
-                <AuthScreens
-                  key={location.path + location.query}
-                  path={path}
-                  query={location.query}
-                  locale={locale}
-                  transport={transport}
-                  onSignedIn={refresh}
-                />
-              ) : (
-                <>
-                  {picker}
-                  <Button variant="ghost" loading={signOutBusy} onClick={() => void signOut()}>
-                    {tr("auth.signOut")}
-                  </Button>
-                </>
-              )}
-            </>
-          )}
+          <section className="auth-card">
+            <Logo className="auth-card-logo" size="md" />
+            {context.kind === "loading" ? (
+              <output>{tr("auth.loading")}</output>
+            ) : (
+              <>
+                <h1 ref={heading} tabIndex={-1}>
+                  {tr(context.kind === "error" ? "auth.sessionError" : (titles[path] ?? "auth.home"))}
+                </h1>
+                {actionError && <p role="alert">{tr(actionError)}</p>}
+                {context.kind === "error" ? (
+                  <>
+                    <p role="alert">{tr(context.message)}</p>
+                    <Button onClick={refresh}>{tr("auth.retry")}</Button>
+                    <a href="/e-mail-bevestigen?error=resend">{tr("auth.resend")}</a>
+                    <Button variant="ghost" loading={signOutBusy} onClick={() => void signOut()}>
+                      {tr("auth.signOut")}
+                    </Button>
+                  </>
+                ) : publicRoutes.includes(path) ? (
+                  <AuthScreens
+                    key={location.path + location.query}
+                    path={path}
+                    query={location.query}
+                    locale={locale}
+                    transport={transport}
+                    onSignedIn={refresh}
+                  />
+                ) : (
+                  <>
+                    {picker}
+                    <Button variant="ghost" loading={signOutBusy} onClick={() => void signOut()}>
+                      {tr("auth.signOut")}
+                    </Button>
+                  </>
+                )}
+              </>
+            )}
+          </section>
         </main>
       </div>
     </div>

@@ -20,7 +20,7 @@ test.afterAll(async () => {
 <title>TalentStroom — Visual review</title>
 <style>body{font:16px/1.5 system-ui;margin:24px}main{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}figure{margin:0}img{width:100%;max-height:600px;object-fit:contain;object-position:top;border:1px solid #aaa}figcaption{padding:8px 0}</style>
 <h1>TalentStroom — Visual review</h1><p>${files.length} screenshots · Chromium · nl-NL · DPR 1</p>
-<p>Auth capture pending: /inloggen, /registreren and /organisatie-kiezen are not implemented in this worktree.</p>
+<p>Auth review: /?gallery#auth contains synthetic previews for login, error, registration, verification, password reset and organization selection.</p>
 <main>${figures.join("\n")}</main></html>`,
   );
 });

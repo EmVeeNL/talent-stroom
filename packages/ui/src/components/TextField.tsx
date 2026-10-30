@@ -3,11 +3,13 @@ import type { InputHTMLAttributes, Ref, ReactNode } from "react";
 import { Button } from "./Button.tsx";
 import { Icon } from "./Icon.tsx";
 import { cx } from "../classnames.ts";
+import type { IconName } from "../icons.ts";
 
 export interface TextFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
   label: string;
   /** Translated password toggle labels. Omit to keep a plain password field. */
   visibilityLabels?: { show: string; hide: string };
+  leadingIcon?: IconName;
   shortcut?: ReactNode;
   hint?: string;
   /** Error message. When set the input gets aria-invalid and the message joins aria-describedby. */
@@ -19,6 +21,7 @@ export function TextField({
   label,
   type = "text",
   visibilityLabels,
+  leadingIcon,
   shortcut,
   hint,
   error,
@@ -54,10 +57,12 @@ export function TextField({
         className={cx(
           "ts-field__control",
           type === "search" && "ts-field__control--search",
+          leadingIcon && "ts-field__control--leading",
           type === "date" && "ts-field__control--date",
           Boolean(shortcut || (type === "password" && visibilityLabels)) && "ts-field__control--trailing",
         )}
       >
+        {leadingIcon && <Icon name={leadingIcon} size={20} />}
         {type === "search" && <Icon name="search" size={20} />}
         <input
           {...rest}

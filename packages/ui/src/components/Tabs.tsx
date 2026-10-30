@@ -6,7 +6,7 @@ import { Icon } from "./Icon.tsx";
 
 export interface TabItem {
   id: string;
-  label: string;
+  label: ReactNode;
   panel: ReactNode;
   icon?: IconName;
   disabled?: boolean;

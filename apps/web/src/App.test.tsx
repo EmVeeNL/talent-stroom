@@ -117,6 +117,8 @@ describe("authentication routing", () => {
 describe("login", () => {
   it("shows and hides the password and signs in with same-origin cookies", async () => {
     setup();
+    expect(await screen.findByRole("tablist", { name: "Inlogmethode" })).toBeTruthy();
+    expect(screen.getByRole("tab", { name: /Passkey/ }).hasAttribute("disabled")).toBe(true);
     await fillLogin();
     await userEvent.click(screen.getByRole("button", { name: "Wachtwoord tonen" }));
     expect(screen.getByLabelText(/^Wachtwoord \*/).getAttribute("type")).toBe("text");
@@ -240,7 +242,7 @@ describe("email and password screens", () => {
 describe("organization picker", () => {
   it("confirms a selection, rotates the session and reloads scoped context", async () => {
     setup("/", true);
-    await userEvent.click(await screen.findByRole("button", { name: org.name }));
+    await userEvent.click(await screen.findByRole("radio", { name: new RegExp(org.name) }));
     await userEvent.click(screen.getByRole("button", { name: "Organisatie openen" }));
     await screen.findByRole("heading", { name: "Je werkruimte" });
     expect(requests.filter((r) => r.url === "/api/v1/me/organizations").length).toBe(2);
@@ -373,7 +375,7 @@ describe("request cancellation", () => {
   });
   it("discards aborted scoped reads before organization switching", async () => {
     setup("/", true);
-    await userEvent.click(await screen.findByRole("button", { name: org.name }));
+    await userEvent.click(await screen.findByRole("radio", { name: new RegExp(org.name) }));
     const fetchMock = vi.mocked(fetch);
     const calls = [...fetchMock.mock.calls];
     const readSignals = calls.map(([input, init]) => (input instanceof Request ? input.signal : init?.signal));

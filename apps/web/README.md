@@ -104,6 +104,13 @@ from the current address/history entry after capture.
 
 ## Implementation and limits
 
+Auth screens use a split layout at 1024px and above. The hero background is a CSS
+placeholder with a navy gradient and the brand wave; `--auth-hero-image` is the
+single replacement point for a licensed image when issue #383 is resolved. No
+photograph is bundled. The email/password flow does not currently support a
+remember-me session option, so the login screen omits that checkbox. Social
+buttons are omitted because provider discovery is not configured by the API.
+
 No router or auth runtime dependency is added. Better Auth calls use plain fetch;
 organization operations use `@talentstroom/api-client`. The only retained server
 data is the app's in-memory membership context. Switching/creating aborts outstanding
