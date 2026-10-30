@@ -1,0 +1,102 @@
+.demo-form-page {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+.demo-form-page > *,
+.demo-form-section > * {
+  min-width: 0;
+}
+.demo-form-section {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+.demo-form-section > h3,
+.demo-form-section > .demo-form-wide {
+  grid-column: 1 / -1;
+}
+.demo-form-full {
+  grid-column: 1 / -1;
+}
+.demo-form-layout {
+  display: grid;
+  gap: 1rem;
+}
+.demo-form-layout--horizontal {
+  grid-template-columns: minmax(8rem, 0.4fr) minmax(0, 1fr);
+  align-items: start;
+}
+.demo-form-layout--grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.demo-form-summary {
+  padding: 1rem;
+  border: 1px solid var(--ts-danger, var(--ts-border));
+  border-radius: var(--ts-radius-lg);
+  background: var(--ts-danger-subtle);
+}
+.demo-form-summary h2 {
+  margin: 0 0 0.5rem;
+}
+.demo-form-toolbar {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+.demo-form-toolbar button {
+  min-width: 2.5rem;
+}
+.demo-form-copy {
+  margin: 0;
+}
+@media (max-width: 767px) {
+  .demo-form-section,
+  .demo-form-layout--horizontal,
+  .demo-form-layout--grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .demo-form-section > h3,
+  .demo-form-section > .demo-form-wide {
+    grid-column: auto;
+  }
+}
+.demo-form-input-group {
+  display: flex;
+  min-width: 0;
+}
+.demo-form-input-group > span {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.75rem;
+  color: var(--ts-text-muted);
+  background: var(--ts-surface-muted);
+  border: 1px solid var(--ts-border);
+}
+.demo-form-input-group[data-part="prefix"] > span {
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+.demo-form-input-group[data-part="suffix"] > span {
+  order: 2;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+.demo-form-input-group input {
+  min-width: 0;
+}
+.demo-form-input-group[data-part="prefix"] input {
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+.demo-form-input-group[data-part="suffix"] input {
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+.demo-form-fieldset {
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid var(--ts-border);
+  border-radius: 0.75rem;
+}
+.demo-form-fieldset legend {
+  padding: 0 0.375rem;
+  font-weight: 600;
+}

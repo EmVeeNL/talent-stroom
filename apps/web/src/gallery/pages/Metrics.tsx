@@ -8,7 +8,6 @@ import {
   RECRUITMENT_STAGES,
   CUSTOM_LABEL_TONE,
   Card,
-  StatCard,
   TrendIndicator,
   Progress,
   Button,
@@ -17,6 +16,8 @@ import {
 import type { MessageKey } from "@talentstroom/i18n";
 import { Section } from "../Section.tsx";
 import { useGallery } from "../context.ts";
+import { Kpis } from "../../kit/ElementSections.tsx";
+import "../../kit/demo-kit.css";
 const tones = ["neutral", "success", "warning", "danger", "info"] as const;
 export function Metrics() {
   const { tr, locale } = useGallery();
@@ -42,24 +43,7 @@ export function Metrics() {
   return (
     <>
       <Section title={tr("gallery.metrics.title")}>
-        <div className="gallery-kpi-row">
-          {(
-            [
-              { label: tr("gallery.metrics.candidates"), value: 1248, icon: "person", tone: "primary", change: 12 },
-              { label: tr("gallery.metrics.vacancies"), value: 86, icon: "work", tone: "success", change: 8 },
-              { label: tr("gallery.metrics.placements"), value: 34, icon: "handshake", tone: "violet", change: 21 },
-              { label: tr("gallery.metrics.clients"), value: 48, icon: "business", tone: "accent", change: 5 },
-            ] as const
-          ).map((stat) => (
-            <StatCard
-              key={stat.label}
-              {...stat}
-              locale={locale}
-              trend={{ value: stat.change, comparisonLabel, locale }}
-              sparkline={{ values: [2, 1, 3, 5, 4, 6, 7], label: tr("gallery.metrics.sparkline") }}
-            />
-          ))}
-        </div>
+        <Kpis locale={locale} />
       </Section>
       <Section title={tr("gallery.cards")}>
         <div className="gallery-card-examples">
