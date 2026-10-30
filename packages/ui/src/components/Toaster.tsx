@@ -2,6 +2,8 @@ import { createContext, useCallback, useContext, useMemo, useRef, useState } fro
 import type { ReactNode } from "react";
 import type { FeedbackTone } from "./AlertBanner.tsx";
 import { Toast } from "./Toast.tsx";
+import { MotionPresence } from "../motion/presence.tsx";
+import { MotionLayout } from "../motion/dom-max.tsx";
 export interface ToastNotification {
   message: ReactNode;
   tone?: FeedbackTone | "error";
@@ -39,19 +41,24 @@ export function Toaster({ children, label, closeLabel, maxVisible = 3 }: Toaster
     <ToastContext value={value}>
       {children}
       <section aria-label={label} className="ts-toaster">
-        {queue.slice(0, Math.max(1, maxVisible)).map((item) => (
-          <Toast
-            key={item.id}
-            tone={item.tone ?? "info"}
-            {...(item.title ? { title: item.title } : {})}
-            action={item.action}
-            duration={item.duration ?? 6000}
-            closeLabel={closeLabel}
-            onDismiss={() => dismiss(item.id)}
-          >
-            {item.message}
-          </Toast>
-        ))}
+        <MotionLayout>
+          <MotionPresence>
+            {queue.slice(0, Math.max(1, maxVisible)).map((item) => (
+              <Toast
+                key={item.id}
+                tone={item.tone ?? "info"}
+                {...(item.title ? { title: item.title } : {})}
+                action={item.action}
+                duration={item.duration ?? 6000}
+                layout
+                closeLabel={closeLabel}
+                onDismiss={() => dismiss(item.id)}
+              >
+                {item.message}
+              </Toast>
+            ))}
+          </MotionPresence>
+        </MotionLayout>
       </section>
     </ToastContext>
   );

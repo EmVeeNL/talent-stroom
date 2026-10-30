@@ -315,6 +315,18 @@ animation decisions. Reduced motion removes translate, scale and layout changes,
 brief opacity fade where it helps continuity. Tests set `MotionGlobalConfig.skipAnimations`,
 and the Playwright harness continues to emulate reduced motion and disable animations.
 
+Overlays use the token-backed `dialog`, `sheetLeft`, `sheetRight`, `popover` and `toast`
+presets. Native dialogs retain their browser focus trap and synchronous close/focus return;
+CSS animates their entrance and backdrop. Tooltips use `motionDelay.tooltip` before appearing.
+
+Popover and ContextMenu retain the native popover top layer when supported; their
+Escape and outside-click handlers close logical state and restore focus immediately.
+Presence keeps the native element showing only for the visual exit, then calls
+`hidePopover()` before removal. Exiting panels are inert and hidden from assistive
+technology. Reduced motion removes panels immediately and disables toast layout
+movement. Card loading crossfades mount new content immediately alongside the inert
+exiting skeleton, so content and lazy children never wait for an exit animation.
+
 Dashboard content uses `MotionContent` keyed by organization and route. It animates only the
 incoming content and never retains an outgoing route. The Query barrier keeps the router tree
 `hidden` and `inert` immediately during organization changes; only a neutral loading message

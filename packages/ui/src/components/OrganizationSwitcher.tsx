@@ -2,6 +2,7 @@ import { NavigationLink } from "./NavigationLink.tsx";
 import { useEffect, useId, useRef, useState } from "react";
 import type { MouseEventHandler } from "react";
 import { cx } from "../classnames.ts";
+import { MotionPanel, MotionPresence } from "../motion/presence.tsx";
 import { Icon } from "./Icon.tsx";
 import { initials, useShellPopup } from "./shellPopup.ts";
 
@@ -116,104 +117,110 @@ export function OrganizationSwitcher({
         </span>
         <Icon name="expand_more" size={20} />
       </button>
-      {popup.open ? (
-        <div
-          id={`${id}-dialog`}
-          role="dialog"
-          aria-labelledby={`${id}-title`}
-          aria-busy={busy || undefined}
-          className="ts-shell-popup ts-org-switcher"
-        >
-          <h2 id={`${id}-title`} className="ts-org-switcher__title">
-            {labels.title}
-          </h2>
-          <div className="ts-org-switcher__search">
-            <Icon name="search" size={20} />
-            <input
-              ref={input}
-              type="search"
-              role="combobox"
-              aria-label={labels.search}
-              placeholder={labels.search}
-              aria-expanded="true"
-              aria-controls={`${id}-list`}
-              aria-autocomplete="list"
-              aria-activedescendant={highlighted ? `${id}-${highlighted.id}` : undefined}
-              autoComplete="off"
-              value={query}
-              onChange={(event) => {
-                setQuery(event.target.value);
-                setActive(0);
-              }}
-              onKeyDown={(event) => {
-                const last = filtered.length - 1;
-                const index = Math.min(active, last);
-                const next: Record<string, number> = {
-                  ArrowDown: index >= last ? 0 : index + 1,
-                  ArrowUp: index <= 0 ? last : index - 1,
-                  Home: 0,
-                  End: last,
-                };
-                if (event.key in next && filtered.length) {
-                  event.preventDefault();
-                  setNavigated(true);
-                  setActive(next[event.key] ?? 0);
-                } else if (event.key === "Enter" && highlighted) {
-                  event.preventDefault();
-                  choose(highlighted);
-                }
-              }}
-            />
-          </div>
-          {error ? (
-            <p role="alert" className="ts-org-switcher__error">
-              {error}
-            </p>
-          ) : null}
-          <div role="listbox" id={`${id}-list`} aria-label={labels.title} className="ts-org-switcher__list">
-            {filtered.map((org) => {
-              const selected = org.id === currentId;
-              return (
-                <div
-                  key={org.id}
-                  id={`${id}-${org.id}`}
-                  role="option"
-                  aria-selected={selected}
-                  aria-disabled={busy || undefined}
-                  className={cx("ts-org-switcher__option", navigated && highlighted?.id === org.id && "is-active")}
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => choose(org)}
-                >
-                  <span className={`ts-org-avatar ts-org-avatar--${tone(org.id)}`} aria-hidden="true">
-                    {initials(org.name)}
-                  </span>
-                  <span className="ts-org-switcher__text">
-                    <span className="ts-org-switcher__name">{org.name}</span>
-                    {selected ? <span className="ts-org-switcher__current">{labels.current}</span> : null}
-                  </span>
-                  {selected ? <Icon name="check" size={20} className="ts-org-switcher__check" /> : null}
-                </div>
-              );
-            })}
-          </div>
-          {!filtered.length ? (
-            <p role="status" className="ts-org-switcher__empty">
-              {labels.empty}
-            </p>
-          ) : null}
-          {busy ? (
-            <p role="status" className="ts-visually-hidden">
-              {labels.busy}
-            </p>
-          ) : null}
-          {createHref ? (
-            <NavigationLink className="ts-org-switcher__create" href={createHref} onClick={onCreate}>
-              <Icon name="add" size={20} />
-              {labels.create}
-            </NavigationLink>
-          ) : null}
-        </div>
-      ) : null}
+      <MotionPresence>
+        {popup.open ? (
+          <MotionPanel
+            id={`${id}-dialog`}
+            role="dialog"
+            aria-labelledby={`${id}-title`}
+            aria-busy={busy || undefined}
+            className="ts-shell-popup ts-org-switcher"
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            preset="popover"
+          >
+            <h2 id={`${id}-title`} className="ts-org-switcher__title">
+              {labels.title}
+            </h2>
+            <div className="ts-org-switcher__search">
+              <Icon name="search" size={20} />
+              <input
+                ref={input}
+                type="search"
+                role="combobox"
+                aria-label={labels.search}
+                placeholder={labels.search}
+                aria-expanded="true"
+                aria-controls={`${id}-list`}
+                aria-autocomplete="list"
+                aria-activedescendant={highlighted ? `${id}-${highlighted.id}` : undefined}
+                autoComplete="off"
+                value={query}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setActive(0);
+                }}
+                onKeyDown={(event) => {
+                  const last = filtered.length - 1;
+                  const index = Math.min(active, last);
+                  const next: Record<string, number> = {
+                    ArrowDown: index >= last ? 0 : index + 1,
+                    ArrowUp: index <= 0 ? last : index - 1,
+                    Home: 0,
+                    End: last,
+                  };
+                  if (event.key in next && filtered.length) {
+                    event.preventDefault();
+                    setNavigated(true);
+                    setActive(next[event.key] ?? 0);
+                  } else if (event.key === "Enter" && highlighted) {
+                    event.preventDefault();
+                    choose(highlighted);
+                  }
+                }}
+              />
+            </div>
+            {error ? (
+              <p role="alert" className="ts-org-switcher__error">
+                {error}
+              </p>
+            ) : null}
+            <div role="listbox" id={`${id}-list`} aria-label={labels.title} className="ts-org-switcher__list">
+              {filtered.map((org) => {
+                const selected = org.id === currentId;
+                return (
+                  <div
+                    key={org.id}
+                    id={`${id}-${org.id}`}
+                    role="option"
+                    aria-selected={selected}
+                    aria-disabled={busy || undefined}
+                    className={cx("ts-org-switcher__option", navigated && highlighted?.id === org.id && "is-active")}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => choose(org)}
+                  >
+                    <span className={`ts-org-avatar ts-org-avatar--${tone(org.id)}`} aria-hidden="true">
+                      {initials(org.name)}
+                    </span>
+                    <span className="ts-org-switcher__text">
+                      <span className="ts-org-switcher__name">{org.name}</span>
+                      {selected ? <span className="ts-org-switcher__current">{labels.current}</span> : null}
+                    </span>
+                    {selected ? <Icon name="check" size={20} className="ts-org-switcher__check" /> : null}
+                  </div>
+                );
+              })}
+            </div>
+            {!filtered.length ? (
+              <p role="status" className="ts-org-switcher__empty">
+                {labels.empty}
+              </p>
+            ) : null}
+            {busy ? (
+              <p role="status" className="ts-visually-hidden">
+                {labels.busy}
+              </p>
+            ) : null}
+            {createHref ? (
+              <NavigationLink className="ts-org-switcher__create" href={createHref} onClick={onCreate}>
+                <Icon name="add" size={20} />
+                {labels.create}
+              </NavigationLink>
+            ) : null}
+          </MotionPanel>
+        ) : null}
+      </MotionPresence>
     </div>
   );
 }

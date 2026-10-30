@@ -643,6 +643,11 @@ export const enGB = {
   "gallery.motion.collapse": "Collapse",
   "gallery.motion.expand": "Expand",
   "gallery.motion.listItem": "List item",
+  "gallery.motion.popover": "Popover",
+  "gallery.motion.dialog": "Dialog",
+  "gallery.motion.sheetLeft": "Sheet from left",
+  "gallery.motion.sheetRight": "Sheet from right",
+  "gallery.motion.toast": "Toast",
   "kanban.board": "Pipeline",
   "kanban.instructions":
     "Press Space to pick up a candidate. Move with the arrow keys, drop with Space or cancel with Escape. You can also use the Move to menu.",

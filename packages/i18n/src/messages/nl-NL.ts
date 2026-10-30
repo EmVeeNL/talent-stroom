@@ -645,6 +645,11 @@ export const nlNL = {
   "gallery.motion.collapse": "Inklappen",
   "gallery.motion.expand": "Uitklappen",
   "gallery.motion.listItem": "Lijstitem",
+  "gallery.motion.popover": "Popover",
+  "gallery.motion.dialog": "Dialoogvenster",
+  "gallery.motion.sheetLeft": "Paneel vanaf links",
+  "gallery.motion.sheetRight": "Paneel vanaf rechts",
+  "gallery.motion.toast": "Melding",
   "kanban.board": "Pijplijn",
   "kanban.instructions":
     "Druk op spatie om een kandidaat op te pakken. Verplaats met de pijltjestoetsen, plaats neer met spatie of annuleer met Escape. Je kunt ook het menu Verplaatsen naar gebruiken.",

@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { axeViolations } from "../test-utils.ts";
+import { domAnimation, LazyMotion } from "motion/react";
 import { Card } from "./Card.tsx";
 
 describe("Card", () => {
@@ -66,4 +67,23 @@ it("groups the title and description opposite the horizontal actions menu", () =
   expect(trigger.closest(".ts-card__actions")).toBeTruthy();
   expect(trigger.textContent).toContain("more_horiz");
   expect(container.querySelector(".ts-card__body")?.textContent).toBe("Inhoud");
+});
+
+it("mounts loaded content immediately when the skeleton starts exiting", () => {
+  const { rerender } = render(
+    <LazyMotion features={domAnimation}>
+      <Card loading>
+        <button>Gegevens</button>
+      </Card>
+    </LazyMotion>,
+  );
+  expect(screen.queryByRole("button", { name: "Gegevens" })).toBeNull();
+  rerender(
+    <LazyMotion features={domAnimation}>
+      <Card>
+        <button>Gegevens</button>
+      </Card>
+    </LazyMotion>,
+  );
+  expect(screen.getByRole("button", { name: "Gegevens" })).toBeDefined();
 });
