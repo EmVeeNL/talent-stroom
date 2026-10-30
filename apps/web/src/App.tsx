@@ -3,6 +3,9 @@ import { DEFAULT_LOCALE, isLocale, LOCALES, t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
 import {
   Button,
+  m,
+  getMotionPreset,
+  useReducedMotion,
   Icon,
   Logo,
   Select,
@@ -32,7 +35,7 @@ const OrganizationPicker = lazy(() =>
 
 // Dev-only component showcase: ?gallery. Tree-shaken from production builds.
 const ComponentGallery = import.meta.env.DEV
-  ? lazy(() => import("./gallery/Gallery.tsx").then((m) => ({ default: m.Gallery })))
+  ? lazy(() => import("./gallery/Gallery.tsx").then((module) => ({ default: module.Gallery })))
   : null;
 
 function AuthThemeButton({ label, labels }: { label: string; labels: Record<"system" | "light" | "dark", string> }) {
@@ -327,11 +330,23 @@ function AuthApp() {
         onExpired={expire}
       />
     ) : null;
+  const reducedMotion = useReducedMotion();
   if (!router) return <output>{tr("auth.loading")}</output>;
   return (
     <QueryProvider layer={layer} synthetic={!!harness}>
-      {transitioning && <output>{tr("auth.loading")}</output>}
-      <div hidden={transitioning} inert={transitioning}>
+      {transitioning && (
+        <m.output {...getMotionPreset("fade", reducedMotion)} initial="initial" animate="animate">
+          {tr("auth.loading")}
+        </m.output>
+      )}
+      {/* Hide scoped content immediately. Only the neutral loading surface may remain visible during the barrier. */}
+      <m.div
+        hidden={transitioning}
+        inert={transitioning}
+        initial={false}
+        animate={{ opacity: transitioning ? 0 : 1 }}
+        transition={getMotionPreset("fade", reducedMotion).transition}
+      >
         <ViewContext value={routerContext}>
           <NavigationLinkContext value={RouterAnchor}>
             <RouterProvider
@@ -345,7 +360,7 @@ function AuthApp() {
             />
           </NavigationLinkContext>
         </ViewContext>
-      </div>
+      </m.div>
     </QueryProvider>
   );
 

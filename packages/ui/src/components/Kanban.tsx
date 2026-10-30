@@ -1,3 +1,8 @@
+import { m, LayoutGroup } from "../motion/provider.tsx";
+import { MotionLayout } from "../motion/dom-max.tsx";
+import { getMotionPreset } from "../motion/presets.ts";
+import { useReducedMotion } from "../motion/reduced-motion.ts";
+import { motionDurations, motionEasings } from "../tokens.ts";
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type { DragEvent, KeyboardEvent, ReactNode } from "react";
 import { cx } from "../classnames.ts";
@@ -153,6 +158,13 @@ export function KanbanBoard({
   className,
 }: KanbanBoardProps) {
   const uid = useId();
+  const mounted = useRef(false);
+  useEffect(() => {
+    mounted.current = true;
+  }, []);
+  const reduced = useReducedMotion();
+  const layoutTransition = { duration: reduced ? 0 : motionDurations.slow / 1000, ease: motionEasings.standard };
+  const itemPreset = getMotionPreset("listItem", reduced);
   const instructionsId = `${uid}-instructions`;
   const viewportMobile = useIsMobile();
   const list = (view ?? (viewportMobile ? "list" : "board")) === "list";
@@ -339,8 +351,11 @@ export function KanbanBoard({
     return (
       <article
         ref={(node) => {
-          if (node) cardNodes.current.set(card.id, node);
-          else cardNodes.current.delete(card.id);
+          if (!node) return undefined;
+          cardNodes.current.set(card.id, node);
+          return () => {
+            if (cardNodes.current.get(card.id) === node) cardNodes.current.delete(card.id);
+          };
         }}
         className="ts-card ts-kanban-card"
         tabIndex={0}
@@ -419,20 +434,51 @@ export function KanbanBoard({
     for (const card of column.cards) {
       const isDragged = dragging?.cardId === card.id;
       if (over && dropTarget.index === slot && !isDragged) {
-        rows.push(<li key={`drop-${slot}`} aria-hidden="true" className="ts-kanban__drop-indicator" />);
+        rows.push(
+          <m.li
+            key="drop"
+            {...getMotionPreset("fade", reduced)}
+            initial="initial"
+            animate="animate"
+            layout={reduced ? false : "position"}
+            transition={{ ...getMotionPreset("fade", reduced).transition, layout: layoutTransition }}
+            aria-hidden="true"
+            className="ts-kanban__drop-indicator"
+          />,
+        );
       }
       if (!isDragged) slot += 1;
       rows.push(
-        <li key={card.id} data-card-id={card.id} className="ts-kanban__item">
+        <m.li
+          key={card.id}
+          {...(reduced ? {} : { layoutId: `${uid}-card-position-${card.id}` })}
+          layout={reduced ? false : "position"}
+          transition={layoutTransition}
+          data-card-id={card.id}
+          className="ts-kanban__item"
+        >
           {renderCard(card, column)}
-        </li>,
+        </m.li>,
       );
     }
     if (over && dropTarget.index >= slot) {
-      rows.push(<li key="drop-end" aria-hidden="true" className="ts-kanban__drop-indicator" />);
+      rows.push(
+        <m.li
+          key="drop"
+          {...getMotionPreset("fade", reduced)}
+          initial="initial"
+          animate="animate"
+          layout={reduced ? false : "position"}
+          transition={{ ...getMotionPreset("fade", reduced).transition, layout: layoutTransition }}
+          aria-hidden="true"
+          className="ts-kanban__drop-indicator"
+        />,
+      );
     }
     return (
-      <section
+      <m.section
+        layout={!reduced}
+        transition={layoutTransition}
         key={column.id}
         className="ts-kanban__column"
         aria-labelledby={headingId}
@@ -469,7 +515,14 @@ export function KanbanBoard({
           </button>
         </header>
         {!collapsed && (
-          <div id={bodyId} className="ts-kanban__body">
+          <m.div
+            key={bodyId}
+            {...itemPreset}
+            initial={mounted.current ? "initial" : false}
+            animate="animate"
+            id={bodyId}
+            className="ts-kanban__body"
+          >
             <ul className="ts-kanban__cards">{rows}</ul>
             {column.cards.length === 0 && (
               <EmptyState
@@ -491,29 +544,33 @@ export function KanbanBoard({
                 {labels.addCardShort}
               </Button>
             )}
-          </div>
+          </m.div>
         )}
-      </section>
+      </m.section>
     );
   };
 
   return (
-    <div className={cx("ts-kanban", list ? "ts-kanban--list" : "ts-kanban--board", className)}>
-      <p id={instructionsId} className="ts-visually-hidden">
-        {labels.instructions}
-      </p>
-      <div role="status" aria-live="polite" aria-atomic="true" className="ts-visually-hidden">
-        {announcement}
-      </div>
-      {list ? (
-        <div className="ts-kanban__columns">{shown.map(renderColumn)}</div>
-      ) : (
-        // A focusable scroll region keeps horizontal scrolling reachable by keyboard.
-        // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-        <div ref={scroller} className="ts-kanban__scroller" role="region" aria-label={labels.board} tabIndex={0}>
-          <div className="ts-kanban__columns">{shown.map(renderColumn)}</div>
+    <MotionLayout>
+      <LayoutGroup id={uid}>
+        <div className={cx("ts-kanban", list ? "ts-kanban--list" : "ts-kanban--board", className)}>
+          <p id={instructionsId} className="ts-visually-hidden">
+            {labels.instructions}
+          </p>
+          <div role="status" aria-live="polite" aria-atomic="true" className="ts-visually-hidden">
+            {announcement}
+          </div>
+          {list ? (
+            <div className="ts-kanban__columns">{shown.map(renderColumn)}</div>
+          ) : (
+            // A focusable scroll region keeps horizontal scrolling reachable by keyboard.
+            // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+            <div ref={scroller} className="ts-kanban__scroller" role="region" aria-label={labels.board} tabIndex={0}>
+              <div className="ts-kanban__columns">{shown.map(renderColumn)}</div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </LayoutGroup>
+    </MotionLayout>
   );
 }

@@ -3,6 +3,8 @@ import { useId, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import {
   Badge,
+  MotionCollection,
+  MotionListItem,
   Button,
   Checkbox,
   Dialog,
@@ -105,7 +107,7 @@ export function NotesApp({ locale }: { locale: Locale }) {
   };
 
   const renderNote = (note: DemoNote) => (
-    <li key={note.id}>
+    <MotionListItem key={note.id}>
       <article className="note" data-color={note.color} aria-labelledby={`${formId}-${note.id}`}>
         <header className="note__head">
           <h3 id={`${formId}-${note.id}`}>{note.title}</h3>
@@ -154,7 +156,7 @@ export function NotesApp({ locale }: { locale: Locale }) {
           </span>
         </footer>
       </article>
-    </li>
+    </MotionListItem>
   );
 
   return (
@@ -205,26 +207,25 @@ export function NotesApp({ locale }: { locale: Locale }) {
           title={tr(archived ? "demo.apps.notes.empty_archive" : "demo.apps.notes.empty")}
           body={tr("demo.apps.notes.empty_body")}
         />
-      ) : (
-        <>
-          {pinned.length > 0 && (
-            <section aria-labelledby={`${formId}-pinned`}>
-              <h2 id={`${formId}-pinned`} className="notes__heading">
-                {tr("demo.apps.notes.pinned")}
-              </h2>
-              <ul className="notes__grid">{pinned.map(renderNote)}</ul>
-            </section>
-          )}
-          {others.length > 0 && (
-            <section aria-labelledby={`${formId}-others`}>
-              <h2 id={`${formId}-others`} className="notes__heading">
-                {tr(pinned.length > 0 ? "demo.apps.notes.others" : "demo.apps.notes.all")}
-              </h2>
-              <ul className="notes__grid">{others.map(renderNote)}</ul>
-            </section>
-          )}
-        </>
-      )}
+      ) : null}
+      <>
+        <section aria-labelledby={`${formId}-pinned`}>
+          <h2 hidden={pinned.length === 0} id={`${formId}-pinned`} className="notes__heading">
+            {tr("demo.apps.notes.pinned")}
+          </h2>
+          <ul className="notes__grid">
+            <MotionCollection>{pinned.map(renderNote)}</MotionCollection>
+          </ul>
+        </section>
+        <section aria-labelledby={`${formId}-others`}>
+          <h2 hidden={others.length === 0} id={`${formId}-others`} className="notes__heading">
+            {tr(pinned.length > 0 ? "demo.apps.notes.others" : "demo.apps.notes.all")}
+          </h2>
+          <ul className="notes__grid">
+            <MotionCollection>{others.map(renderNote)}</MotionCollection>
+          </ul>
+        </section>
+      </>
 
       <output className="ts-visually-hidden" aria-live="polite">
         {status}

@@ -1,3 +1,4 @@
+import { MotionCollection, MotionTableRow } from "../motion/collections.tsx";
 import { useId, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import {
@@ -253,43 +254,45 @@ export function DataTable<Row>({
               </tr>
             </thead>
             <tbody>
-              {loading
-                ? Array.from({ length: 5 }, (_, i) => (
-                    <tr key={i}>
-                      {selectable && (
-                        <td>
-                          <Skeleton shape="text" />
-                        </td>
-                      )}
-                      {visibleColumns.map((column) => (
-                        <td key={column.id} data-column={column.id}>
-                          <Skeleton shape="text" />
-                        </td>
-                      ))}
-                    </tr>
-                  ))
-                : visibleRows.map((row) => {
-                    const id = row.id;
-                    return (
-                      <tr key={id} data-selected={selectedIds.includes(id) || undefined}>
+              <MotionCollection>
+                {loading
+                  ? Array.from({ length: 5 }, (_, i) => (
+                      <tr key={i}>
                         {selectable && (
                           <td>
-                            <Checkbox
-                              label={selectRowLabel?.(rowLabel?.(row.original.value) ?? id) ?? ""}
-                              className="ts-data-table__select"
-                              checked={Boolean(selection[id])}
-                              onChange={() => row.toggleSelected(!selection[id])}
-                            />
+                            <Skeleton shape="text" />
                           </td>
                         )}
                         {visibleColumns.map((column) => (
                           <td key={column.id} data-column={column.id}>
-                            {columns.find((item) => item.id === column.id)?.cell(row.original.value)}
+                            <Skeleton shape="text" />
                           </td>
                         ))}
                       </tr>
-                    );
-                  })}
+                    ))
+                  : visibleRows.map((row) => {
+                      const id = row.id;
+                      return (
+                        <MotionTableRow key={id} data-selected={selectedIds.includes(id) || undefined}>
+                          {selectable && (
+                            <td>
+                              <Checkbox
+                                label={selectRowLabel?.(rowLabel?.(row.original.value) ?? id) ?? ""}
+                                className="ts-data-table__select"
+                                checked={Boolean(selection[id])}
+                                onChange={() => row.toggleSelected(!selection[id])}
+                              />
+                            </td>
+                          )}
+                          {visibleColumns.map((column) => (
+                            <td key={column.id} data-column={column.id}>
+                              {columns.find((item) => item.id === column.id)?.cell(row.original.value)}
+                            </td>
+                          ))}
+                        </MotionTableRow>
+                      );
+                    })}
+              </MotionCollection>
             </tbody>
           </table>
           {loading && (

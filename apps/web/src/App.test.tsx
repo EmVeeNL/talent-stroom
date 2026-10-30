@@ -455,3 +455,43 @@ it("captures callback credentials before Router sees them and discards them on n
     factory.mockRestore();
   }
 });
+
+describe("dashboard content motion", () => {
+  it("keeps route heading focus immediate with reduced motion", async () => {
+    document.documentElement.dataset["motion"] = "reduce";
+    try {
+      setup("/?preview=dashboard");
+      await userEvent.click(await screen.findByRole("link", { name: "Chat" }));
+      const heading = await screen.findByRole("heading", { name: "Chat", level: 1 });
+      await waitFor(() => expect(document.activeElement).toBe(heading));
+      expect(heading.closest("main")?.firstElementChild?.getAttribute("style") ?? "").not.toContain("translate");
+    } finally {
+      document.documentElement.removeAttribute("data-motion");
+    }
+  });
+
+  it("hides old organization content throughout a pending switch without retaining an exit copy", async () => {
+    setup("/", true, org.organizationId);
+    const second = { ...org, organizationId: "33333333-3333-4333-8333-333333333333", name: "Tweede testbureau" };
+    organizations = [org, second];
+    let complete: ((response: Response) => void) | undefined;
+    intercept = (request) =>
+      request.url.endsWith("/switch")
+        ? new Promise<Response>((resolve) => {
+            complete = resolve;
+          })
+        : undefined;
+    const trigger = await screen.findByRole("button", { name: `Switch organisatie: ${org.name}` });
+    await userEvent.click(trigger);
+    await userEvent.click(screen.getByRole("option", { name: second.name }));
+    await waitFor(() => expect(complete).toBeDefined());
+    expect(screen.queryByRole("heading", { name: "Je werkruimte" })).toBeNull();
+    expect(screen.queryByRole("button", { name: `Switch organisatie: ${org.name}` })).toBeNull();
+    expect(document.querySelectorAll("[hidden][inert]").length).toBe(1);
+    active = second.organizationId;
+    if (!complete) throw new Error("Expected switch request");
+    complete(Response.json(second));
+    await screen.findByRole("button", { name: `Switch organisatie: ${second.name}` });
+    expect(screen.queryByRole("button", { name: `Switch organisatie: ${org.name}` })).toBeNull();
+  });
+});
