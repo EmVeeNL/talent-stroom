@@ -10,3 +10,4 @@ export {
 } from "./organizations.ts";
 
 export { InvitationIdParam } from "./invitations.ts";
+export { SignInRequest, SignUpRequest, AuthEmailRequest, NewPasswordRequest } from "./auth.ts";

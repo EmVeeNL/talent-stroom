@@ -2,7 +2,11 @@ import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { DEFAULT_LOCALE, isLocale, LOCALES, t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
 import {
+  TopLoadingBar,
   Button,
+  m,
+  getMotionPreset,
+  useReducedMotion,
   Icon,
   Logo,
   Select,
@@ -11,7 +15,13 @@ import {
   setThemePreference,
 } from "@talentstroom/ui";
 import { createTransport, errorKey, isAborted, RequestError } from "./auth.ts";
-import { RouterProvider, useRouterState } from "@tanstack/react-router";
+import {
+  createBrowserHistory,
+  createMemoryHistory,
+  RouterContextProvider,
+  RouterProvider,
+  useRouterState,
+} from "@tanstack/react-router";
 import { createAppRouter, activeMembership, ViewContext } from "./router.tsx";
 import type { AppRouter, AppView, SessionContext } from "./router.tsx";
 import type { ReactNode } from "react";
@@ -32,7 +42,7 @@ const OrganizationPicker = lazy(() =>
 
 // Dev-only component showcase: ?gallery. Tree-shaken from production builds.
 const ComponentGallery = import.meta.env.DEV
-  ? lazy(() => import("./gallery/Gallery.tsx").then((m) => ({ default: m.Gallery })))
+  ? lazy(() => import("./gallery/Gallery.tsx").then((module) => ({ default: module.Gallery })))
   : null;
 
 function AuthThemeButton({ label, labels }: { label: string; labels: Record<"system" | "light" | "dark", string> }) {
@@ -87,23 +97,26 @@ function AuthApp() {
   });
   const [layer] = useState(() => createDataLayer());
   const [transitioning, setTransitioning] = useState(false);
+  const revalidation = useRef({ last: -Infinity, pending: false });
   const initialCallback = useRef(callback);
-  const [router, setRouter] = useState<AppRouter>();
-  useEffect(() => {
+  const [router] = useState(() => {
     const captured = initialCallback.current;
     const params = new URLSearchParams(captured.query);
     if (params.has("token") || params.has("error")) window.history.replaceState(null, "", captured.path);
-    const current = createAppRouter({ demoAuthEnabled: harness !== "dashboard", queryClient: layer.client });
-    initialCallback.current = { path: captured.path, query: "" };
-    let mounted = true;
-    queueMicrotask(() => {
-      if (mounted) setRouter(current);
+    return createAppRouter({
+      history: createMemoryHistory({
+        initialEntries: [window.location.pathname + window.location.search + window.location.hash],
+      }),
+      demoAuthEnabled: harness !== "dashboard",
+      queryClient: layer.client,
     });
-    return () => {
-      mounted = false;
-      current.history.destroy();
-    };
-  }, [harness, layer]);
+  });
+  useEffect(() => {
+    // Attach browser listeners only for the retained instance (StrictMode may discard an initializer).
+    const history = createBrowserHistory();
+    router.update({ history, context: router.options.context });
+    return () => history.destroy();
+  }, [router]);
   const demoAuth =
     demoPagesEnabled &&
     demoAuthRoutes.some((route) => route.path === window.location.pathname) &&
@@ -202,8 +215,25 @@ function AuthApp() {
   // Revalidate cookie context after tab changes/reconnection. Exchange no data across tabs.
   useEffect(() => {
     if (harness || demoAuth) return undefined;
-    const revalidate = () => {
-      if (document.visibilityState === "visible" && context.kind === "ready" && !transitioning) reloadContext();
+    const revalidate = (event: Event) => {
+      const check = revalidation.current;
+      if (
+        (event.type !== "online" && document.visibilityState !== "visible") ||
+        context.kind !== "ready" ||
+        transitioning ||
+        check.pending
+      )
+        return;
+      if (event.type !== "online" && Date.now() - check.last < 30_000) return;
+      check.last = Date.now();
+      check.pending = true;
+      // Query handles 401 expiry. Transient failures leave the current view intact.
+      void layer
+        .revalidate(transport)
+        .catch(() => undefined)
+        .finally(() => {
+          check.pending = false;
+        });
     };
     window.addEventListener("focus", revalidate);
     window.addEventListener("online", revalidate);
@@ -226,10 +256,10 @@ function AuthApp() {
       onSignedIn: refresh,
       query: callback.path === path ? callback.query : "",
     }),
-    renderFrame,
+    renderCard,
   };
+  const guardState = useRef("");
   useEffect(() => {
-    if (!router) return;
     router.update({
       context: {
         session: context,
@@ -237,8 +267,12 @@ function AuthApp() {
         resolveSession: () => (context.kind === "loading" ? sessionGate.current.promise : Promise.resolve(context)),
       },
     });
-    router.clearCache();
-    void router.invalidate();
+    const nextGuard = `${context.kind}:${activeMembership(context)?.organizationId ?? ""}`;
+    if (nextGuard !== guardState.current) {
+      guardState.current = nextGuard;
+      router.clearCache();
+      void router.invalidate();
+    }
   }, [router, context, layer]);
   useEffect(
     () =>
@@ -327,29 +361,92 @@ function AuthApp() {
         onExpired={expire}
       />
     ) : null;
-  if (!router) return <output>{tr("auth.loading")}</output>;
+  const reducedMotion = useReducedMotion();
   return (
     <QueryProvider layer={layer} synthetic={!!harness}>
-      {transitioning && <output>{tr("auth.loading")}</output>}
-      <div hidden={transitioning} inert={transitioning}>
-        <ViewContext value={routerContext}>
-          <NavigationLinkContext value={RouterAnchor}>
-            <RouterProvider
+      <ViewContext value={routerContext}>
+        <NavigationLinkContext value={RouterAnchor}>
+          <RouterContextProvider router={router}>
+            <AppFrame
               router={router}
-              context={{
-                session: context,
-                queryClient: layer.client,
-                resolveSession: () =>
-                  context.kind === "loading" ? sessionGate.current.promise : Promise.resolve(context),
-              }}
-            />
-          </NavigationLinkContext>
-        </ViewContext>
-      </div>
+              loading={context.kind === "loading" || transitioning}
+              blocked={transitioning}
+              label={tr("shell.loading")}
+              render={(currentPath, pending, children) =>
+                demoPagesEnabled &&
+                demoAuthRoutes.some((route) => route.path === currentPath) &&
+                harness !== "dashboard"
+                  ? children
+                  : renderFrame(currentPath, children, pending)
+              }
+            >
+              {/* AppFrame hides scoped content during the switch barrier; the new organization fades in. */}
+              <m.div
+                initial={false}
+                animate={{ opacity: transitioning ? 0 : 1 }}
+                transition={getMotionPreset("fade", reducedMotion).transition}
+              >
+                {router && (
+                  <RouterProvider
+                    router={router}
+                    context={{
+                      session: context,
+                      queryClient: layer.client,
+                      resolveSession: () =>
+                        context.kind === "loading" ? sessionGate.current.promise : Promise.resolve(context),
+                    }}
+                  />
+                )}
+              </m.div>
+            </AppFrame>
+          </RouterContextProvider>
+        </NavigationLinkContext>
+      </ViewContext>
     </QueryProvider>
   );
 
-  function renderFrame(path: string, children: ReactNode) {
+  function renderCard(path: string, children: ReactNode) {
+    if (active && context.kind === "ready" && (findRoute(path) || !Object.hasOwn(authRouteTitles, path)))
+      return children;
+    return (
+      <>
+        <h1 ref={heading} tabIndex={-1}>
+          {tr(
+            context.kind === "error"
+              ? "auth.sessionError"
+              : ((authRouteTitles as Record<string, MessageKey>)[path] ?? "auth.home"),
+          )}
+        </h1>
+        {actionError && <p role="alert">{tr(actionError)}</p>}
+        {context.kind === "error" ? (
+          <>
+            <p role="alert">{tr(context.message)}</p>
+            <Button onClick={refresh}>{tr("auth.retry")}</Button>
+            <Link
+              to="/e-mail-bevestigen"
+              onClick={() => setCallback({ path: "/e-mail-bevestigen", query: "?error=resend" })}
+            >
+              {tr("auth.resend")}
+            </Link>
+            <Button variant="ghost" loading={signOutBusy} onClick={() => void signOut()}>
+              {tr("auth.signOut")}
+            </Button>
+          </>
+        ) : path !== "/organisatie-kiezen" ? (
+          children
+        ) : (
+          <>
+            {picker}
+            <Button variant="ghost" loading={signOutBusy} onClick={() => void signOut()}>
+              {tr("auth.signOut")}
+            </Button>
+          </>
+        )}
+      </>
+    );
+  }
+
+  function renderFrame(path: string, children: ReactNode, pending = false) {
     const currentRoute = findRoute(path);
     if (active && context.kind === "ready" && (currentRoute || !Object.hasOwn(authRouteTitles, path))) {
       return (
@@ -367,7 +464,7 @@ function AuthApp() {
           headingRef={heading}
           currentPath={path}
         >
-          <PageEffects path={path} locale={locale} heading={heading} />
+          <PageEffects router={router} path={path} locale={locale} heading={heading} />
           {actionError && (
             <p role="alert" className="workspace-alert">
               {tr(actionError)}
@@ -410,47 +507,16 @@ function AuthApp() {
           </>
         }
       >
-        <PageEffects path={path} locale={locale} heading={heading} />
-        <main className="auth-content">
-          <section className="auth-card">
+        <PageEffects router={router} path={path} locale={locale} heading={heading} />
+        <main className="auth-content" aria-busy={pending}>
+          <section className="auth-card" data-auth-route={path}>
             <Logo className="auth-card-logo" size="md" />
             {context.kind === "loading" ? (
               <output>{tr("auth.loading")}</output>
+            ) : context.kind === "error" ? (
+              renderCard(path, null)
             ) : (
-              <>
-                <h1 ref={heading} tabIndex={-1}>
-                  {tr(
-                    context.kind === "error"
-                      ? "auth.sessionError"
-                      : ((authRouteTitles as Record<string, MessageKey>)[path] ?? "auth.home"),
-                  )}
-                </h1>
-                {actionError && <p role="alert">{tr(actionError)}</p>}
-                {context.kind === "error" ? (
-                  <>
-                    <p role="alert">{tr(context.message)}</p>
-                    <Button onClick={refresh}>{tr("auth.retry")}</Button>
-                    <Link
-                      to="/e-mail-bevestigen"
-                      onClick={() => setCallback({ path: "/e-mail-bevestigen", query: "?error=resend" })}
-                    >
-                      {tr("auth.resend")}
-                    </Link>
-                    <Button variant="ghost" loading={signOutBusy} onClick={() => void signOut()}>
-                      {tr("auth.signOut")}
-                    </Button>
-                  </>
-                ) : path !== "/organisatie-kiezen" ? (
-                  children
-                ) : (
-                  <>
-                    {picker}
-                    <Button variant="ghost" loading={signOutBusy} onClick={() => void signOut()}>
-                      {tr("auth.signOut")}
-                    </Button>
-                  </>
-                )}
-              </>
+              children
             )}
           </section>
         </main>
@@ -460,15 +526,17 @@ function AuthApp() {
 }
 
 function PageEffects({
+  router,
   path,
   locale,
   heading,
 }: {
+  router: AppRouter;
   path: string;
   locale: Locale;
   heading: React.RefObject<HTMLHeadingElement | null>;
 }) {
-  const status = useRouterState({ select: (state) => state.status });
+  const status = useRouterState({ router, select: (state) => state.status });
   useEffect(() => {
     document.title = `${t(locale, (knownTitles as Record<string, MessageKey>)[path] ?? "auth.home")} · ${t(locale, "app.name")}`;
     if (status === "idle") {
@@ -480,4 +548,35 @@ function PageEffects({
     }
   }, [path, locale, heading, status]);
   return null;
+}
+
+function AppFrame({
+  router,
+  loading,
+  blocked,
+  label,
+  render,
+  children,
+}: {
+  router: AppRouter;
+  loading: boolean;
+  blocked: boolean;
+  label: string;
+  render: (path: string, loading: boolean, children: ReactNode) => ReactNode;
+  children: ReactNode;
+}) {
+  const pending = useRouterState({ router, select: (state) => state.status === "pending" || state.isLoading });
+  const path = useRouterState({ router, select: (state) => state.location.pathname });
+  const busy = loading || pending;
+  useEffect(() => {
+    document.querySelectorAll("main").forEach((main) => main.setAttribute("aria-busy", String(busy)));
+  }, [busy]);
+  return (
+    <>
+      <TopLoadingBar loading={busy} label={label} />
+      <div hidden={blocked} inert={blocked}>
+        {render(path, busy, children)}
+      </div>
+    </>
+  );
 }

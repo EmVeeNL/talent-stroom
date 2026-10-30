@@ -2,6 +2,8 @@ import { createElement, useState } from "react";
 import type { ReactNode } from "react";
 import {
   Avatar,
+  MotionCollection,
+  MotionListItem,
   Badge,
   Card,
   ContextMenu,
@@ -23,13 +25,13 @@ export const tr = (
   values?: Record<string, string | number>,
 ) => t(locale, key, values);
 export function Frame({
-  locale,
+  breadcrumbs,
   title,
   subtitle,
   children,
   actions,
 }: {
-  locale: Locale;
+  breadcrumbs: ReactNode;
   title: string;
   subtitle: string;
   children: ReactNode;
@@ -37,20 +39,26 @@ export function Frame({
 }) {
   return (
     <div className="demo-dashboard">
+      {breadcrumbs}
       <div className="demo-dashboard__welcome">
         <div>
           <h1>{title}</h1>
           <p>{subtitle}</p>
         </div>
-        <div className="demo-dashboard__welcome-aside">
-          <time dateTime="2026-10-30T14:32:00+01:00">
-            <Icon name="calendar_month" size={16} />
-            {tr(locale, "demo.dashboard.date")}, 14:32
-          </time>
-          {actions}
-        </div>
+        {actions && <div className="demo-dashboard__welcome-aside">{actions}</div>}
       </div>
       {children}
+    </div>
+  );
+}
+export function DashboardBreadcrumbs({ locale, children }: { locale: Locale; children: ReactNode }) {
+  return (
+    <div className="demo-dashboard__breadcrumbs">
+      {children}
+      <time dateTime="2026-10-30T14:32:00+01:00">
+        <Icon name="calendar_month" size={16} />
+        {tr(locale, "demo.dashboard.date")}, 14:32
+      </time>
     </div>
   );
 }
@@ -183,19 +191,21 @@ export function TaskList({ locale }: { locale: Locale }) {
   return (
     <Panel title={tr(locale, "demo.dashboard.tasks-today")}>
       <ul className="demo-task-list">
-        {tasks.map((key, i) => (
-          <li key={key}>
-            <label>
-              <input
-                type="checkbox"
-                checked={checked[i]}
-                onChange={() => setChecked(checked.map((v, j) => (j === i ? !v : v)))}
-              />
-              <span>{tr(locale, key)}</span>
-            </label>
-            <time>{["09:00", "10:30", "13:00", "15:00"][i]}</time>
-          </li>
-        ))}
+        <MotionCollection reorder={false}>
+          {tasks.map((key, i) => (
+            <MotionListItem key={key}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={checked[i]}
+                  onChange={() => setChecked(checked.map((v, j) => (j === i ? !v : v)))}
+                />
+                <span>{tr(locale, key)}</span>
+              </label>
+              <time>{["09:00", "10:30", "13:00", "15:00"][i]}</time>
+            </MotionListItem>
+          ))}
+        </MotionCollection>
       </ul>
     </Panel>
   );

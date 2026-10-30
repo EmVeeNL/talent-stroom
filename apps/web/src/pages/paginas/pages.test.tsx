@@ -12,14 +12,14 @@ describe("Pages demo interactions", () => {
     expect(screen.getByText("Zijn de prijzen inclusief btw?")).toBeTruthy();
     expect(screen.queryByText("Hoe maak ik een account aan?")).toBeNull();
   });
-  it("shows a local demo confirmation after valid contact submission", () => {
+  it("shows a local demo confirmation after valid contact submission", async () => {
     render(<ContactPage locale={locale} />);
-    fireEvent.change(screen.getByLabelText("Naam"), { target: { value: "Mila Voorbeeld" } });
-    fireEvent.change(screen.getByLabelText("E-mailadres"), { target: { value: "mila@voorbeeld.nl" } });
-    fireEvent.change(screen.getByLabelText("Onderwerp"), { target: { value: "Algemene vraag" } });
-    fireEvent.change(screen.getByLabelText("Bericht"), { target: { value: "Ik heb een korte vraag." } });
+    fireEvent.change(screen.getByLabelText(/^Naam/), { target: { value: "Mila Voorbeeld" } });
+    fireEvent.change(screen.getByLabelText(/^E-mailadres/), { target: { value: "mila@voorbeeld.nl" } });
+    fireEvent.change(screen.getByLabelText(/^Onderwerp/), { target: { value: "general" } });
+    fireEvent.change(screen.getByLabelText(/^Bericht/), { target: { value: "Ik heb een korte vraag." } });
     fireEvent.click(screen.getByRole("checkbox"));
     fireEvent.click(screen.getByRole("button", { name: "Bericht versturen" }));
-    expect(screen.getByRole("status").textContent).toContain("Er is niets verstuurd");
+    expect((await screen.findByRole("status")).textContent).toContain("Er is niets verstuurd");
   });
 });

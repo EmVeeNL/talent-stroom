@@ -67,6 +67,13 @@ interface Handlers {
   onScopeChanged?: () => void;
 }
 
+function identity(value: object) {
+  const user: unknown = "user" in value ? value.user : undefined;
+  if (!user || typeof user !== "object") return undefined;
+  // Better Auth supplies an id; the email fallback also supports older session fixtures.
+  return "id" in user ? user.id : "email" in user ? user.email : undefined;
+}
+
 /** Private to one mounted app. No persistence, broadcast data, or module-level client. */
 export function createDataLayer(initialHandlers: Handlers = {}) {
   let handlers = initialHandlers;
@@ -77,6 +84,7 @@ export function createDataLayer(initialHandlers: Handlers = {}) {
   let work = new AbortController();
   let lifecycle: AbortController | undefined;
   let currentTransport: Transport | undefined;
+  let resolved: Bootstrap | undefined;
   const client = new QueryClient({
     queryCache: new QueryCache({
       onError: (error, query) => {
@@ -103,6 +111,7 @@ export function createDataLayer(initialHandlers: Handlers = {}) {
   });
   function discard() {
     generation++;
+    resolved = undefined;
     activeOrganizationId = undefined;
     membershipIds.clear();
     work.abort();
@@ -186,7 +195,51 @@ export function createDataLayer(initialHandlers: Handlers = {}) {
       return bootstrap(transport);
     }
     activeOrganizationId = next;
-    return { session, data };
+    resolved = { session, data };
+    return resolved;
+  }
+  /** Inspect cookie context without changing the active scope or exposing new data to the view. */
+  async function revalidate(transport: Transport) {
+    if (blocked || !resolved?.session || !resolved.data) return;
+    const previousSession = resolved.session;
+    const previousData = resolved.data;
+    const captured = generation;
+    const signal = work.signal;
+    const session = await client.fetchQuery(sessionOptions(transport));
+    guard(captured, signal);
+    if (!session) {
+      expire();
+      return;
+    }
+    const resetScope = () => {
+      // Revoke cached scope synchronously, before a different identity can be rendered.
+      void discard();
+      handlers.onScopeChanged?.();
+    };
+    if (identity(session) !== identity(previousSession)) {
+      resetScope();
+      return;
+    }
+    const data = await client.fetchQuery(organizationOptions(transport));
+    guard(captured, signal);
+    const changed =
+      data.activeOrganizationId !== previousData.activeOrganizationId ||
+      previousData.organizations.some(
+        (old) =>
+          !data.organizations.some(
+            (next) =>
+              next.organizationId === old.organizationId &&
+              next.membershipId === old.membershipId &&
+              next.role === old.role,
+          ),
+      );
+    if (changed) {
+      resetScope();
+      return;
+    }
+    membershipIds = new Set(data.organizations.map((org) => org.organizationId));
+    resolved = { session, data };
+    handlers.onLoaded?.(resolved);
   }
   async function mutation<T>(key: QueryKey, run: () => Promise<T>) {
     // Credentials and form values stay in the invocation closure, never Mutation variables/keys/meta.
@@ -331,9 +384,24 @@ export function createDataLayer(initialHandlers: Handlers = {}) {
     guard(captured, signal);
     return result;
   }
+  async function authSubmit(
+    transport: Transport,
+    endpoint: string,
+    body?: Record<string, string>,
+    locale: Locale = "nl-NL",
+    externalSignal?: AbortSignal,
+  ) {
+    if (blocked) aborted();
+    const captured = generation;
+    const signal = AbortSignal.any([work.signal, ...(externalSignal ? [externalSignal] : [])]);
+    const result = await mutation(["session", "auth-submit"], () => transport.auth(endpoint, body, locale, signal));
+    guard(captured, signal);
+    return result;
+  }
   return {
     client,
     bootstrap,
+    revalidate,
     sessionOptions,
     organizationOptions,
     orgQuery,
@@ -341,6 +409,7 @@ export function createDataLayer(initialHandlers: Handlers = {}) {
     transition,
     changeOrganization,
     signIn,
+    authSubmit,
     expire,
     reset: () => {
       lifecycle?.abort();

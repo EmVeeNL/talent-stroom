@@ -1,5 +1,5 @@
 import type { Transition, Variants } from "motion/react";
-import { motionDurations, motionEasings, springs } from "../tokens.ts";
+import { motionDurations, motionEasings } from "../tokens.ts";
 
 export type MotionPresetName =
   | "fade"
@@ -129,7 +129,7 @@ export const motionPresets: Record<MotionPresetName, MotionPreset> = {
   scaleIn: { variants: variants.scaleIn, transition: transitions.base },
   collapse: { variants: variants.collapse, transition: transitions.slow },
   expand: { variants: variants.expand, transition: transitions.slow },
-  listItem: { variants: variants.listItem, transition: { type: "spring", ...springs.snappy } },
+  listItem: { variants: variants.listItem, transition: transitions.slow },
   popover: { variants: variants.popover, transition: transitions.fast },
   dialog: { variants: variants.dialog, transition: transitions.base },
   sheetLeft: { variants: variants.sheetLeft, transition: transitions.slow },

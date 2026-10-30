@@ -20,7 +20,9 @@
     "react-dom": "catalog:",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-query": "catalog:",
-    "@talentstroom/contracts": "workspace:*"
+    "@talentstroom/contracts": "workspace:*",
+    "@tanstack/react-form": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@playwright/test": "catalog:",

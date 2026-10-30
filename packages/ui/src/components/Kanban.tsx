@@ -1,3 +1,8 @@
+import { m, LayoutGroup } from "../motion/provider.tsx";
+import { MotionLayout } from "../motion/dom-max.tsx";
+import { getMotionPreset } from "../motion/presets.ts";
+import { useReducedMotion } from "../motion/reduced-motion.ts";
+import { motionDurations, motionEasings } from "../tokens.ts";
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type { DragEvent, KeyboardEvent, ReactNode } from "react";
 import { cx } from "../classnames.ts";
@@ -153,6 +158,13 @@ export function KanbanBoard({
   className,
 }: KanbanBoardProps) {
   const uid = useId();
+  const mounted = useRef(false);
+  useEffect(() => {
+    mounted.current = true;
+  }, []);
+  const reduced = useReducedMotion();
+  const layoutTransition = { duration: reduced ? 0 : motionDurations.slow / 1000, ease: motionEasings.standard };
+  const itemPreset = getMotionPreset("listItem", reduced);
   const instructionsId = `${uid}-instructions`;
   const viewportMobile = useIsMobile();
   const list = (view ?? (viewportMobile ? "list" : "board")) === "list";
@@ -183,6 +195,14 @@ export function KanbanBoard({
   }, [list, columns, collapsedIds]);
   const cardNodes = useRef(new Map<string, HTMLElement>());
   const pendingFocus = useRef<string | null>(null);
+  const columnNodes = useRef(new Map<string, HTMLElement>());
+  const pendingColumnFocus = useRef<string | null>(null);
+  useLayoutEffect(() => {
+    const id = pendingColumnFocus.current;
+    if (!id) return;
+    columnNodes.current.get(id)?.querySelector<HTMLButtonElement>("button")?.focus();
+    pendingColumnFocus.current = null;
+  }, [collapsedIds]);
   const isCollapsed = (id: string) => collapsedIds.includes(id);
 
   // While a card is lifted with the keyboard, preview it in its target position.
@@ -217,6 +237,7 @@ export function KanbanBoard({
   }, [pickup]);
 
   const setCollapsed = (id: string, collapse: boolean) => {
+    pendingColumnFocus.current = id;
     const next = collapse ? [...collapsedIds, id] : collapsedIds.filter((candidate) => candidate !== id);
     if (collapsedColumnIds === undefined) setUncontrolledCollapsed(next);
     onCollapsedChange?.(next);
@@ -339,8 +360,11 @@ export function KanbanBoard({
     return (
       <article
         ref={(node) => {
-          if (node) cardNodes.current.set(card.id, node);
-          else cardNodes.current.delete(card.id);
+          if (!node) return undefined;
+          cardNodes.current.set(card.id, node);
+          return () => {
+            if (cardNodes.current.get(card.id) === node) cardNodes.current.delete(card.id);
+          };
         }}
         className="ts-card ts-kanban-card"
         tabIndex={0}
@@ -412,28 +436,78 @@ export function KanbanBoard({
     const collapsed = isCollapsed(column.id);
     const headingId = `${uid}-column-${column.id}`;
     const bodyId = `${headingId}-body`;
-    const menuItems = columnMenuItems?.(column) ?? [];
+    const menuItems: ContextMenuItem[] = [
+      {
+        id: "column-collapse",
+        label: labels.collapse(column.title),
+        icon: "expand_less",
+        onSelect: () => setCollapsed(column.id, true),
+      },
+      {
+        id: "column-add",
+        label: labels.addCardShort,
+        icon: "add",
+        disabled: !onAddCard,
+        onSelect: () => onAddCard?.(column.id),
+      },
+      ...(columnMenuItems?.(column) ?? []),
+    ];
     const over = dropTarget?.columnId === column.id;
     let slot = 0;
     const rows: ReactNode[] = [];
     for (const card of column.cards) {
       const isDragged = dragging?.cardId === card.id;
       if (over && dropTarget.index === slot && !isDragged) {
-        rows.push(<li key={`drop-${slot}`} aria-hidden="true" className="ts-kanban__drop-indicator" />);
+        rows.push(
+          <m.li
+            key="drop"
+            {...getMotionPreset("fade", reduced)}
+            initial="initial"
+            animate="animate"
+            layout={reduced ? false : "position"}
+            transition={{ ...getMotionPreset("fade", reduced).transition, layout: layoutTransition }}
+            aria-hidden="true"
+            className="ts-kanban__drop-indicator"
+          />,
+        );
       }
       if (!isDragged) slot += 1;
       rows.push(
-        <li key={card.id} data-card-id={card.id} className="ts-kanban__item">
+        <m.li
+          key={card.id}
+          {...(reduced ? {} : { layoutId: `${uid}-card-position-${card.id}` })}
+          layout={reduced ? false : "position"}
+          transition={layoutTransition}
+          data-card-id={card.id}
+          className="ts-kanban__item"
+        >
           {renderCard(card, column)}
-        </li>,
+        </m.li>,
       );
     }
     if (over && dropTarget.index >= slot) {
-      rows.push(<li key="drop-end" aria-hidden="true" className="ts-kanban__drop-indicator" />);
+      rows.push(
+        <m.li
+          key="drop"
+          {...getMotionPreset("fade", reduced)}
+          initial="initial"
+          animate="animate"
+          layout={reduced ? false : "position"}
+          transition={{ ...getMotionPreset("fade", reduced).transition, layout: layoutTransition }}
+          aria-hidden="true"
+          className="ts-kanban__drop-indicator"
+        />,
+      );
     }
     return (
-      <section
+      <m.section
+        layout={!reduced}
+        transition={layoutTransition}
         key={column.id}
+        ref={(node) => {
+          if (node) columnNodes.current.set(column.id, node);
+          else columnNodes.current.delete(column.id);
+        }}
         className="ts-kanban__column"
         aria-labelledby={headingId}
         data-tone={toneClass(column.tone)}
@@ -446,30 +520,44 @@ export function KanbanBoard({
         }}
         onDrop={(event) => onColumnDrop(event, column)}
       >
-        <header className="ts-kanban__header">
-          <Heading id={headingId} className="ts-kanban__title">
-            {column.title}
-          </Heading>
-          <Badge tone={column.tone ?? "neutral"} className="ts-kanban__count">
-            <span aria-hidden="true">{column.cards.length}</span>
-            <span className="ts-visually-hidden">{labels.count(column.cards.length)}</span>
-          </Badge>
-          {!collapsed && menuItems.length > 0 && (
-            <ContextMenu triggerLabel={labels.columnMenu(column.title)} items={menuItems} />
-          )}
+        {collapsed ? (
           <button
             type="button"
-            className="ts-kanban__icon-button ts-kanban__toggle"
-            aria-expanded={!collapsed}
-            aria-controls={collapsed ? undefined : bodyId}
-            aria-label={collapsed ? labels.expand(column.title) : labels.collapse(column.title)}
-            onClick={() => setCollapsed(column.id, !collapsed)}
+            className="ts-kanban__header ts-kanban__expand"
+            aria-label={labels.expand(column.title)}
+            aria-expanded={false}
+            onClick={() => setCollapsed(column.id, false)}
           >
-            <Icon name={collapsed ? "chevron_right" : "expand_more"} />
+            <Icon name="chevron_right" />
+            <span id={headingId} className="ts-kanban__title">
+              {column.title}
+            </span>
+            <Badge tone={column.tone ?? "neutral"} className="ts-kanban__count">
+              <span aria-hidden="true">{column.cards.length}</span>
+              <span className="ts-visually-hidden">{labels.count(column.cards.length)}</span>
+            </Badge>
           </button>
-        </header>
+        ) : (
+          <header className="ts-kanban__header">
+            <Heading id={headingId} className="ts-kanban__title">
+              {column.title}
+            </Heading>
+            <Badge tone={column.tone ?? "neutral"} className="ts-kanban__count">
+              <span aria-hidden="true">{column.cards.length}</span>
+              <span className="ts-visually-hidden">{labels.count(column.cards.length)}</span>
+            </Badge>
+            <ContextMenu triggerLabel={labels.columnMenu(column.title)} items={menuItems} />
+          </header>
+        )}
         {!collapsed && (
-          <div id={bodyId} className="ts-kanban__body">
+          <m.div
+            key={bodyId}
+            {...itemPreset}
+            initial={mounted.current ? "initial" : false}
+            animate="animate"
+            id={bodyId}
+            className="ts-kanban__body"
+          >
             <ul className="ts-kanban__cards">{rows}</ul>
             {column.cards.length === 0 && (
               <EmptyState
@@ -491,29 +579,33 @@ export function KanbanBoard({
                 {labels.addCardShort}
               </Button>
             )}
-          </div>
+          </m.div>
         )}
-      </section>
+      </m.section>
     );
   };
 
   return (
-    <div className={cx("ts-kanban", list ? "ts-kanban--list" : "ts-kanban--board", className)}>
-      <p id={instructionsId} className="ts-visually-hidden">
-        {labels.instructions}
-      </p>
-      <div role="status" aria-live="polite" aria-atomic="true" className="ts-visually-hidden">
-        {announcement}
-      </div>
-      {list ? (
-        <div className="ts-kanban__columns">{shown.map(renderColumn)}</div>
-      ) : (
-        // A focusable scroll region keeps horizontal scrolling reachable by keyboard.
-        // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-        <div ref={scroller} className="ts-kanban__scroller" role="region" aria-label={labels.board} tabIndex={0}>
-          <div className="ts-kanban__columns">{shown.map(renderColumn)}</div>
+    <MotionLayout>
+      <LayoutGroup id={uid}>
+        <div className={cx("ts-kanban", list ? "ts-kanban--list" : "ts-kanban--board", className)}>
+          <p id={instructionsId} className="ts-visually-hidden">
+            {labels.instructions}
+          </p>
+          <div role="status" aria-live="polite" aria-atomic="true" className="ts-visually-hidden">
+            {announcement}
+          </div>
+          {list ? (
+            <div className="ts-kanban__columns">{shown.map(renderColumn)}</div>
+          ) : (
+            // A focusable scroll region keeps horizontal scrolling reachable by keyboard.
+            // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+            <div ref={scroller} className="ts-kanban__scroller" role="region" aria-label={labels.board} tabIndex={0}>
+              <div className="ts-kanban__columns">{shown.map(renderColumn)}</div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </LayoutGroup>
+    </MotionLayout>
   );
 }

@@ -27,7 +27,7 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
-.notes section + section {
+.notes section:has(> .notes__grid:not(:empty)) ~ section:has(> .notes__grid:not(:empty)) {
   margin-top: var(--ts-space-2);
 }
 .notes__grid {
@@ -118,4 +118,9 @@
     width: 100%;
     min-width: 0;
   }
+}
+
+/* Keep presence mounted for the final exit without leaving an empty grid gap. */
+.notes section:has(> .notes__grid:empty) {
+  display: none;
 }
