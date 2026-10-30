@@ -1,17 +1,18 @@
-import { Breadcrumb, EmptyState, PageHeader } from "@talentstroom/ui";
+import { Card, EmptyState } from "@talentstroom/ui";
 import { t } from "@talentstroom/i18n";
 import type { Locale } from "@talentstroom/i18n";
-
+import { PageFrame } from "./pageShared.tsx";
 export default function StartpaginaPage({ locale }: { locale: Locale }) {
-  const title = t(locale, "nav.paginas.startpagina");
   return (
-    <>
-      <Breadcrumb
-        label={t(locale, "nav.breadcrumbs")}
-        items={[{ label: t(locale, "nav.group.paginas") }, { label: title }]}
-      />
-      <PageHeader title={title} />
-      <EmptyState title={title} body={t(locale, "nav.demo_building", { issue: 414 })} />
-    </>
+    <PageFrame locale={locale} titleKey="nav.paginas.startpagina" subtitle={t(locale, "demo.pages.starter.subtitle")}>
+      <div className="page-stack">
+        <Card>
+          <EmptyState
+            title={t(locale, "demo.pages.starter.emptyTitle")}
+            body={t(locale, "demo.pages.starter.emptyBody")}
+          />
+        </Card>
+      </div>
+    </PageFrame>
   );
 }
