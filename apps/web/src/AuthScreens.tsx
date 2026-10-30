@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { Button, Checkbox, TextField } from "@talentstroom/ui";
+import { Button, Checkbox, Tabs, TextField } from "@talentstroom/ui";
 import { DEFAULT_LOCALE, t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
 import { errorKey, isAborted } from "./auth.ts";
@@ -28,17 +28,18 @@ export function AuthScreens({
   locale,
   transport,
   onSignedIn,
+  previewError = false,
 }: {
   path: string;
   query: string;
   locale: Locale;
   transport: Transport;
   onSignedIn: () => void;
+  previewError?: boolean;
 }) {
   const tr = (key: MessageKey) => t(locale, key);
-  const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(() => path === "/e-mail-bevestigen" && new URLSearchParams(query).has("token"));
-  const [error, setError] = useState<MessageKey>();
+  const [error, setError] = useState<MessageKey | undefined>(() => (previewError ? "auth.loginError" : undefined));
   const [done, setDone] = useState<MessageKey>();
   const controller = useRef<AbortController | null>(null);
   const params = new URLSearchParams(query);
@@ -128,7 +129,7 @@ export function AuthScreens({
   const invalidReset = reset && (invalid || !token);
   return (
     <>
-      {login && <p className="auth-intro">{tr("auth.intro")}</p>}
+      {login && <p className="auth-intro">{tr("auth.loginSubtitle")}</p>}
       {(done || verified) && <output>{tr(done ?? "auth.verified")}</output>}
       {(invalid || invalidReset) && <p role="alert">{tr("auth.invalidLink")}</p>}
       {error && <p role="alert">{tr(error)}</p>}
@@ -137,51 +138,100 @@ export function AuthScreens({
         <a href="/wachtwoord-vergeten">{tr("auth.newReset")}</a>
       ) : (
         !done && (
-          <form
-            aria-label={tr(titles[path] ?? "auth.signIn")}
-            onSubmit={(event) => void submit(event)}
-            aria-busy={busy}
-          >
-            <fieldset disabled={busy} className="auth-fields">
-              {register && (
-                <TextField name="name" label={tr("auth.name")} required autoComplete="name" maxLength={100} />
-              )}
-              {!reset && <TextField name="email" label={tr("auth.email")} type="email" required autoComplete="email" />}
-              {(login || register || reset) && (
-                <>
+          <>
+            {login && (
+              <Tabs
+                label={tr("auth.method")}
+                selectedId="email"
+                tabs={[
+                  { id: "email", label: tr("auth.emailTab"), panel: null },
+                  {
+                    id: "passkey",
+                    label: (
+                      <>
+                        <span>{tr("auth.passkeyTab")}</span>
+                        <span className="auth-soon-badge">{tr("auth.comingSoon")}</span>
+                      </>
+                    ),
+                    panel: null,
+                    disabled: true,
+                  },
+                ]}
+              />
+            )}
+            <form
+              aria-label={tr(titles[path] ?? "auth.signIn")}
+              onSubmit={(event) => void submit(event)}
+              aria-busy={busy}
+            >
+              <fieldset disabled={busy} className="auth-fields">
+                {register && (
                   <TextField
-                    name="password"
-                    label={tr("auth.password")}
-                    type={show ? "text" : "password"}
+                    name="name"
+                    label={tr("auth.name")}
+                    placeholder={tr("auth.namePlaceholder")}
                     required
-                    minLength={login ? undefined : 12}
-                    maxLength={128}
-                    autoComplete={login ? "current-password" : "new-password"}
-                    {...(!login ? { hint: tr("auth.passwordHint") } : {})}
+                    autoComplete="name"
+                    maxLength={100}
                   />
-                  <Button variant="ghost" aria-pressed={show} onClick={() => setShow(!show)}>
-                    {tr(show ? "auth.hide" : "auth.show")}
-                  </Button>
-                </>
-              )}
-              {register && <Checkbox name="terms" required label={tr("auth.terms")} />}
-              {login && <a href="/wachtwoord-vergeten">{tr("auth.forgotLink")}</a>}
-              {verify && <p className="auth-intro">{tr("auth.verificationHelp")}</p>}
-              <Button type="submit" loading={busy} loadingLabel={tr("auth.loading")}>
-                {tr(
-                  login
-                    ? "auth.signIn"
-                    : register
-                      ? "auth.createAccount"
-                      : reset
-                        ? "auth.savePassword"
-                        : verify
-                          ? "auth.resend"
-                          : "auth.sendReset",
                 )}
-              </Button>
-            </fieldset>
-          </form>
+                {!reset && (
+                  <TextField
+                    name="email"
+                    label={tr("auth.email")}
+                    placeholder={tr("auth.emailPlaceholder")}
+                    type="email"
+                    leadingIcon="mail"
+                    required
+                    autoComplete="email"
+                  />
+                )}
+                {(login || register || reset) && (
+                  <>
+                    <TextField
+                      name="password"
+                      label={tr("auth.password")}
+                      placeholder={tr("auth.passwordPlaceholder")}
+                      type="password"
+                      leadingIcon="lock"
+                      visibilityLabels={{ show: tr("auth.show"), hide: tr("auth.hide") }}
+                      required
+                      minLength={login ? undefined : 12}
+                      maxLength={128}
+                      autoComplete={login ? "current-password" : "new-password"}
+                      {...(!login ? { hint: tr("auth.passwordHint") } : {})}
+                    />
+                  </>
+                )}
+                {register && <Checkbox name="terms" required label={tr("auth.terms")} />}
+                {login && (
+                  <div className="auth-login-options">
+                    <span aria-hidden="true" />
+                    <a href="/wachtwoord-vergeten">{tr("auth.forgotLink")}</a>
+                  </div>
+                )}
+                {verify && <p className="auth-intro">{tr("auth.verificationHelp")}</p>}
+                <Button
+                  type="submit"
+                  loading={busy}
+                  loadingLabel={tr("auth.loading")}
+                  {...(login ? { trailingIcon: "arrow_forward", className: "auth-submit" } : {})}
+                >
+                  {tr(
+                    login
+                      ? "auth.signIn"
+                      : register
+                        ? "auth.createAccount"
+                        : reset
+                          ? "auth.savePassword"
+                          : verify
+                            ? "auth.resend"
+                            : "auth.sendReset",
+                  )}
+                </Button>
+              </fieldset>
+            </form>
+          </>
         )
       )}
       <nav className="auth-links">
@@ -192,7 +242,6 @@ export function AuthScreens({
         ) : (
           <a href="/inloggen">{tr(verified || done ? "auth.signIn" : "auth.back")}</a>
         )}
-        {login && <a href="/e-mail-bevestigen?error=resend">{tr("auth.resend")}</a>}
       </nav>
     </>
   );

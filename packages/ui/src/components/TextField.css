@@ -82,6 +82,9 @@
 .ts-field__control--search input {
   padding-left: var(--ts-space-10);
 }
+.ts-field__control--leading input {
+  padding-left: var(--ts-space-10);
+}
 .ts-field__control--trailing input {
   padding-right: var(--ts-space-12);
 }

@@ -16,6 +16,8 @@ export interface RadioOption {
   value: string;
   label: string;
   description?: string;
+  avatar?: string;
+  badge?: string;
   disabled?: boolean;
 }
 export function RadioGroup({
@@ -76,7 +78,13 @@ export function RadioGroup({
               }}
             />
             <span className="ts-radio-option__content">
+              {o.avatar && (
+                <span className="ts-radio-option__avatar" aria-hidden="true">
+                  {o.avatar}
+                </span>
+              )}
               <span>{o.label}</span>
+              {o.badge && <span className="ts-radio-option__badge">{o.badge}</span>}
               {o.description && <span className="ts-field__hint">{o.description}</span>}
             </span>
           </label>

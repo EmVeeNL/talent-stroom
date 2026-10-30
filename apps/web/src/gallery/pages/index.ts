@@ -8,6 +8,7 @@ import { Filters } from "./Filters.tsx";
 import { Forms } from "./Forms.tsx";
 import { Overlays } from "./Overlays.tsx";
 import { Feedback } from "./Feedback.tsx";
+import { Auth } from "./Auth.tsx";
 import { Kanban } from "./Kanban.tsx";
 export const pages = [
   { id: "tokens", titleKey: "gallery.page.tokens" satisfies MessageKey, Page: Tokens },
@@ -19,5 +20,6 @@ export const pages = [
   { id: "forms", titleKey: "gallery.page.forms" satisfies MessageKey, Page: Forms },
   { id: "overlays", titleKey: "gallery.page.overlays" satisfies MessageKey, Page: Overlays },
   { id: "feedback", titleKey: "gallery.page.feedback" satisfies MessageKey, Page: Feedback },
+  { id: "auth", titleKey: "gallery.page.auth" satisfies MessageKey, Page: Auth },
   { id: "kanban", titleKey: "gallery.page.kanban" satisfies MessageKey, Page: Kanban },
 ] as const;
