@@ -34,10 +34,28 @@ export { Breadcrumb } from "./components/Breadcrumb.tsx";
 export type { BreadcrumbProps } from "./components/Breadcrumb.tsx";
 export { Kbd } from "./components/Kbd.tsx";
 export type { KbdProps } from "./components/Kbd.tsx";
-export { Sidebar } from "./components/Sidebar.tsx";
-export type { SidebarProps } from "./components/Sidebar.tsx";
+export { Sidebar, SidebarAssistant } from "./components/Sidebar.tsx";
+export type { SidebarProps, SidebarSection, SidebarAssistantProps } from "./components/Sidebar.tsx";
+export { AppShell, PageHeader, useIsMobile } from "./components/AppShell.tsx";
+export type { AppShellLabels, AppShellProps, PageHeaderProps } from "./components/AppShell.tsx";
+export { LanguageMenu, NavbarIconButton, NavbarSearch, ThemeButton, useDarkMode } from "./components/Navbar.tsx";
+export type {
+  LanguageMenuProps,
+  LanguageOption,
+  NavbarIconButtonProps,
+  NavbarSearchProps,
+  ThemeButtonProps,
+} from "./components/Navbar.tsx";
+export { OrganizationSwitcher } from "./components/OrganizationSwitcher.tsx";
+export type {
+  OrganizationOption,
+  OrganizationSwitcherLabels,
+  OrganizationSwitcherProps,
+} from "./components/OrganizationSwitcher.tsx";
+export { UserMenu } from "./components/UserMenu.tsx";
+export type { UserMenuLabels, UserMenuProps } from "./components/UserMenu.tsx";
 export { CommandPalette } from "./components/CommandPalette.tsx";
-export type { CommandPaletteProps } from "./components/CommandPalette.tsx";
+export type { CommandPaletteProps, CommandPaletteTriggerProps } from "./components/CommandPalette.tsx";
 export { getThemePreference, setThemePreference } from "./theme.ts";
 export type { ThemePreference } from "./theme.ts";
 export type { SidebarItem } from "./components/Sidebar.tsx";

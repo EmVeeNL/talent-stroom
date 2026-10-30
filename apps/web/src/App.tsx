@@ -1,11 +1,13 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { DEFAULT_LOCALE, isLocale, LOCALES, t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
-import { Button, Dialog, Header, Select, ThemeToggle } from "@talentstroom/ui";
+import { Button, Select, ThemeToggle } from "@talentstroom/ui";
 import { createTransport, errorKey, isAborted, listOrganizations, RequestError } from "./auth.ts";
 import type { OrganizationList } from "./auth.ts";
 import { AuthScreens, publicRoutes, titles } from "./AuthScreens.tsx";
 import { OrganizationPicker } from "./OrganizationPicker.tsx";
+import { Workspace } from "./Workspace.tsx";
+import type { SessionUser } from "./Workspace.tsx";
 import "./auth.css";
 
 // Dev-only component showcase: ?gallery. Tree-shaken from production builds.
@@ -26,9 +28,19 @@ export function App() {
 type Context =
   | { kind: "loading" }
   | { kind: "guest" }
-  | { kind: "ready"; data: OrganizationList }
+  | { kind: "ready"; data: OrganizationList; user: SessionUser }
   | { kind: "error"; message: MessageKey };
 const readLocation = () => ({ path: window.location.pathname, query: window.location.search });
+/** Display name and email from the Better Auth session (kept in memory only). */
+function readUser(session: object): SessionUser {
+  const user: unknown = "user" in session ? session.user : undefined;
+  const field = (key: string) => {
+    const value: unknown =
+      user && typeof user === "object" ? Object.getOwnPropertyDescriptor(user, key)?.value : undefined;
+    return typeof value === "string" ? value : "";
+  };
+  return { name: field("name"), email: field("email") };
+}
 function AuthApp() {
   const [location, setLocation] = useState(readLocation);
   const [locale, setLocale] = useState<Locale>(DEFAULT_LOCALE);
@@ -71,7 +83,7 @@ function AuthApp() {
           return;
         }
         const data = await listOrganizations(transport, signal);
-        if (!signal.aborted) setContext({ kind: "ready", data });
+        if (!signal.aborted) setContext({ kind: "ready", data, user: readUser(session) });
       } catch (err) {
         if (isAborted(err) || signal.aborted) return;
         setContext(
@@ -187,37 +199,42 @@ function AuthApp() {
         onExpired={expire}
       />
     ) : null;
-  const home = path === "/" && active;
+  if (path === "/" && active && context.kind === "ready")
+    return (
+      <Workspace
+        locale={locale}
+        onLocaleChange={setLocale}
+        transport={transport}
+        data={context.data}
+        user={context.user}
+        signOutBusy={signOutBusy}
+        onSignOut={() => void signOut()}
+        onChanged={refresh}
+        onExpired={expire}
+        headingRef={heading}
+      >
+        {actionError && (
+          <p role="alert" className="workspace-alert">
+            {tr(actionError)}
+          </p>
+        )}
+        <p className="workspace-intro">{tr("auth.homeIntro")}</p>
+      </Workspace>
+    );
   return (
-    <div className={home ? "workspace" : "auth-shell"}>
-      {home ? (
-        <Header
-          userMenu={
-            <Button variant="ghost" loading={signOutBusy} onClick={() => void signOut()}>
-              {tr("auth.signOut")}
-            </Button>
-          }
-        >
-          <strong>{tr("app.name")}</strong>
-          <span>{active.name}</span>
-          <Dialog title={tr("auth.picker")} triggerLabel={tr("auth.switchOrg")} closeLabel={tr("auth.close")}>
-            {picker}
-          </Dialog>
-        </Header>
-      ) : (
-        <aside className="auth-brand">
-          <a href="/inloggen" className="auth-wordmark">
-            {tr("app.name")}
-          </a>
-          <div>
-            <p className="auth-brand-title">{tr("auth.brandLine")}</p>
-            <p>{tr("auth.brandText")}</p>
-          </div>
-        </aside>
-      )}
-      <div className={home ? "workspace-body" : "auth-panel"}>
+    <div className="auth-shell">
+      <aside className="auth-brand">
+        <a href="/inloggen" className="auth-wordmark">
+          {tr("app.name")}
+        </a>
+        <div>
+          <p className="auth-brand-title">{tr("auth.brandLine")}</p>
+          <p>{tr("auth.brandText")}</p>
+        </div>
+      </aside>
+      <div className="auth-panel">
         <div className="auth-controls">{controls}</div>
-        <main className={home ? "workspace-content" : "auth-content"}>
+        <main className="auth-content">
           {context.kind === "loading" ? (
             <output>{tr("auth.loading")}</output>
           ) : (
@@ -244,13 +261,6 @@ function AuthApp() {
                   transport={transport}
                   onSignedIn={refresh}
                 />
-              ) : home ? (
-                <>
-                  <p>
-                    {tr("auth.active")}: <strong>{active.name}</strong>
-                  </p>
-                  <p>{tr("auth.homeIntro")}</p>
-                </>
               ) : (
                 <>
                   {picker}

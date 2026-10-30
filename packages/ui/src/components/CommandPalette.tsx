@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
+import type { ReactNode, Ref } from "react";
 import { cx } from "../classnames.ts";
 import { Button } from "./Button.tsx";
 import { Kbd } from "./Kbd.tsx";
@@ -15,6 +16,17 @@ export interface CommandPaletteProps {
   emptyLabel: string;
   actions: readonly CommandAction[];
   className?: string;
+  /** Custom trigger (e.g. the navbar search field). Spread the props onto a `<button>`. */
+  renderTrigger?: (props: CommandPaletteTriggerProps) => ReactNode;
+}
+export interface CommandPaletteTriggerProps {
+  ref: Ref<HTMLButtonElement>;
+  type: "button";
+  "aria-haspopup": "dialog";
+  "aria-expanded": boolean;
+  "aria-controls": string;
+  "aria-keyshortcuts": string;
+  onClick: () => void;
 }
 export function CommandPalette({
   label,
@@ -23,6 +35,7 @@ export function CommandPalette({
   emptyLabel,
   actions,
   className,
+  renderTrigger,
 }: CommandPaletteProps) {
   const id = useId();
   const dialog = useRef<HTMLDialogElement>(null);
@@ -72,16 +85,28 @@ export function CommandPalette({
   };
   return (
     <>
-      <Button
-        ref={trigger}
-        variant="secondary"
-        aria-haspopup="dialog"
-        aria-expanded={open}
-        aria-controls={`${id}-dialog`}
-        onClick={show}
-      >
-        {triggerLabel} <Kbd>Ctrl / ⌘ K</Kbd>
-      </Button>
+      {renderTrigger ? (
+        renderTrigger({
+          ref: trigger,
+          type: "button",
+          "aria-haspopup": "dialog",
+          "aria-expanded": open,
+          "aria-controls": `${id}-dialog`,
+          "aria-keyshortcuts": "Control+K Meta+K",
+          onClick: show,
+        })
+      ) : (
+        <Button
+          ref={trigger}
+          variant="secondary"
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          aria-controls={`${id}-dialog`}
+          onClick={show}
+        >
+          {triggerLabel} <Kbd>Ctrl / ⌘ K</Kbd>
+        </Button>
+      )}
       <dialog
         ref={dialog}
         id={`${id}-dialog`}

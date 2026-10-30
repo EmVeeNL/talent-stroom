@@ -66,7 +66,7 @@ light, dark and system themes through the shared ThemeToggle.
 | `/wachtwoord-vergeten`   | Request a password reset email                                             |
 | `/wachtwoord-herstellen` | Set a new password using the emailed token                                 |
 | `/organisatie-kiezen`    | List, confirm/switch or create an organization                             |
-| `/`                      | Signed-in placeholder with active organization, switch dialog and sign-out |
+| `/`                      | Signed-in home in the app shell (sidebar, navbar, org switcher, user menu) |
 
 History API navigation preserves normal links, modified clicks and browser
 back/forward. The production host must serve the SPA for these paths.
@@ -90,8 +90,9 @@ Use Node 26 and pnpm 12. From the repository root:
 4. `pnpm dev`
 5. Open http://localhost:5173/registreren and register with synthetic data.
 6. Open Mailpit at http://localhost:8025, follow the verification link, then sign in.
-7. Create your first organization. Open the header switcher to pick another
-   organization; confirm with “Organisatie openen”.
+7. Create your first organization. Open the navbar organization switcher
+   (“Switch organisatie”) and pick another organization; it switches immediately
+   (session rotation, scoped state reloaded).
 8. Sign out and use “Wachtwoord vergeten?” to exercise password recovery through
    Mailpit.
 

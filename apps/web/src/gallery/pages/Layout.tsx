@@ -1,50 +1,187 @@
 import { useState } from "react";
 import {
-  Sidebar,
-  Header,
+  AppShell,
   Breadcrumb,
-  CommandPalette,
-  Kbd,
   Button,
-  Card,
+  CommandPalette,
   Icon,
-  Logo,
-  Tabs,
   ICON_NAMES,
+  Kbd,
+  LanguageMenu,
+  Logo,
+  NavbarIconButton,
+  NavbarSearch,
+  OrganizationSwitcher,
+  PageHeader,
+  SidebarAssistant,
+  StatCard,
+  Tabs,
+  ThemeButton,
+  UserMenu,
 } from "@talentstroom/ui";
 import { Section } from "../Section.tsx";
 import { useGallery } from "../context.ts";
+import { shellLabels, shellSections } from "../../Workspace.tsx";
+
+const ORGANIZATIONS = [
+  { id: "demo", name: "TalentStroom Demo" },
+  { id: "innovatech", name: "Innovatech Recruitment" },
+  { id: "scaleup", name: "ScaleUp BV" },
+  { id: "creative", name: "Creative Minds" },
+  { id: "dataworks", name: "DataWorks" },
+  { id: "cloudworks", name: "CloudWorks" },
+];
+
+/** Dev-only `&shell=collapsed` and `&open=org|user|language` render fixed states for screenshots. */
+function ShellPreview() {
+  const { tr, locale } = useGallery();
+  const params = new URLSearchParams(window.location.search);
+  const open = params.get("open");
+  const [active, setActive] = useState("dashboard");
+  const [org, setOrg] = useState("demo");
+  const [language, setLanguage] = useState<string>(locale);
+  const sections = shellSections(tr, () => "#layout");
+  for (const item of sections.flatMap((section) => section.items)) {
+    item.onClick = (event) => {
+      event.preventDefault();
+      setActive(item.id);
+    };
+    if (item.id === "tasks") {
+      item.count = 3;
+      item.countLabel = tr("shell.count").replace("{count}", "3");
+    }
+  }
+  const label = (id: string) =>
+    sections.flatMap((section) => section.items).find((item) => item.id === id)?.label ?? id;
+  const languages = [
+    { value: "nl-NL", label: tr("auth.dutch"), short: "NL" },
+    { value: "en-GB", label: tr("auth.english"), short: "EN" },
+  ];
+  return (
+    <AppShell
+      className="gallery-shell__app"
+      defaultCollapsed={params.get("shell") === "collapsed"}
+      labels={shellLabels(tr)}
+      sidebar={{
+        label: tr("shell.navigation"),
+        soonLabel: tr("shell.soon"),
+        home: { href: "#layout", label: tr("shell.home") },
+        activeId: active,
+        sections,
+        footer: (
+          <SidebarAssistant
+            title={tr("shell.assistant.title")}
+            description={tr("shell.assistant.description")}
+            soonLabel={tr("shell.soon")}
+            onClick={() => setActive("dashboard")}
+          />
+        ),
+      }}
+      header={{
+        search: (
+          <CommandPalette
+            label={tr("shell.searchTitle")}
+            triggerLabel={tr("shell.searchTitle")}
+            closeLabel={tr("shell.close")}
+            emptyLabel={tr("shell.noResults")}
+            actions={sections
+              .flatMap((section) => section.items)
+              .map((item) => ({
+                id: item.id,
+                label: item.label,
+                group: tr("shell.pages"),
+                onSelect: () => setActive(item.id),
+              }))}
+            renderTrigger={(props) => <NavbarSearch {...props} placeholder={tr("shell.search")} />}
+          />
+        ),
+        children: (
+          <>
+            <OrganizationSwitcher
+              organizations={ORGANIZATIONS}
+              currentId={org}
+              labels={{
+                title: tr("shell.org.title"),
+                search: tr("shell.org.search"),
+                current: tr("shell.org.current"),
+                create: tr("shell.org.create"),
+                empty: tr("shell.org.empty"),
+                busy: tr("shell.org.busy"),
+              }}
+              onSelect={setOrg}
+              createHref="#layout"
+              defaultOpen={open === "org"}
+            />
+            <LanguageMenu label={tr("shell.language")} value={language} options={languages} onChange={setLanguage} />
+            <ThemeButton label={tr("shell.darkMode")} />
+          </>
+        ),
+        notifications: (
+          <>
+            <NavbarIconButton
+              icon="notifications"
+              label={tr("shell.notificationsUnread").replace("{count}", "2")}
+              dot
+              className="ts-navbar-button--optional"
+            />
+            <NavbarIconButton icon="help" label={tr("shell.help")} className="ts-navbar-button--optional" />
+          </>
+        ),
+        userMenu: (
+          <UserMenu
+            name="Robin Voorbeeld"
+            email="robin@example.test"
+            organization={ORGANIZATIONS.find((item) => item.id === org)?.name ?? ""}
+            labels={{
+              menu: tr("shell.user.menu"),
+              profile: tr("shell.user.profile"),
+              settings: tr("shell.user.settings"),
+              darkMode: tr("shell.darkMode"),
+              language: tr("shell.language"),
+              shortcuts: tr("shell.user.shortcuts"),
+              help: tr("shell.user.help"),
+              signOut: tr("auth.signOut"),
+              soon: tr("shell.soon"),
+            }}
+            languageName={languages.find((item) => item.value === language)?.label ?? ""}
+            onLanguageChange={() => setLanguage(language === "nl-NL" ? "en-GB" : "nl-NL")}
+            onSignOut={() => setActive("dashboard")}
+            onProfile={() => setActive("users")}
+            onSettings={() => setActive("settings")}
+            defaultOpen={open === "user"}
+          />
+        ),
+      }}
+    >
+      <PageHeader
+        title={active === "dashboard" ? tr("gallery.shell.greeting") : label(active)}
+        subtitle={tr("gallery.shell.subtitle")}
+        actions={
+          <Button icon="add" onClick={() => setActive("candidates")}>
+            {tr("gallery.shell.newCandidate")}
+          </Button>
+        }
+      />
+      <div className="gallery-shell__stats">
+        <StatCard label={tr("shell.nav.candidates")} value={1248} icon="group" />
+        <StatCard label={tr("shell.nav.vacancies")} value={86} icon="work" />
+        <StatCard label={tr("shell.nav.placements")} value={34} icon="work_history" />
+        <StatCard label={tr("shell.nav.clients")} value={48} icon="handshake" />
+      </div>
+    </AppShell>
+  );
+}
+
 export function Layout() {
   const { tr } = useGallery();
-  const [collapsed, setCollapsed] = useState(false);
-  const [active, setActive] = useState("dashboard");
-  const nav = (
-    [
-      ["dashboard", "dashboard"],
-      ["vacancies", "work"],
-      ["candidates", "group"],
-      ["clients", "business"],
-      ["tasks", "checklist"],
-    ] as const
-  ).map(([id, icon]) => ({
-    id,
-    icon,
-    label: tr(`gallery.nav.${id}`),
-    href: "#layout",
-    onClick: (event: React.MouseEvent<HTMLAnchorElement>) => {
-      event.preventDefault();
-      setActive(id);
-    },
-  }));
-  const actions = nav.map((item) => ({
-    id: item.id,
-    label: item.label,
-    group: tr("gallery.pages"),
-    onSelect: () => setActive(item.id),
-  }));
-
   return (
     <>
+      <Section title={tr("gallery.shell")}>
+        <p className="gallery-icons-intro">{tr("gallery.shell.intro")}</p>
+        <div className="gallery-shell">
+          <ShellPreview />
+        </div>
+      </Section>
       <Section title={tr("gallery.icons")}>
         <p className="gallery-icons-intro">{tr("gallery.icons.intro")}</p>
         <div className="gallery-icons-examples">
@@ -74,84 +211,14 @@ export function Layout() {
           ))}
         </ul>
       </Section>
-      <Section title={tr("gallery.frame")}>
-        <div className="gallery-frame">
-          <Sidebar
-            label={tr("gallery.navigation")}
-            collapsed={collapsed}
-            workspace={
-              <span className="gallery-workspace">
-                <Logo variant={collapsed ? "mark" : "full"} tone="dark" size="sm" decorative />
-                {collapsed ? (
-                  <span className="ts-visually-hidden">{tr("gallery.workspace")}</span>
-                ) : (
-                  tr("gallery.workspace")
-                )}
-              </span>
-            }
-            items={[
-              ...nav.slice(0, 1),
-              { id: "recruitment", label: tr("gallery.recruitment"), icon: "work", children: nav.slice(1) },
-            ]}
-            activeId={active}
-          />
-          <div className="gallery-frame__body">
-            <Header
-              search={
-                <CommandPalette
-                  label={tr("gallery.search")}
-                  triggerLabel={tr("gallery.search")}
-                  closeLabel={tr("gallery.close")}
-                  emptyLabel={tr("gallery.noResults")}
-                  actions={[
-                    ...actions,
-                    {
-                      id: "new-candidate",
-                      label: tr("gallery.buttons.withIcon"),
-                      group: tr("gallery.actions"),
-                      onSelect: () => setActive("candidates"),
-                    },
-                  ]}
-                />
-              }
-              notifications={
-                <Button
-                  variant="ghost"
-                  aria-label={tr("gallery.notifications")}
-                  icon="notifications"
-                  onClick={() => setActive("tasks")}
-                />
-              }
-              userMenu={
-                <details className="gallery-user">
-                  <summary>{tr("gallery.user")}</summary>
-                  <p>{tr("gallery.userRole")}</p>
-                </details>
-              }
-            />
-            <div className="gallery-frame__content">
-              <Breadcrumb
-                label={tr("gallery.breadcrumb")}
-                items={[
-                  { label: tr("gallery.workspace"), href: "#layout" },
-                  { label: nav.find((item) => item.id === active)?.label ?? tr("gallery.nav.dashboard") },
-                ]}
-              />
-              <h2>{nav.find((item) => item.id === active)?.label}</h2>
-              <p>{tr("gallery.sample")}</p>
-              <Card title={tr("gallery.vacancy")}>
-                <p>{tr("gallery.client")}</p>
-                <p>{tr("gallery.candidate")}</p>
-              </Card>
-              <p>
-                <Kbd>⌘</Kbd> / <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd>
-              </p>
-              <Button variant="secondary" aria-pressed={collapsed} onClick={() => setCollapsed(!collapsed)}>
-                {tr(collapsed ? "gallery.expand" : "gallery.collapse")}
-              </Button>
-            </div>
-          </div>
-        </div>
+      <Section title={tr("gallery.breadcrumb")}>
+        <Breadcrumb
+          label={tr("gallery.breadcrumb")}
+          items={[{ label: tr("gallery.workspace"), href: "#layout" }, { label: tr("gallery.nav.candidates") }]}
+        />
+        <p>
+          <Kbd>⌘</Kbd> / <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd>
+        </p>
       </Section>{" "}
       <Section title={tr("gallery.brand")}>
         <div className="gallery-brand">

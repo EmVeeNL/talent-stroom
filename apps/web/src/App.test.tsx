@@ -41,7 +41,11 @@ function setup(path = "/inloggen", authenticated = false, activeOrg: string | nu
       const intercepted = intercept?.(request);
       if (intercepted) return intercepted;
       if (url.pathname.endsWith("get-session"))
-        return Response.json(signedIn ? { user: { emailVerified: true }, session: {} } : null);
+        return Response.json(
+          signedIn
+            ? { user: { emailVerified: true, name: "Robin Voorbeeld", email: "robin@example.test" }, session: {} }
+            : null,
+        );
       if (request.method === "GET") {
         if (organizationStatus !== 200)
           return Response.json({ status: organizationStatus }, { status: organizationStatus });
@@ -83,12 +87,22 @@ describe("authentication routing", () => {
     await screen.findByRole("heading", { name: "Kies je organisatie" });
     expect(window.location.pathname).toBe("/organisatie-kiezen");
   });
-  it("opens the active workspace and signs out", async () => {
-    setup("/inloggen", true, org.organizationId);
-    await screen.findByRole("heading", { name: "Je werkruimte" });
+  it("opens the active workspace in the app shell and signs out from the user menu", async () => {
+    const { container } = setup("/inloggen", true, org.organizationId);
+    await screen.findByRole("heading", { level: 1, name: "Je werkruimte" });
     expect(screen.getAllByText(org.name).length).toBeGreaterThan(0);
-    await userEvent.click(screen.getByRole("button", { name: "Uitloggen" }));
+    expect(screen.getByRole("navigation", { name: "Hoofdnavigatie" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Dashboard" }).getAttribute("aria-current")).toBe("page");
+    expect(screen.queryByRole("link", { name: /Kandidaten/ })).toBeNull();
+    expect(screen.getByText("Kandidaten").closest("[aria-disabled]")?.textContent).toContain("Binnenkort");
+    const result = await axe.run(container, { rules: { "color-contrast": { enabled: false } } });
+    expect(result.violations.map((v) => v.id)).toEqual([]);
+    const menu = screen.getByRole("button", { name: "Gebruikersmenu: Robin Voorbeeld, Testbureau" });
+    await userEvent.click(menu);
+    expect(screen.getByText("robin@example.test")).toBeTruthy();
+    await userEvent.click(screen.getByRole("menuitem", { name: "Uitloggen" }));
     await screen.findByRole("heading", { name: "Welkom terug" });
+    expect(requests.some((r) => r.url === "/api/auth/sign-out")).toBe(true);
   });
   it("supports navigation links and browser history", async () => {
     setup();
@@ -239,14 +253,25 @@ describe("organization picker", () => {
     await screen.findByRole("heading", { name: "Je werkruimte" });
     expect(lastBody).toEqual({ name: "Testbureau" });
   });
-  it("reuses the picker in the home dialog", async () => {
-    setup("/", true, org.organizationId);
-    await userEvent.click(await screen.findByRole("button", { name: "Organisatie wisselen" }));
-    const dialog = screen.getByRole("dialog");
-    await userEvent.click(within(dialog).getByRole("button", { name: org.name }));
-    await userEvent.click(within(dialog).getByRole("button", { name: "Organisatie openen" }));
-    await screen.findByRole("heading", { name: "Je werkruimte" });
-    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  it("switches from the navbar organization switcher, rotating the session and reloading memberships", async () => {
+    const second = { ...org, organizationId: "33333333-3333-4333-8333-333333333333", name: "Tweede testbureau" };
+    setup("/", true, second.organizationId);
+    organizations = [org, second];
+    const trigger = await screen.findByRole("button", { name: "Switch organisatie: Tweede testbureau" });
+    const reads = requests.filter((r) => r.url === "/api/v1/me/organizations").length;
+    trigger.focus();
+    await userEvent.keyboard("{Enter}");
+    const dialog = screen.getByRole("dialog", { name: "Switch organisatie" });
+    expect(
+      within(dialog)
+        .getByRole("option", { name: /Tweede testbureau/ })
+        .getAttribute("aria-selected"),
+    ).toBe("true");
+    await userEvent.keyboard("{ArrowDown}{Enter}");
+    await screen.findByRole("button", { name: "Switch organisatie: Testbureau" });
+    expect(requests.some((r) => r.url === "/api/v1/organizations/" + org.organizationId + "/switch")).toBe(true);
+    expect(requests.filter((r) => r.url === "/api/v1/me/organizations").length).toBe(reads + 1);
+    expect(screen.queryByRole("dialog")).toBeNull();
   });
   it.each([401, 403, 422, 429])("handles organization failure %s without entering a workspace", async (code) => {
     setup("/", true);
@@ -273,18 +298,34 @@ describe("context and keyboard safety", () => {
     await screen.findByText("Je bent nog geen lid van een organisatie. Maak hieronder je eerste organisatie aan.");
     expect(screen.getByRole("button", { name: "Organisatie aanmaken" })).toBeTruthy();
   });
-  it("confirms switching to a different membership and replaces active context", async () => {
+  it("does not switch for the current membership and replaces active context after a switch", async () => {
     const second = { ...org, organizationId: "33333333-3333-4333-8333-333333333333", name: "Tweede testbureau" };
     setup("/", true, second.organizationId);
     organizations = [org, second];
-    await userEvent.click(await screen.findByRole("button", { name: "Organisatie wisselen" }));
-    const dialog = screen.getByRole("dialog");
-    await userEvent.click(within(dialog).getByRole("button", { name: org.name }));
+    const trigger = await screen.findByRole("button", { name: /^Switch organisatie/ });
+    await userEvent.click(trigger);
+    await userEvent.click(screen.getByRole("option", { name: /Tweede testbureau/ }));
     expect(requests.some((request) => request.url.endsWith("/switch"))).toBe(false);
-    await userEvent.click(within(dialog).getByRole("button", { name: "Organisatie openen" }));
-    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
-    expect(screen.queryByText(second.name, { selector: ".ts-header > span" })).toBeNull();
-    expect(screen.getAllByText(org.name).length).toBeGreaterThan(0);
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(document.activeElement).toBe(trigger);
+    await userEvent.click(trigger);
+    await userEvent.click(screen.getByRole("option", { name: new RegExp(`^${org.name}`) }));
+    await screen.findByRole("button", { name: `Switch organisatie: ${org.name}` });
+    expect(screen.getByRole("button", { name: /Gebruikersmenu/ }).getAttribute("aria-label")).not.toContain(
+      second.name,
+    );
+  });
+  it("shows a safe error in the switcher and expires the session on 401", async () => {
+    const second = { ...org, organizationId: "33333333-3333-4333-8333-333333333333", name: "Tweede testbureau" };
+    setup("/", true, second.organizationId);
+    organizations = [org, second];
+    await userEvent.click(await screen.findByRole("button", { name: /^Switch organisatie/ }));
+    status = 403;
+    await userEvent.click(screen.getByRole("option", { name: new RegExp(`^${org.name}`) }));
+    expect((await screen.findByRole("alert")).textContent).not.toContain("Private");
+    status = 401;
+    await userEvent.click(screen.getByRole("option", { name: new RegExp(`^${org.name}`) }));
+    await screen.findByRole("heading", { name: "Welkom terug" });
   });
   it("supports keyboard submission and restores heading focus", async () => {
     setup();

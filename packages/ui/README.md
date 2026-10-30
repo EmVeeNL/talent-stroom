@@ -34,7 +34,8 @@ Values come from the redesign design kit (`docs/images/redesign/`); the kit-to-t
 
 | Category               | Components                                                                                                                                   |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Foundations and layout | `Logo`, `Icon`, `Kbd`, `Card`, `Sidebar`, `Header`, `Breadcrumb`, `ThemeToggle`                                                              |
+| Foundations and layout | `Logo`, `Icon`, `Kbd`, `Card`, `AppShell`, `PageHeader`, `Sidebar`, `Header`, `Breadcrumb`, `ThemeToggle`                                    |
+| App shell              | `SidebarAssistant`, `NavbarSearch`, `NavbarIconButton`, `ThemeButton`, `LanguageMenu`, `OrganizationSwitcher`, `UserMenu`                    |
 | Actions and navigation | `Button`, `Tabs`, `CommandPalette`                                                                                                           |
 | Forms                  | `FormField`, `TextField`, `Textarea`, `NumberInput`, `Select`, `Switch`, `Checkbox`, `CheckboxGroup`, `RadioGroup`, `Slider`, `FileUploader` |
 | Metrics and status     | `StatCard`, `TrendIndicator`, `Progress`, `Badge`, `StatusPill`, `StageBadge`, `FilterChip`                                                  |
@@ -68,10 +69,13 @@ The Material Symbols font itself must be loaded by the app (self-host; see `docs
 
 ## Layout and navigation
 
-- `Sidebar`: recursive `items` (`id`, translated `label`, `icon`, `href`, optional `children` and link `onClick`), `activeId`, `collapsed`, and a `workspace` switcher slot. Native disclosure buttons use Space/Enter; links retain their names in icon-only mode. Hover/focus labels can be dismissed with Escape. Collapsed groups remain expanded so their destinations stay reachable.
-- `Header`: banner with `search`, `notifications`, `userMenu`, and optional children slots. Pass accessible controls as slot content.
+- `AppShell` (app shell v2, issue #381): navy `Sidebar` (252 px, 68 px collapsed), 64 px `Header` and `main` with content max 1600 px and 24/16 px page margins. Owns the collapse toggle (`menu_open`/`menu`, `aria-expanded`, `aria-controls`) and, below 768 px, the overlay drawer: `role="dialog"` + `aria-modal`, focus moves in, Tab/Shift+Tab wrap, Escape/scrim/close button close it and focus returns to the toggle; the rest of the page is `inert`. Skip link to `main`. `PageHeader`: H1 (30/38) + subtitle + right-aligned actions.
+- `Sidebar`: `sections` (`id`, optional uppercase `label`, `items`), items with `icon`, `href`, `count`/`countLabel`, `aria-current="page"` for `activeId`. Items without a route use `soon`: rendered as a disabled entry with the translated `soonLabel` in its name, never as a dead link. Collapsed: names stay in the accessible name, hover/focus tooltips (Escape dismisses). `home` logo link, `footer` slot for `SidebarAssistant` ("AI Assistent", `auto_awesome`, icon-only in the collapsed rail).
+- `Header`: banner with `start`, `search`, children (icon actions), `notifications` and `userMenu` (after a divider). Navbar parts: `NavbarSearch` (search field look-alike with ⌘K/Ctrl K chip; pass it to `CommandPalette` `renderTrigger`), `NavbarIconButton` (labelled icon-only button, optional unread `dot`), `ThemeButton` (`dark_mode` toggle button with `aria-pressed`, synced through `useDarkMode` with ThemeToggle, storage, OS changes and `data-theme`), `LanguageMenu` (flag + code, `menuitemradio` choices).
+- `OrganizationSwitcher` (foundation concept 08): trigger `business` + name + `expand_more`; non-modal dialog with title, search combobox (`aria-activedescendant`, Up/Down wrap, Home/End, Enter) over a listbox where the current organization is `aria-selected` and checked, plus a "Nieuwe organisatie" link. Escape/outside click close and restore focus. The app performs the server-side switch in `onSelect`.
+- `UserMenu` (09): menu button (`aria-haspopup="menu"`, ArrowDown/ArrowUp open) with name/email, Mijn profiel, Instellingen, Donkere modus (`menuitemcheckbox`), Taal, Sneltoetsen, Help en support, Uitloggen (danger). Entries without a handler are `aria-disabled` and marked with `labels.soon`. Arrow keys/Home/End move, Escape returns focus, Tab and outside click close.
 - `Breadcrumb`: labelled navigation and an ordered list; the final item is the current page. Decorative separators are hidden from assistive technology.
-- `CommandPalette`: native modal dialog, Cmd/Ctrl+K, labelled combobox, grouped listbox, filtering, wrapping Up/Down, Home/End, Enter to run, Escape/close button, and focus restored to its trigger. The browser provides modal focus containment. Each action takes `id`, translated `label` and `group`, and `onSelect`.
+- `CommandPalette`: native modal dialog, Cmd/Ctrl+K (optional `renderTrigger` for a custom trigger such as `NavbarSearch`), labelled combobox, grouped listbox, filtering, wrapping Up/Down, Home/End, Enter to run, Escape/close button, and focus restored to its trigger. The browser provides modal focus containment. Each action takes `id`, translated `label` and `group`, and `onSelect`.
 - `Kbd`: semantic keyboard shortcut chip.
 
 ## Accessibility checklist (per component)
