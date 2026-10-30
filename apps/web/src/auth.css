@@ -189,13 +189,44 @@ body {
   margin: 0;
   padding: 0;
 }
+/* Frosted card over the photo. Built on theme tokens (not on [data-theme]) so light, dark
+   and "system" (prefers-color-scheme) always get a matching surface, fields and text. */
 .auth-card {
   padding: var(--ts-space-6);
   color: var(--ts-text);
-  background: var(--ts-surface);
-  border: var(--ts-border-width) solid var(--ts-border);
+  --auth-glass: 80%;
+  background: color-mix(in srgb, var(--ts-surface) var(--auth-glass), transparent);
+  border: var(--ts-border-width) solid color-mix(in srgb, var(--ts-border) 60%, rgb(255 255 255 / 30%));
   border-radius: var(--ts-radius-xl);
-  box-shadow: var(--ts-shadow-card);
+  box-shadow: 0 24px 64px rgb(3 16 34 / 30%);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+}
+.auth-card .ts-field__input,
+.auth-card .ts-field__control {
+  background: color-mix(in srgb, var(--ts-surface-muted, var(--ts-surface)) 72%, transparent);
+}
+/* Same selectors as the dark tokens: explicit dark theme, or system dark unless forced light. */
+:root[data-theme="dark"] .auth-card {
+  --auth-glass: 62%;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .auth-card {
+    --auth-glass: 62%;
+  }
+}
+.auth-card .ts-tabs__list,
+.auth-card [role="tablist"] {
+  background: transparent;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .auth-card {
+    background: var(--ts-surface);
+  }
+  .auth-card .ts-field__input,
+  .auth-card .ts-field__control {
+    background: var(--ts-surface-muted, var(--ts-surface));
+  }
 }
 .auth-card-logo {
   margin-bottom: var(--ts-space-6);
