@@ -4,6 +4,17 @@ import { axeViolations } from "../test-utils.ts";
 import { Badge, StageBadge, StatusPill } from "./Badge.tsx";
 
 describe("Badge and StatusPill", () => {
+  it("can omit the stage icon while keeping its label and tone", () => {
+    render(
+      <StageBadge stage="gesprek" icon={false}>
+        Gesprek
+      </StageBadge>,
+    );
+    const pill = screen.getByText("Gesprek");
+    expect(pill.className).toContain("ts-badge--violet");
+    expect(pill.querySelector(".ts-icon")).toBeNull();
+  });
+
   it("applies the tone class", () => {
     render(<Badge tone="warning">Wacht</Badge>);
     expect(screen.getByText("Wacht").className).toContain("ts-badge--warning");

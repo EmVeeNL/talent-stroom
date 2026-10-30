@@ -35,8 +35,8 @@
   gap: var(--ts-space-3);
   box-sizing: border-box;
   width: 100%;
-  min-height: var(--ts-control-height-md);
-  padding: var(--ts-space-2) var(--ts-space-3);
+  min-height: var(--ts-control-height-sm);
+  padding: var(--ts-space-1) var(--ts-space-2);
   border: 0;
   border-radius: var(--ts-radius-md);
   background: transparent;

@@ -5,7 +5,8 @@
   max-width: calc(100vw - 16px);
   box-sizing: border-box;
   padding: var(--ts-space-4);
-  border-radius: var(--ts-radius-md);
+  border: var(--ts-border-width) solid var(--ts-border);
+  border-radius: var(--ts-radius-lg);
   background: var(--ts-surface-raised);
   color: var(--ts-text);
   box-shadow: var(--ts-shadow-popover);

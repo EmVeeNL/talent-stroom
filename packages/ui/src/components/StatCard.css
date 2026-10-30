@@ -17,17 +17,17 @@
   --stat-tint: var(--ts-accent-subtle);
 }
 .ts-stat-card .ts-card__body {
-  padding: var(--ts-space-5);
+  padding: var(--ts-space-4);
 }
 .ts-stat-card__layout {
   display: flex;
   align-items: flex-start;
-  gap: var(--ts-space-4);
+  gap: var(--ts-space-3);
   position: relative;
 }
 .ts-stat-card__icon {
   display: inline-flex;
-  padding: var(--ts-space-3);
+  padding: var(--ts-space-2);
   border-radius: var(--ts-radius-md);
   background: var(--stat-tint);
   color: var(--stat-color);
@@ -46,10 +46,10 @@
   overflow-wrap: normal;
 }
 .ts-stat-card__value {
-  font-size: var(--ts-font-size-3xl);
-  font-weight: var(--ts-font-weight-bold);
+  font-size: var(--ts-font-size-2xl);
+  font-weight: var(--ts-font-weight-semibold);
   font-variant-numeric: tabular-nums;
-  line-height: var(--ts-line-height-3xl);
+  line-height: var(--ts-line-height-2xl);
   overflow-wrap: normal;
 }
 .ts-stat-card__description {
@@ -79,10 +79,14 @@
   .ts-stat-card__sparkline {
     position: absolute;
     right: 0;
-    bottom: 18px;
+    top: var(--ts-space-5);
     width: 60px;
   }
-  .ts-stat-card:has(.ts-stat-card__sparkline) .ts-trend {
-    margin-right: 64px;
-  }
+}
+
+.ts-stat-card__trend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ts-space-1);
+  white-space: nowrap;
 }

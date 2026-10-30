@@ -8,19 +8,9 @@
 .dk-grid > * {
   min-width: 0;
 }
-.dk-grid .ts-field__label,
 .dk-grid .ts-check,
 .dk-grid .ts-radio {
   font-size: 13px;
-}
-.dk-grid .ts-card__title {
-  font: 600 16px/22px var(--font-ui);
-}
-.dk-panel .ts-card__header {
-  padding: var(--ts-space-3) var(--ts-space-4) 0;
-}
-.dk-panel .ts-card__body {
-  padding: var(--ts-space-3) var(--ts-space-4) var(--ts-space-4);
 }
 .dk-kpi {
   grid-column: span 2;
@@ -135,10 +125,10 @@
 .dk-multi li {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  padding: 2px 4px 2px 8px;
+  gap: var(--ts-space-1);
+  padding: 0 var(--ts-space-1) 0 var(--ts-space-2);
   border: 1px solid var(--ts-border);
-  border-radius: var(--ts-radius-sm);
+  border-radius: var(--ts-radius-full);
   background: var(--ts-surface);
   font-size: 12px;
 }
@@ -182,14 +172,16 @@
   text-align: center;
 }
 .dk-btn-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--ts-space-2);
 }
 .dk-row--chips {
   align-items: flex-start;
 }
 .dk-table__scroll {
+  /* Positioned so visually hidden (absolute) header labels stay inside the scroller. */
+  position: relative;
   overflow-x: auto;
   max-width: 100%;
 }
@@ -207,7 +199,8 @@
   text-align: left;
 }
 .dk-table td {
-  padding: var(--ts-space-2);
+  height: 40px;
+  padding: 0 var(--ts-space-2);
   border-bottom: 1px solid var(--ts-border);
   white-space: nowrap;
 }
@@ -258,10 +251,8 @@
   list-style: none;
 }
 .dk-kanban li {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--ts-space-1);
+  position: relative;
+  display: block;
   padding: var(--ts-space-2);
   border: 1px solid var(--ts-border);
   border-left: 2px solid var(--dk-tone);
@@ -274,7 +265,7 @@
   font-size: 12px;
 }
 .dk-kanban li strong {
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
   line-height: 16px;
 }
 .dk-kanban li span,
@@ -284,7 +275,7 @@
 .dk-kanban li small {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--ts-space-1);
 }
 .dk-dropdown ul {
   margin: var(--ts-space-2) 0 0;
@@ -404,8 +395,8 @@
   display: grid;
   place-items: center;
   flex: none;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--ts-radius-md);
   background: color-mix(in srgb, var(--dk-kpi) 16%, transparent);
   color: var(--dk-kpi);
@@ -415,7 +406,7 @@
   font-size: 12px;
 }
 .dk-kpi__head strong {
-  font: 700 24px/30px var(--font-ui);
+  font: var(--ts-font-page-title);
 }
 .dk-kpi__foot {
   display: flex;
@@ -454,7 +445,7 @@
 .dk-cal__grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 2px;
+  gap: var(--ts-space-1);
   text-align: center;
 }
 .dk-cal__dow {
@@ -500,16 +491,16 @@
   font-size: 11px;
 }
 .dk-toast-list .ts-button {
-  margin: -6px -6px 0 0;
+  margin: 0;
 }
 .dk-grid .ts-switch__label,
 .dk-grid .ts-check span,
 .dk-grid .ts-radio {
-  font-size: 12.5px;
+  font-size: 13px;
 }
 .dk-table th,
 .dk-table td {
-  padding: var(--ts-space-2) 6px;
+  padding: 0 var(--ts-space-2);
   font-size: 12px;
 }
 .dk-table table {
@@ -518,9 +509,6 @@
 .dk-table .ts-button {
   min-width: 0;
   padding-inline: 4px;
-}
-.dk-btn-grid {
-  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
 }
 .dk-btn-grid .ts-button {
   white-space: nowrap;
@@ -535,4 +523,58 @@
 .dk-fieldset legend {
   padding: 0;
   margin-bottom: var(--ts-space-1);
+}
+
+/* Compact panel chrome leaves room for the controls in the 5/2/2/3 grid. */
+.dk-panel .ts-card__body {
+  padding: var(--ts-space-3);
+}
+.dk-toggles .ts-switch {
+  gap: var(--ts-space-2);
+}
+.dk-grid .dk-toggles .ts-switch__label,
+.dk-radio-slider .ts-radio {
+  font-size: 12px;
+}
+.dk-kpi__foot {
+  flex-wrap: wrap;
+}
+.dk-kpi__foot > div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  column-gap: var(--ts-space-1);
+}
+.dk-kpi__foot small {
+  white-space: nowrap;
+}
+.dk-kpi__foot svg {
+  margin-inline-start: auto;
+}
+.dk-kanban li .ts-avatar {
+  position: absolute;
+  right: var(--ts-space-1);
+  bottom: var(--ts-space-1);
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
+}
+.dk-kanban li small {
+  min-height: 24px;
+  padding-inline-end: 24px;
+}
+.dk-table__actions {
+  width: 32px;
+}
+.dk-table .ts-button {
+  border-color: transparent;
+}
+.dk-toggles .ts-switch__control {
+  gap: var(--ts-space-2);
+}
+.dk-toggles .ts-switch__track {
+  width: 36px;
+}
+.dk-toggles .ts-switch__control[aria-checked="true"] .ts-switch__track span {
+  transform: translateX(10px);
 }

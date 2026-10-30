@@ -32,8 +32,8 @@
 .ts-data-table th,
 .ts-data-table td {
   box-sizing: border-box;
-  height: 64px;
-  padding: var(--ts-space-2) var(--ts-space-4);
+  height: 40px;
+  padding: 0 var(--ts-space-4);
   border-bottom: var(--ts-border-width) solid var(--ts-border);
   white-space: nowrap;
 }
@@ -45,7 +45,7 @@
   align-items: center;
   gap: var(--ts-space-2);
   border: 0;
-  min-height: 44px;
+  min-height: 32px;
   background: transparent;
   color: inherit;
   font: inherit;
@@ -62,12 +62,18 @@
   text-align: center;
   color: var(--ts-text-muted);
 }
+.ts-data-table__select {
+  position: relative;
+}
 .ts-data-table__select > span:last-child {
   position: absolute;
   width: 1px;
   height: 1px;
   overflow: hidden;
   clip-path: inset(50%);
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  margin: -1px;
 }
 .ts-data-table:focus-visible,
 .ts-data-table button:focus-visible {
@@ -83,8 +89,8 @@
   display: none;
 }
 .ts-data-table th {
-  height: 48px;
-  padding-block: var(--ts-space-0-5);
+  height: 40px;
+  padding-block: 0;
 }
 .ts-data-table tbody tr:hover td {
   background: var(--ts-surface-muted);
@@ -93,12 +99,12 @@
   background: var(--ts-primary-subtle);
 }
 .ts-data-table[data-density="compact"] td {
-  height: 48px;
-  padding-block: var(--ts-space-0-5);
+  height: 40px;
+  padding-block: 0;
 }
 .ts-data-table .ts-check {
-  min-width: 44px;
-  min-height: 44px;
+  min-width: 32px;
+  min-height: 32px;
   justify-content: center;
   align-items: center;
 }
@@ -124,6 +130,16 @@
 }
 
 .ts-data-table .ts-context-menu-anchor > .ts-button {
-  min-height: 44px;
-  min-width: 44px;
+  min-height: 32px;
+  min-width: 32px;
+}
+
+.ts-data-table .ts-context-menu-anchor > .ts-button {
+  border-color: transparent;
+}
+
+/* The hidden label must not make a 20px checkbox overflow its selection cell. */
+.ts-data-table .ts-data-table__select {
+  min-width: 20px;
+  gap: 0;
 }

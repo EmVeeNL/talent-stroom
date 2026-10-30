@@ -162,6 +162,25 @@ export function KanbanBoard({
   const [pickup, setPickup] = useState<Pickup | null>(null);
   const [dragging, setDragging] = useState<{ cardId: string; fromColumnId: string } | null>(null);
   const [dropTarget, setDropTarget] = useState<{ columnId: string; index: number } | null>(null);
+  const scroller = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const node = scroller.current;
+    if (!node) return undefined;
+    const update = () => {
+      const overflow = node.scrollWidth > node.clientWidth + 1;
+      node.toggleAttribute("data-fade-start", overflow && node.scrollLeft > 1);
+      node.toggleAttribute("data-fade-end", overflow && node.scrollLeft + node.clientWidth < node.scrollWidth - 1);
+    };
+    update();
+    const observer = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(update);
+    observer?.observe(node);
+    if (node.firstElementChild) observer?.observe(node.firstElementChild);
+    node.addEventListener("scroll", update, { passive: true });
+    return () => {
+      observer?.disconnect();
+      node.removeEventListener("scroll", update);
+    };
+  }, [list, columns, collapsedIds]);
   const cardNodes = useRef(new Map<string, HTMLElement>());
   const pendingFocus = useRef<string | null>(null);
   const isCollapsed = (id: string) => collapsedIds.includes(id);
@@ -491,7 +510,7 @@ export function KanbanBoard({
       ) : (
         // A focusable scroll region keeps horizontal scrolling reachable by keyboard.
         // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-        <div className="ts-kanban__scroller" role="region" aria-label={labels.board} tabIndex={0}>
+        <div ref={scroller} className="ts-kanban__scroller" role="region" aria-label={labels.board} tabIndex={0}>
           <div className="ts-kanban__columns">{shown.map(renderColumn)}</div>
         </div>
       )}

@@ -1,4 +1,4 @@
-/* Sidebar v2: full-height navy rail, 252 px expanded / 68 px collapsed (same in both themes). */
+/* Sidebar v2: full-height navy rail, 240 px expanded / 68 px collapsed (same in both themes). */
 .ts-sidebar {
   box-sizing: border-box;
   display: flex;
@@ -19,7 +19,7 @@
   padding: 0;
   margin: 0;
   display: grid;
-  gap: var(--ts-space-0-5);
+  gap: var(--ts-space-1);
 }
 .ts-sidebar__brand {
   display: flex;
@@ -28,7 +28,7 @@
   gap: var(--ts-space-2);
   box-sizing: border-box;
   min-height: var(--ts-navbar-height);
-  padding: var(--ts-space-3) var(--ts-space-4);
+  padding: var(--ts-space-2) var(--ts-space-4);
 }
 .ts-sidebar--collapsed .ts-sidebar__brand {
   justify-content: center;
@@ -55,9 +55,7 @@
   margin: var(--ts-space-4) 0 var(--ts-space-1);
   padding-inline: var(--ts-space-3);
   color: var(--ts-sidebar-text-muted);
-  font-size: var(--ts-font-size-xs);
-  line-height: var(--ts-line-height-xs);
-  font-weight: var(--ts-font-weight-semibold);
+  font: var(--ts-font-section-label);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -75,7 +73,7 @@
 }
 .ts-sidebar__group-button {
   box-sizing: border-box;
-  min-height: 40px;
+  min-height: 36px;
   margin-top: 0;
   padding: var(--ts-space-2) var(--ts-space-3);
   border-radius: var(--ts-radius-md);
@@ -107,8 +105,8 @@
   margin-top: var(--ts-space-1) !important;
 }
 .ts-sidebar__nested .ts-sidebar__item {
-  min-height: 40px;
-  padding-inline-start: calc(var(--ts-space-3) + 20px + var(--ts-space-3));
+  min-height: 36px;
+  padding-inline-start: var(--ts-space-12);
 }
 .ts-sidebar__nested .ts-sidebar__item > .ts-icon {
   display: none;
@@ -180,7 +178,6 @@ a.ts-sidebar__item:hover {
   background: var(--ts-sidebar-active-bg);
   color: var(--ts-sidebar-text-active);
   font-weight: var(--ts-font-weight-semibold);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%);
 }
 .ts-sidebar__item[aria-disabled="true"] {
   cursor: default;
@@ -210,8 +207,8 @@ a.ts-sidebar__item:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 22px;
-  height: 22px;
+  min-width: 20px;
+  height: 20px;
   box-sizing: border-box;
   padding: 0 var(--ts-space-1);
   border-radius: var(--ts-radius-full);
@@ -228,7 +225,7 @@ a.ts-sidebar__item:hover {
   inset-inline-end: 6px;
   min-width: 16px;
   height: 16px;
-  padding: 0 3px;
+  padding: 0 var(--ts-space-1);
   font-size: 10px;
   box-shadow: 0 0 0 2px var(--ts-sidebar-bg);
 }
@@ -276,10 +273,10 @@ a.ts-sidebar__item:hover {
   gap: var(--ts-space-3);
   box-sizing: border-box;
   width: 100%;
-  padding: var(--ts-space-3) var(--ts-space-4);
+  padding: var(--ts-space-3);
   border: var(--ts-border-width) solid var(--ts-sidebar-border);
   border-radius: var(--ts-radius-lg);
-  background: linear-gradient(135deg, rgb(78 130 255 / 14%), rgb(93 221 193 / 6%)), var(--ts-sidebar-hover-bg);
+  background: var(--ts-sidebar-hover-bg);
   color: var(--ts-sidebar-text);
   font: inherit;
   text-align: start;
@@ -333,4 +330,44 @@ a.ts-sidebar__item:hover {
   .ts-sidebar__item {
     transition: none;
   }
+}
+
+/* Optical icon size; keep the public Icon size API unchanged. */
+.ts-sidebar__item > .ts-icon,
+.ts-sidebar__group-button > .ts-icon:first-child {
+  --ts-icon-size: 18px;
+}
+.ts-sidebar__group-button {
+  position: relative;
+  font-weight: var(--ts-font-weight-medium);
+}
+.ts-sidebar__item[aria-current="page"]::before,
+.ts-sidebar__group-button--active::before {
+  content: "";
+  position: absolute;
+  inset-block: var(--ts-space-2);
+  inset-inline-start: 0;
+  width: 2px;
+  background: var(--ts-sidebar-accent);
+}
+.ts-sidebar--collapsed .ts-sidebar__nested .ts-sidebar__item {
+  padding-inline: 0;
+}
+.ts-sidebar__brand .ts-logo {
+  --ts-logo-height: 28px;
+}
+.ts-sidebar--collapsed .ts-sidebar__group-button {
+  justify-content: center;
+  padding-inline: 0;
+}
+.ts-sidebar--collapsed .ts-sidebar__group-button > .ts-icon:last-child {
+  display: none;
+}
+
+.ts-sidebar--collapsed .ts-sidebar__nested .ts-sidebar__item > .ts-icon {
+  display: inline-block;
+}
+
+.ts-sidebar ul[hidden] {
+  display: none;
 }

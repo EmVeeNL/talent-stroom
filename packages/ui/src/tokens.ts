@@ -8,17 +8,17 @@ export const cssVariables = {
   "--font-ui": '"Asap Sharp", "Asap", system-ui, sans-serif',
   "--ts-font-size-xs": "12px",
   "--ts-font-size-sm": "14px",
-  "--ts-font-size-md": "16px",
-  "--ts-font-size-lg": "18px",
-  "--ts-font-size-xl": "20px",
+  "--ts-font-size-md": "14px",
+  "--ts-font-size-lg": "16px",
+  "--ts-font-size-xl": "18px",
   "--ts-font-size-2xl": "24px",
   "--ts-font-size-3xl": "30px",
   "--ts-font-size-4xl": "36px",
   "--ts-line-height-xs": "16px",
   "--ts-line-height-sm": "20px",
-  "--ts-line-height-md": "24px",
-  "--ts-line-height-lg": "26px",
-  "--ts-line-height-xl": "28px",
+  "--ts-line-height-md": "20px",
+  "--ts-line-height-lg": "24px",
+  "--ts-line-height-xl": "24px",
   "--ts-line-height-2xl": "32px",
   "--ts-line-height-3xl": "38px",
   "--ts-line-height-4xl": "44px",
@@ -29,13 +29,14 @@ export const cssVariables = {
   "--ts-font-weight-semibold": "600",
   "--ts-font-weight-bold": "700",
   "--ts-font-hero": "700 36px/44px var(--font-ui)",
-  "--ts-font-page-title": "700 30px/38px var(--font-ui)",
-  "--ts-font-section-title": "700 24px/32px var(--font-ui)",
-  "--ts-font-card-title": "600 18px/26px var(--font-ui)",
-  "--ts-font-body": "400 16px/24px var(--font-ui)",
+  "--ts-font-page-title": "600 24px/32px var(--font-ui)",
+  "--ts-font-section-title": "600 20px/28px var(--font-ui)",
+  "--ts-font-card-title": "600 14px/20px var(--font-ui)",
+  "--ts-font-body": "400 14px/20px var(--font-ui)",
   "--ts-font-compact": "400 14px/20px var(--font-ui)",
+  "--ts-font-section-label": "600 11px/16px var(--font-ui)",
   "--ts-font-caption": "400 12px/16px var(--font-ui)",
-  "--ts-font-label": "600 14px/20px var(--font-ui)",
+  "--ts-font-label": "600 12px/16px var(--font-ui)",
 
   // Palette: primary (kit primary = 500)
   "--ts-primary-50": "#eef3fe",
@@ -63,11 +64,11 @@ export const cssVariables = {
   "--ts-neutral-900": "#102038",
 
   // Palette: navy (dark theme surfaces and the sidebar)
-  "--ts-navy-950": "#081727",
+  "--ts-navy-950": "#101725",
   "--ts-navy-900": "#0a1829",
-  "--ts-navy-850": "#10243b",
-  "--ts-navy-800": "#183049",
-  "--ts-navy-700": "#30475d",
+  "--ts-navy-850": "#182131",
+  "--ts-navy-800": "#202b3c",
+  "--ts-navy-700": "#303b4e",
 
   // Palette: accent mint/teal
   "--ts-accent-50": "#e4faf7",
@@ -84,7 +85,7 @@ export const cssVariables = {
   "--ts-surface-raised": "#ffffff",
   "--ts-text": "#102038",
   "--ts-text-muted": "#5b6b83",
-  "--ts-border": "#d8e2ef",
+  "--ts-border": "#e4e8f0",
   "--ts-border-strong": "#7a8ba3",
   "--ts-disabled-bg": "#edf2f9",
   "--ts-disabled-text": "#7a8ba3",
@@ -120,25 +121,25 @@ export const cssVariables = {
   "--ts-neutral-text": "#3b4a61",
 
   // Navy sidebar (same in both themes)
-  "--ts-sidebar-bg": "#0a1829",
+  "--ts-sidebar-bg": "#0e1625",
   "--ts-sidebar-text": "#c5d1e0",
   "--ts-sidebar-text-muted": "#8a9cb6",
   "--ts-sidebar-text-active": "#ffffff",
-  "--ts-sidebar-hover-bg": "#12263d",
-  "--ts-sidebar-active-bg": "#1b3fa0",
+  "--ts-sidebar-hover-bg": "#182438",
+  "--ts-sidebar-active-bg": "#1b2e49",
   "--ts-sidebar-border": "#1c3049",
-  "--ts-sidebar-accent": "#5dddc1",
+  "--ts-sidebar-accent": "#4e82ff",
 
-  // Radius: inputs/buttons md, cards lg, modals xl
-  "--ts-radius-sm": "6px",
-  "--ts-radius-md": "10px",
-  "--ts-radius-lg": "14px",
-  "--ts-radius-xl": "20px",
+  // Radius: controls sm/md 4px, panels lg 6px, dialogs xl 8px
+  "--ts-radius-sm": "4px",
+  "--ts-radius-md": "4px",
+  "--ts-radius-lg": "6px",
+  "--ts-radius-xl": "8px",
   "--ts-radius-full": "9999px",
 
-  // Spacing (4px base plus a 2px half step)
+  // Spacing (strict 4px scale; legacy 0-5 name aliases the first step)
   "--ts-space": "4px",
-  "--ts-space-0-5": "2px",
+  "--ts-space-0-5": "4px",
   "--ts-space-1": "4px",
   "--ts-space-2": "8px",
   "--ts-space-3": "12px",
@@ -153,9 +154,9 @@ export const cssVariables = {
 
   // Borders and elevation
   "--ts-border-width": "1px",
-  "--ts-shadow-card": "0 3px 12px rgb(16 32 56 / 6%)",
-  "--ts-shadow-popover": "0 12px 36px rgb(16 32 56 / 16%)",
-  "--ts-shadow-modal": "0 24px 64px rgb(16 32 56 / 20%)",
+  "--ts-shadow-card": "0 1px 2px rgb(16 32 56 / 4%)",
+  "--ts-shadow-popover": "0 4px 12px rgb(16 32 56 / 8%)",
+  "--ts-shadow-modal": "0 8px 24px rgb(16 32 56 / 10%)",
 
   // Focus ring
   "--ts-focus-ring-color": "#245bf4",
@@ -168,13 +169,13 @@ export const cssVariables = {
   "--ts-breakpoint-tablet": "768px",
   "--ts-breakpoint-desktop": "1024px",
   "--ts-breakpoint-wide": "1440px",
-  "--ts-sidebar-width": "252px",
+  "--ts-sidebar-width": "240px",
   "--ts-sidebar-width-collapsed": "68px",
-  "--ts-navbar-height": "64px",
+  "--ts-navbar-height": "56px",
   "--ts-content-max-width": "1600px",
   "--ts-control-height-sm": "32px",
-  "--ts-control-height-md": "40px",
-  "--ts-control-height-lg": "48px",
+  "--ts-control-height-md": "36px",
+  "--ts-control-height-lg": "36px",
 
   // Motion
   "--ts-duration-fast": "120ms",
@@ -184,15 +185,15 @@ export const cssVariables = {
 /** Full resolved dark theme, including the shared palette, typography and sidebar tokens. */
 export const darkCssVariables: Record<keyof typeof cssVariables, string> = {
   ...cssVariables,
-  "--ts-bg": "#081727",
-  "--ts-surface": "#10243b",
-  "--ts-surface-muted": "#183049",
-  "--ts-surface-raised": "#183049",
+  "--ts-bg": "#101725",
+  "--ts-surface": "#182131",
+  "--ts-surface-muted": "#202b3c",
+  "--ts-surface-raised": "#202b3c",
   "--ts-text": "#f3f7fc",
   "--ts-text-muted": "#a2b5ca",
-  "--ts-border": "#30475d",
+  "--ts-border": "#303b4e",
   "--ts-border-strong": "#7b90a8",
-  "--ts-disabled-bg": "#183049",
+  "--ts-disabled-bg": "#202b3c",
   "--ts-disabled-text": "#7b90a8",
   "--ts-primary": "#3369f0",
   "--ts-primary-hover": "#2559e0",
@@ -219,9 +220,9 @@ export const darkCssVariables: Record<keyof typeof cssVariables, string> = {
   "--ts-violet-text": "#c3b1ff",
   "--ts-neutral-subtle": "#22384f",
   "--ts-neutral-text": "#c9d5e5",
-  "--ts-shadow-card": "0 1px 2px rgb(0 0 0 / 24%)",
-  "--ts-shadow-popover": "0 12px 32px rgb(0 0 0 / 36%)",
-  "--ts-shadow-modal": "0 24px 64px rgb(0 0 0 / 48%)",
+  "--ts-shadow-card": "none",
+  "--ts-shadow-popover": "none",
+  "--ts-shadow-modal": "none",
   "--ts-focus-ring-color": "#82aeff",
 };
 
@@ -326,11 +327,11 @@ export const palette = {
   },
 } as const;
 
-export const radius = { sm: 6, md: 10, lg: 14, xl: 20, full: 9999 } as const;
+export const radius = { sm: 4, md: 4, lg: 6, xl: 8, full: 9999 } as const;
 
 export const spacingBasePx = 4;
 export const spacing = {
-  "0-5": 2,
+  "0-5": 4,
   1: 4,
   2: 8,
   3: 12,
@@ -344,21 +345,21 @@ export const spacing = {
   20: 80,
 } as const;
 
-export const fontSize = { xs: 12, sm: 14, md: 16, lg: 18, xl: 20, "2xl": 24, "3xl": 30, "4xl": 36 } as const;
+export const fontSize = { xs: 12, sm: 14, md: 14, lg: 16, xl: 18, "2xl": 24, "3xl": 30, "4xl": 36 } as const;
 export const fontWeight = { regular: 400, medium: 500, semibold: 600, bold: 700 } as const;
 export const lineHeight = { body: 1.5, heading: 1.25 } as const;
-export const lineHeightPx = { xs: 16, sm: 20, md: 24, lg: 26, xl: 28, "2xl": 32, "3xl": 38, "4xl": 44 } as const;
+export const lineHeightPx = { xs: 16, sm: 20, md: 20, lg: 24, xl: 24, "2xl": 32, "3xl": 38, "4xl": 44 } as const;
 
 /** Typographic roles from 02-typography.md: size/line-height in px and weight. */
 export const typeScale = {
   hero: { variable: "--ts-font-hero", size: 36, lineHeight: 44, weight: 700 },
-  pageTitle: { variable: "--ts-font-page-title", size: 30, lineHeight: 38, weight: 700 },
-  sectionTitle: { variable: "--ts-font-section-title", size: 24, lineHeight: 32, weight: 700 },
-  cardTitle: { variable: "--ts-font-card-title", size: 18, lineHeight: 26, weight: 600 },
-  body: { variable: "--ts-font-body", size: 16, lineHeight: 24, weight: 400 },
+  pageTitle: { variable: "--ts-font-page-title", size: 24, lineHeight: 32, weight: 600 },
+  sectionTitle: { variable: "--ts-font-section-title", size: 20, lineHeight: 28, weight: 600 },
+  cardTitle: { variable: "--ts-font-card-title", size: 14, lineHeight: 20, weight: 600 },
+  body: { variable: "--ts-font-body", size: 14, lineHeight: 20, weight: 400 },
   compact: { variable: "--ts-font-compact", size: 14, lineHeight: 20, weight: 400 },
   caption: { variable: "--ts-font-caption", size: 12, lineHeight: 16, weight: 400 },
-  label: { variable: "--ts-font-label", size: 14, lineHeight: 20, weight: 600 },
+  label: { variable: "--ts-font-label", size: 12, lineHeight: 16, weight: 600 },
 } as const satisfies Record<string, { variable: CssVariableName; size: number; lineHeight: number; weight: number }>;
 
 export const shadows = {
@@ -369,8 +370,8 @@ export const shadows = {
 
 export const breakpoints = { mobile: 390, tablet: 768, desktop: 1024, wide: 1440 } as const;
 export const layout = {
-  sidebarWidth: 252,
+  sidebarWidth: 240,
   sidebarWidthCollapsed: 68,
-  navbarHeight: 64,
+  navbarHeight: 56,
   contentMaxWidth: 1600,
 } as const;

@@ -1,4 +1,4 @@
-/* Navbar v2: 64 px, search with ⌘K, icon actions and the user button. */
+/* Navbar v2: 56 px, search with ⌘K, icon actions and the user button. */
 .ts-header {
   display: flex;
   align-items: center;
@@ -65,7 +65,7 @@
 }
 .ts-navbar-search__kbd {
   flex: none;
-  padding: 2px var(--ts-space-2);
+  padding: 0 var(--ts-space-1);
   border: var(--ts-border-width) solid var(--ts-border);
   border-radius: var(--ts-radius-sm);
   background: var(--ts-surface-muted);
@@ -83,8 +83,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--ts-control-height-md);
-  height: var(--ts-control-height-md);
+  width: var(--ts-control-height-sm);
+  height: var(--ts-control-height-sm);
   padding: 0;
   border: 0;
   border-radius: var(--ts-radius-md);
@@ -229,10 +229,10 @@
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: var(--ts-radius-full);
-  background: linear-gradient(135deg, var(--ts-primary-400), var(--ts-accent-600));
+  background: var(--ts-primary);
   color: var(--ts-neutral-0);
   font-size: var(--ts-font-size-sm);
   font-weight: var(--ts-font-weight-bold);

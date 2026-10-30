@@ -16,7 +16,7 @@
 
 .ts-field__hint {
   margin: 0;
-  font-size: var(--ts-font-size-sm);
+  font: var(--ts-font-caption);
   color: var(--ts-text-muted);
 }
 
@@ -32,7 +32,7 @@
 
 .ts-field__error {
   margin: 0;
-  font-size: var(--ts-font-size-sm);
+  font: var(--ts-font-caption);
   font-weight: var(--ts-font-weight-medium);
   color: var(--ts-danger-text);
 }
@@ -46,10 +46,9 @@
   padding: 0 var(--ts-space-3);
   border: var(--ts-border-width) solid var(--ts-border-strong);
   border-radius: var(--ts-radius-md);
-  background: var(--ts-surface-muted);
+  background: var(--ts-surface);
   color: var(--ts-text);
-  font: inherit;
-  font-size: var(--ts-font-size-md);
+  font: var(--ts-font-body);
   width: 100%;
   caret-color: var(--ts-primary-text);
 }

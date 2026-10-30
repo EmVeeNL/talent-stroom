@@ -2,8 +2,7 @@ body {
   margin: 0;
   background: var(--ts-bg);
   color: var(--ts-text);
-  font-family: var(--font-ui);
-  line-height: var(--ts-line-height-body);
+  font: var(--ts-font-body);
 }
 .auth-shell {
   position: relative;
@@ -191,20 +190,18 @@ body {
   padding: 0;
 }
 .auth-card {
-  padding: clamp(2rem, 3vw, 2.5rem);
-  color: #102038;
-  background: rgb(255 255 255 / 78%);
-  border: 1px solid rgb(255 255 255 / 58%);
+  padding: var(--ts-space-6);
+  color: var(--ts-text);
+  background: var(--ts-surface);
+  border: var(--ts-border-width) solid var(--ts-border);
   border-radius: var(--ts-radius-xl);
-  box-shadow: 0 24px 72px rgb(3 16 34 / 28%);
-  backdrop-filter: blur(20px) saturate(140%);
+  box-shadow: var(--ts-shadow-card);
 }
 .auth-card-logo {
   margin-bottom: var(--ts-space-6);
 }
 .auth-content h1 {
-  font-size: var(--ts-font-size-2xl);
-  line-height: var(--ts-line-height-heading);
+  font: var(--ts-font-page-title);
   text-wrap: balance;
   margin: 0 0 var(--ts-space-2);
 }
@@ -220,7 +217,7 @@ body {
 .auth-fields {
   display: flex;
   flex-direction: column;
-  gap: var(--ts-space-5);
+  gap: var(--ts-space-4);
   border: 0;
   padding: 0;
   margin: var(--ts-space-5) 0 0;
@@ -385,19 +382,6 @@ body {
   }
   .auth-card {
     padding: 1.5rem;
-  }
-}
-[data-theme="dark"] .auth-card {
-  color: #f3f7fc;
-  background: rgb(8 23 39 / 72%);
-  border-color: rgb(197 209 224 / 24%);
-}
-@supports not (backdrop-filter: blur(1px)) {
-  .auth-card {
-    background: #fff;
-  }
-  [data-theme="dark"] .auth-card {
-    background: #10243b;
   }
 }
 @media (min-width: 1024px) {

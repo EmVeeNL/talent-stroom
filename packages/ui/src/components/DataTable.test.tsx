@@ -54,6 +54,23 @@ describe("DataTable", () => {
     expect(select).toHaveBeenCalledWith(["a", "b"]);
     expect(await axeViolations(container)).toEqual([]);
   });
+  it("keeps an actions header accessible when visually hidden and exposes column sizing", () => {
+    const { container } = render(
+      <DataTable
+        caption="Kandidaten"
+        columns={[{ id: "actions", label: "Acties", hideLabel: true, width: 48, cell: () => "…" }]}
+        rows={[{ id: "a" }]}
+        rowKey={(row) => row.id}
+        emptyLabel="Leeg"
+        loadingLabel="Laden"
+      />,
+    );
+    const header = screen.getByRole("columnheader", { name: "Acties" });
+    expect(header.querySelector(".ts-visually-hidden")).not.toBeNull();
+    expect(header.style.width).toBe("48px");
+    expect(container.querySelector('td[data-column="actions"]')).not.toBeNull();
+  });
+
   it("supports empty and loading states", async () => {
     const props = {
       caption: "Kandidaten",

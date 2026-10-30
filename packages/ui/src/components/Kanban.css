@@ -49,7 +49,7 @@
   --ts-kanban-ink: var(--ts-primary-text);
 }
 
-/* Board layout: horizontal scroll with persistent edge shadows as scroll affordance. */
+/* Board layout: horizontal scroll with overflow-dependent edge fades as scroll affordance. */
 .ts-kanban__scroller {
   max-width: 100%;
   overflow-x: auto;
@@ -58,12 +58,17 @@
   scrollbar-width: thin;
   scrollbar-color: var(--ts-border-strong) transparent;
   border-radius: var(--ts-radius-lg);
+  --kanban-fade-start: transparent;
+  --kanban-fade-end: transparent;
   background:
-    linear-gradient(to right, var(--ts-bg) 30%, transparent) left center / 40px 100% no-repeat local,
-    linear-gradient(to left, var(--ts-bg) 30%, transparent) right center / 40px 100% no-repeat local,
-    radial-gradient(farthest-side at 0 50%, rgb(16 32 56 / 22%), transparent) left center / 14px 100% no-repeat scroll,
-    radial-gradient(farthest-side at 100% 50%, rgb(16 32 56 / 22%), transparent) right center / 14px 100% no-repeat
-      scroll;
+    linear-gradient(to right, var(--kanban-fade-start), transparent) left / 14px 100% no-repeat,
+    linear-gradient(to left, var(--kanban-fade-end), transparent) right / 14px 100% no-repeat;
+}
+.ts-kanban__scroller[data-fade-start] {
+  --kanban-fade-start: var(--ts-border-strong);
+}
+.ts-kanban__scroller[data-fade-end] {
+  --kanban-fade-end: var(--ts-border-strong);
 }
 .ts-kanban__scroller:focus-visible {
   outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);

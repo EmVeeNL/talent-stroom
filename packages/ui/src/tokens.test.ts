@@ -2,7 +2,16 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { contrastRatio } from "./contrast.ts";
-import { cssVariables, darkCssVariables } from "./tokens.ts";
+import {
+  cssVariables,
+  darkCssVariables,
+  fontSize,
+  layout,
+  lineHeightPx,
+  radius,
+  spacing,
+  typeScale,
+} from "./tokens.ts";
 
 const css = readFileSync(new URL("./tokens.css", import.meta.url), "utf8");
 const rootBlock = /:root\s*\{([\s\S]*?)\n\}/.exec(css)?.[1] ?? "";
@@ -109,4 +118,40 @@ describe("documented deviations from the design kit", () => {
   it("kit line colour #D8E2EF is decorative; input boundaries use --ts-border-strong", () => {
     expect(contrastRatio(v("--ts-border"), v("--ts-surface"))).toBeLessThan(UI);
   });
+});
+
+describe("v2 compact design contract", () => {
+  it("uses sharp controls, restrained panels and compact shell dimensions in both themes", () => {
+    for (const theme of Object.values(themes)) {
+      expect(theme["--ts-radius-md"]).toBe("4px");
+      expect(theme["--ts-radius-lg"]).toBe("6px");
+      expect(theme["--ts-radius-xl"]).toBe("8px");
+      expect(theme["--ts-sidebar-width"]).toBe("240px");
+      expect(theme["--ts-navbar-height"]).toBe("56px");
+      expect(theme["--ts-control-height-md"]).toBe("36px");
+      expect(theme["--ts-font-page-title"]).toBe("600 24px/32px var(--font-ui)");
+      expect(theme["--ts-font-card-title"]).toBe("600 14px/20px var(--font-ui)");
+      expect(theme["--ts-font-body"]).toBe("400 14px/20px var(--font-ui)");
+      expect(theme["--ts-font-label"]).toBe("600 12px/16px var(--font-ui)");
+    }
+  });
+
+  it("uses borders alone for dark elevation", () => {
+    for (const token of ["--ts-shadow-card", "--ts-shadow-popover", "--ts-shadow-modal"] as const) {
+      expect(darkCssVariables[token]).toBe("none");
+    }
+  });
+});
+
+it("keeps grouped exports synchronized with the CSS token contract", () => {
+  for (const [name, value] of Object.entries(radius)) expect(parsed[`--ts-radius-${name}`]).toBe(`${value}px`);
+  for (const [name, value] of Object.entries(spacing)) expect(parsed[`--ts-space-${name}`]).toBe(`${value}px`);
+  for (const [name, value] of Object.entries(fontSize)) expect(parsed[`--ts-font-size-${name}`]).toBe(`${value}px`);
+  for (const [name, value] of Object.entries(lineHeightPx))
+    expect(parsed[`--ts-line-height-${name}`]).toBe(`${value}px`);
+  for (const role of Object.values(typeScale)) {
+    expect(v(role.variable)).toBe(`${role.weight} ${role.size}px/${role.lineHeight}px var(--font-ui)`);
+  }
+  expect(v("--ts-sidebar-width")).toBe(`${layout.sidebarWidth}px`);
+  expect(v("--ts-navbar-height")).toBe(`${layout.navbarHeight}px`);
 });

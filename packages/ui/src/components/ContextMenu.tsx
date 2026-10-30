@@ -73,7 +73,8 @@ export function ContextMenu({
     <span ref={anchor} className="ts-context-menu-anchor">
       <Button
         ref={trigger}
-        variant="ghost"
+        variant="outline"
+        size="sm"
         disabled={disabled}
         aria-label={triggerLabel}
         aria-haspopup="menu"
@@ -91,7 +92,7 @@ export function ContextMenu({
           }
         }}
       >
-        <Icon name="more_vert" />
+        <Icon name="more_horiz" size={16} />
       </Button>
       {open && (
         <div
@@ -156,7 +157,7 @@ export function ContextMenu({
                   }
                 }}
               >
-                {item.icon && <Icon name={item.icon} />}
+                {item.icon && <Icon name={item.icon} size={16} />}
                 {item.label}
               </button>
             ),

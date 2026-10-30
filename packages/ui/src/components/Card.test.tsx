@@ -48,3 +48,22 @@ it("only exposes caller-supplied actions and replaces loading content with skele
   expect(screen.queryByText("Inhoud")).toBeNull();
   expect(screen.getByRole("button", { name: "Meer acties" })).toBeTruthy();
 });
+
+it("groups the title and description opposite the horizontal actions menu", () => {
+  const { container } = render(
+    <Card
+      title="Pipeline"
+      subtitle="Recente wijzigingen"
+      menuLabel="Meer acties"
+      menuItems={[{ id: "refresh", label: "Vernieuwen", onSelect: () => {} }]}
+    >
+      Inhoud
+    </Card>,
+  );
+  const heading = screen.getByRole("heading", { name: "Pipeline" });
+  expect(heading.parentElement?.textContent).toContain("Recente wijzigingen");
+  const trigger = screen.getByRole("button", { name: "Meer acties" });
+  expect(trigger.closest(".ts-card__actions")).toBeTruthy();
+  expect(trigger.textContent).toContain("more_horiz");
+  expect(container.querySelector(".ts-card__body")?.textContent).toBe("Inhoud");
+});

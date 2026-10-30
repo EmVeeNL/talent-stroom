@@ -99,3 +99,18 @@ it("opens the active expandable group and supports keyboard disclosure controls"
   await userEvent.keyboard("{Enter}");
   expect(toggle.getAttribute("aria-expanded")).toBe("true");
 });
+
+it("keeps nested destinations recognizable when the rail is collapsed", () => {
+  const nested: SidebarSection[] = [
+    {
+      id: "apps",
+      label: "Apps",
+      nested: true,
+      items: [{ id: "tasks", label: "Taken", icon: "task_alt", href: "/taken" }],
+    },
+  ];
+  const { rerender } = render(<Sidebar {...props} sections={nested} />);
+  expect(screen.getByRole("link", { name: "Taken" }).querySelector(".ts-icon")).toBeNull();
+  rerender(<Sidebar {...props} sections={nested} collapsed />);
+  expect(screen.getByRole("link", { name: "Taken" }).querySelector(".ts-icon")?.textContent).toBe("task_alt");
+});

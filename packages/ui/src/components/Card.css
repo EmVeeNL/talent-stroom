@@ -1,5 +1,6 @@
 /* Card */
 .ts-card {
+  min-width: 0;
   background: var(--ts-surface);
   border: var(--ts-border-width) solid var(--ts-border);
   border-radius: var(--ts-radius-lg);
@@ -11,7 +12,8 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--ts-space-3);
-  padding: var(--ts-space-4) var(--ts-space-5) 0;
+  padding: var(--ts-space-3) var(--ts-space-4);
+  border-bottom: var(--ts-border-width) solid var(--ts-border);
 }
 
 .ts-card__heading {
@@ -22,18 +24,15 @@
   align-items: center;
   gap: var(--ts-space-2);
   margin-left: auto;
+  flex-shrink: 0;
 }
 .ts-card__subtitle {
   margin: var(--ts-space-1) 0 0;
-  font: var(--ts-font-compact);
+  font: var(--ts-font-caption);
   color: var(--ts-text-muted);
-}
-.ts-card:hover {
-  border-color: var(--ts-border-strong);
 }
 .ts-card[data-selected] {
   border-color: var(--ts-primary-text);
-  box-shadow: 0 0 0 1px var(--ts-primary-text);
 }
 .ts-card--data .ts-card__body {
   padding-inline: 0;
@@ -44,5 +43,5 @@
 }
 
 .ts-card__body {
-  padding: var(--ts-space-4) var(--ts-space-5) var(--ts-space-5);
+  padding: var(--ts-space-4);
 }
