@@ -24,6 +24,7 @@ import {
   Toaster,
 } from "@talentstroom/ui";
 import type { IconName } from "@talentstroom/ui";
+import { MotionShowcase } from "./MotionShowcase.tsx";
 
 function Panel({ title, children, className }: { title: string; children: React.ReactNode; className?: string }) {
   return (
@@ -199,6 +200,7 @@ export function ElementsAdvanced({ locale }: { locale: Locale }) {
           <ToastDemo locale={locale} />
         </Toaster>
       </Panel>
+      <MotionShowcase locale={locale} />
     </div>
   );
 }

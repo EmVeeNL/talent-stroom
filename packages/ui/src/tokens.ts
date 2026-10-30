@@ -180,6 +180,11 @@ export const cssVariables = {
   // Motion
   "--ts-duration-fast": "120ms",
   "--ts-duration-base": "200ms",
+  "--ts-duration-slow": "320ms",
+  "--ts-delay-tooltip": "500ms",
+  "--ts-ease-standard": "cubic-bezier(0.2, 0, 0, 1)",
+  "--ts-ease-emphasised": "cubic-bezier(0.05, 0.7, 0.1, 1)",
+  "--ts-ease-exit": "cubic-bezier(0.3, 0, 1, 1)",
 } as const;
 
 /** Full resolved dark theme, including the shared palette, typography and sidebar tokens. */
@@ -375,3 +380,13 @@ export const layout = {
   navbarHeight: 56,
   contentMaxWidth: 1600,
 } as const;
+
+/** Numeric motion values for JavaScript consumers. Motion durations are converted to seconds at use sites. */
+export const motionDurations = { fast: 120, base: 200, slow: 320 } as const;
+export const motionDelay = { tooltip: 500 } as const;
+export const motionEasings = {
+  standard: [0.2, 0, 0, 1],
+  emphasised: [0.05, 0.7, 0.1, 1],
+  exit: [0.3, 0, 1, 1],
+} as const;
+export const springs = { snappy: { stiffness: 400, damping: 34 } } as const;
