@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertBanner, EmptyState, Button, Skeleton, Switch, Toaster, useToast } from "@talentstroom/ui";
+import { AlertBanner, EmptyState, Button, Skeleton, Switch, Toast, Toaster, useToast } from "@talentstroom/ui";
 import type { FeedbackTone } from "@talentstroom/ui";
 import { useGallery } from "../context.ts";
 import { Section } from "../Section.tsx";
@@ -7,11 +7,42 @@ const tones = ["info", "success", "warning", "danger"] as const;
 function FeedbackExamples() {
   const { tr } = useGallery();
   const { toast } = useToast();
+  const [dismissed, setDismissed] = useState<FeedbackTone[]>([]);
   const [hidden, setHidden] = useState<FeedbackTone[]>([]);
   const [loading, setLoading] = useState(true);
   const notify = (tone: FeedbackTone) => toast({ tone, message: tr(`gallery.overlays.${tone}`) });
   return (
     <>
+      <Section title={tr("gallery.overlays.notifications")}>
+        <div className="gallery-feedback-board">
+          {tones
+            .filter((tone) => !dismissed.includes(tone))
+            .map((tone) => (
+              <Toast
+                key={tone}
+                tone={tone}
+                title={tr(`gallery.overlays.${tone}`)}
+                duration={0}
+                closeLabel={tr("gallery.close")}
+                onDismiss={() => setDismissed((items) => [...items, tone])}
+                action={
+                  tone === "danger" ? (
+                    <Button variant="ghost" onClick={() => notify("success")}>
+                      {tr("gallery.overlays.retry")}
+                    </Button>
+                  ) : undefined
+                }
+              >
+                {tr("gallery.overlays.toastBody")}
+              </Toast>
+            ))}
+          {dismissed.length > 0 && (
+            <Button variant="ghost" onClick={() => setDismissed([])}>
+              {tr("gallery.overlays.restore")}
+            </Button>
+          )}
+        </div>
+      </Section>
       <Section title={tr("gallery.empty.title")}>
         {(["records", "results", "error"] as const).map((kind) => (
           <EmptyState
@@ -74,7 +105,7 @@ function FeedbackExamples() {
           {loading ? (
             <>
               <output>{tr("gallery.overlays.loading")}</output>
-              <Skeleton shape="rows" lines={3} />
+              <Skeleton variant="table" lines={3} />
             </>
           ) : (
             <>
@@ -87,10 +118,20 @@ function FeedbackExamples() {
       </Section>
       <Section title={tr("gallery.overlays.placeholderShapes")}>
         <div className="gallery-skeleton-examples" aria-busy="true">
-          <Skeleton shape="avatar" />
-          <Skeleton lines={3} />
-          <Skeleton shape="card" />
-          <Skeleton shape="rows" lines={2} />
+          {(["table", "card", "profile"] as const).map((variant) => (
+            <div key={variant}>
+              <h3>
+                {tr(
+                  variant === "table"
+                    ? "gallery.overlays.skeletonTable"
+                    : variant === "card"
+                      ? "gallery.overlays.skeletonCard"
+                      : "gallery.overlays.skeletonProfile",
+                )}
+              </h3>
+              <Skeleton variant={variant} lines={3} />
+            </div>
+          ))}
         </div>
       </Section>
     </>

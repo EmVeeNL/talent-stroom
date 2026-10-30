@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { Dialog } from "./Dialog.tsx";
 import { Button } from "./Button.tsx";
 export interface AlertDialogProps {
+  /** Always-visible, nonmodal gallery example. */
+  inline?: boolean;
   title: string;
   triggerLabel: string;
   cancelLabel: string;

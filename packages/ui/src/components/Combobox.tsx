@@ -10,6 +10,9 @@ export interface ComboboxOption {
 }
 export interface ComboboxProps {
   label: string;
+  placeholder?: string;
+  /** Always-visible in-flow gallery example with a fixed filter. */
+  previewQuery?: string;
   error?: string;
   readOnly?: boolean;
   options: ComboboxOption[];
@@ -22,6 +25,8 @@ export interface ComboboxProps {
 }
 export function Combobox({
   label,
+  placeholder,
+  previewQuery,
   error,
   readOnly,
   options,
@@ -34,16 +39,18 @@ export function Combobox({
 }: ComboboxProps) {
   const id = useId(),
     input = useRef<HTMLInputElement>(null),
-    [query, setQuery] = useState(""),
-    [open, setOpen] = useState(false),
+    [localQuery, setQuery] = useState(""),
+    [localOpen, setOpen] = useState(false),
     [active, setActive] = useState(0);
+  const query = previewQuery ?? localQuery;
+  const open = previewQuery !== undefined || localOpen;
   const filtered = options.filter((o) => o.label.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
   const enabled = filtered.filter((o) => !o.disabled);
   const item = enabled[Math.min(active, enabled.length - 1)];
   useEffect(() => {
-    if (open && item)
+    if (open && item && previewQuery === undefined)
       document.getElementById(`${id}-${encodeURIComponent(item.value)}`)?.scrollIntoView?.({ block: "nearest" });
-  }, [open, item, id]);
+  }, [open, item, id, previewQuery]);
   const select = (option: ComboboxOption) => {
     onChange(
       multiple
@@ -94,6 +101,7 @@ export function Combobox({
         <div className="ts-combobox__input">
           <input
             id={id}
+            placeholder={placeholder}
             ref={input}
             role="combobox"
             aria-autocomplete="list"
@@ -153,7 +161,7 @@ export function Combobox({
         </p>
       )}
       {open && (
-        <div className="ts-combobox__popup">
+        <div className="ts-combobox__popup" style={previewQuery !== undefined ? { position: "static" } : undefined}>
           <ul id={`${id}-list`} role="listbox" aria-label={label} aria-multiselectable={multiple || undefined}>
             {filtered.map((o) => (
               <li

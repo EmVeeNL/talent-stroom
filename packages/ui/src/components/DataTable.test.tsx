@@ -64,7 +64,7 @@ describe("DataTable", () => {
       loadingLabel: "Laden",
     };
     const { container, rerender } = render(<DataTable {...props} />);
-    expect(screen.getByText("Geen kandidaten")).toBeDefined();
+    expect(screen.getByText("Geen kandidaten").closest(".ts-data-table")).toBeNull();
     expect(await axeViolations(container)).toEqual([]);
     rerender(<DataTable {...props} loading />);
     expect(screen.getByRole("region").getAttribute("aria-busy")).toBe("true");

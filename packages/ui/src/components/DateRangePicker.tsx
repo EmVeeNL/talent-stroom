@@ -16,7 +16,10 @@ export interface DateRangeLabels {
   complete: string;
 }
 export interface DateRangePickerProps {
+  /** Always-visible calendar in the gallery, without moving focus. */
+  inline?: boolean;
   label: string;
+  selectionMode?: "range" | "single";
   value?: DateRange;
   onChange: (value: DateRange) => void;
   labels: DateRangeLabels;
@@ -35,7 +38,9 @@ function addMonths(date: Date, amount: number) {
   return new Date(start.getFullYear(), start.getMonth(), Math.min(date.getDate(), last.getDate()));
 }
 export function DateRangePicker({
+  inline = false,
   label,
+  selectionMode = "range",
   value,
   onChange,
   labels,
@@ -53,11 +58,18 @@ export function DateRangePicker({
     : labels.hint;
   return (
     <div className="ts-field">
+      {selectionMode === "single" && (
+        <label className="ts-field__label" htmlFor={`${id}-trigger`}>
+          {label}
+        </label>
+      )}
       <Popover
+        inline={inline}
         initialFocus='.ts-date-range button[tabindex="0"]'
         label={label}
         trigger={
           <Button
+            id={`${id}-trigger`}
             className="ts-date-range-trigger"
             ref={trigger}
             variant="secondary"
@@ -70,12 +82,13 @@ export function DateRangePicker({
               if (readOnly) e.preventDefault();
             }}
           >
-            {label}: {formatted}
+            {selectionMode === "single" ? formatted : `${label}: ${formatted}`}
           </Button>
         }
       >
         <Calendar
           {...(value ? { value } : {})}
+          selectionMode={selectionMode}
           onChange={onChange}
           labels={labels}
           locale={locale}
@@ -95,6 +108,7 @@ export function DateRangePicker({
   );
 }
 function Calendar({
+  selectionMode,
   value,
   onChange,
   labels,
@@ -124,6 +138,11 @@ function Calendar({
     setFocus(next);
   };
   const choose = (date: Date) => {
+    if (selectionMode === "single") {
+      onChange({ start: date });
+      close();
+      return;
+    }
     if (!anchor) {
       setAnchor(date);
       onChange({ start: date });
@@ -229,21 +248,25 @@ function Calendar({
         <Button variant="ghost" size="sm" onClick={() => preset(today, today)}>
           {labels.today}
         </Button>
-        <Button variant="ghost" size="sm" onClick={() => preset(addDays(today, -6), today)}>
-          {labels.last7}
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() =>
-            preset(
-              new Date(today.getFullYear(), today.getMonth(), 1),
-              new Date(today.getFullYear(), today.getMonth() + 1, 0),
-            )
-          }
-        >
-          {labels.month}
-        </Button>
+        {selectionMode !== "single" && (
+          <>
+            <Button variant="ghost" size="sm" onClick={() => preset(addDays(today, -6), today)}>
+              {labels.last7}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() =>
+                preset(
+                  new Date(today.getFullYear(), today.getMonth(), 1),
+                  new Date(today.getFullYear(), today.getMonth() + 1, 0),
+                )
+              }
+            >
+              {labels.month}
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );
