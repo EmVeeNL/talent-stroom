@@ -7,7 +7,11 @@ const tones = ["info", "success", "warning", "danger"] as const;
 
 // Fake timers and synchronous events keep the auto-dismiss deterministic: a slow axe
 // run or a busy CI runner must not let the 200 ms timer fire before hover or focus pauses it.
-const advance = (ms: number) => act(() => vi.advanceTimersByTime(ms));
+const advance = (ms: number) => {
+  act(() => {
+    vi.advanceTimersByTime(ms);
+  });
+};
 
 afterEach(() => {
   vi.useRealTimers();
