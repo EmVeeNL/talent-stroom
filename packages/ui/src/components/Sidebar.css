@@ -1,11 +1,15 @@
+/* Sidebar v2: full-height navy rail, 252 px expanded / 68 px collapsed (same in both themes). */
 .ts-sidebar {
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   width: var(--ts-sidebar-width);
+  height: 100%;
   flex-shrink: 0;
-  padding: var(--ts-space-3);
   background: var(--ts-sidebar-bg);
   color: var(--ts-sidebar-text);
-  border-radius: var(--ts-radius-md);
+  border-inline-end: var(--ts-border-width) solid var(--ts-sidebar-border);
+  transition: width var(--ts-duration-base) ease;
 }
 .ts-sidebar--collapsed {
   width: var(--ts-sidebar-width-collapsed);
@@ -14,17 +18,57 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  display: grid;
+  gap: var(--ts-space-0-5);
 }
-.ts-sidebar ul ul {
-  padding-inline-start: var(--ts-space-3);
+.ts-sidebar__brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ts-space-2);
+  box-sizing: border-box;
+  min-height: var(--ts-navbar-height);
+  padding: var(--ts-space-3) var(--ts-space-4);
 }
-.ts-sidebar--collapsed ul ul {
+.ts-sidebar--collapsed .ts-sidebar__brand {
+  justify-content: center;
+  padding-inline: var(--ts-space-2);
+}
+.ts-sidebar__home {
+  display: inline-flex;
+  text-decoration: none;
+  border-radius: var(--ts-radius-sm);
+  padding: var(--ts-space-1);
+}
+.ts-sidebar__nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--ts-space-2) var(--ts-space-3) var(--ts-space-4);
+  scrollbar-width: thin;
+  scrollbar-color: var(--ts-sidebar-border) transparent;
+}
+.ts-sidebar--collapsed .ts-sidebar__nav {
+  padding-inline: var(--ts-space-3);
+}
+.ts-sidebar__heading {
+  margin: var(--ts-space-4) 0 var(--ts-space-1);
+  padding-inline: var(--ts-space-3);
+  color: var(--ts-sidebar-text-muted);
+  font-size: var(--ts-font-size-xs);
+  line-height: var(--ts-line-height-xs);
+  font-weight: var(--ts-font-weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.ts-sidebar--collapsed .ts-sidebar__heading {
+  margin-block: var(--ts-space-3);
+}
+.ts-sidebar__heading--divider {
+  height: var(--ts-border-width);
+  margin-inline: var(--ts-space-3);
   padding: 0;
-}
-.ts-sidebar__workspace {
-  padding-bottom: var(--ts-space-4);
-  border-bottom: var(--ts-border-width) solid var(--ts-sidebar-border);
-  margin-bottom: var(--ts-space-3);
+  background: var(--ts-sidebar-border);
 }
 .ts-sidebar__item {
   box-sizing: border-box;
@@ -33,43 +77,195 @@
   align-items: center;
   gap: var(--ts-space-3);
   width: 100%;
-  min-height: 44px;
-  padding: var(--ts-space-3);
-  border: 0;
-  border-radius: var(--ts-radius-sm);
-  background: transparent;
+  min-height: 36px;
+  padding: var(--ts-space-2) var(--ts-space-3);
+  border-radius: var(--ts-radius-md);
   color: var(--ts-sidebar-text);
-  font: inherit;
   font-size: var(--ts-font-size-sm);
+  line-height: var(--ts-line-height-sm);
+  font-weight: var(--ts-font-weight-medium);
   text-decoration: none;
-  text-align: start;
-  cursor: pointer;
+  transition: background-color var(--ts-duration-fast) ease;
 }
-.ts-sidebar__item:hover {
+.ts-sidebar--collapsed .ts-sidebar__item {
+  justify-content: center;
+  padding-inline: 0;
+}
+.ts-sidebar__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ts-sidebar--collapsed .ts-sidebar__label,
+.ts-sidebar--collapsed .ts-sidebar__soon {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+a.ts-sidebar__item:hover {
   background: var(--ts-sidebar-hover-bg);
+  color: var(--ts-sidebar-text-active);
 }
-.ts-sidebar__item[aria-current] {
+.ts-sidebar__item[aria-current="page"] {
   background: var(--ts-sidebar-active-bg);
   color: var(--ts-sidebar-text-active);
   font-weight: var(--ts-font-weight-semibold);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%);
 }
-.ts-sidebar__item:focus-visible {
+.ts-sidebar__item[aria-disabled="true"] {
+  cursor: default;
+}
+.ts-sidebar__item[aria-disabled="true"] .ts-icon,
+.ts-sidebar__item[aria-disabled="true"] .ts-sidebar__label {
+  opacity: 0.72;
+}
+/* "Binnenkort" stays in the accessible name; the pill only shows on hover to keep the rail calm. */
+.ts-sidebar__soon {
+  display: none;
+  padding: 0 var(--ts-space-2);
+  border-radius: var(--ts-radius-full);
+  background: var(--ts-sidebar-hover-bg);
+  color: var(--ts-sidebar-text-muted);
+  font-size: var(--ts-font-size-xs);
+  line-height: 20px;
+  font-weight: var(--ts-font-weight-medium);
+}
+.ts-sidebar__item[aria-disabled="true"]:hover .ts-sidebar__soon {
+  display: inline-block;
+}
+.ts-sidebar__item[aria-disabled="true"]:hover .ts-sidebar__count {
+  display: none;
+}
+.ts-sidebar__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  box-sizing: border-box;
+  padding: 0 var(--ts-space-1);
+  border-radius: var(--ts-radius-full);
+  background: var(--ts-danger);
+  color: var(--ts-text-on-danger);
+  font-size: var(--ts-font-size-xs);
+  line-height: 1;
+  font-weight: var(--ts-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+.ts-sidebar--collapsed .ts-sidebar__count {
+  position: absolute;
+  top: 2px;
+  inset-inline-end: 6px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  font-size: 10px;
+  box-shadow: 0 0 0 2px var(--ts-sidebar-bg);
+}
+.ts-sidebar__item:focus-visible,
+.ts-sidebar__home:focus-visible,
+.ts-sidebar-assistant:focus-visible {
   outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color-on-dark);
   outline-offset: var(--ts-focus-ring-offset);
 }
 .ts-sidebar__tooltip {
   display: none;
   position: absolute;
-  inset-inline-start: 100%;
-  z-index: 2;
-  padding: var(--ts-space-2);
-  background: var(--ts-sidebar-bg);
-  color: var(--ts-sidebar-text);
+  inset-inline-start: calc(100% + var(--ts-space-3));
+  top: 50%;
+  z-index: 40;
+  transform: translateY(-50%);
+  padding: var(--ts-space-1) var(--ts-space-2);
+  background: var(--ts-neutral-900);
+  color: var(--ts-neutral-0);
   border: var(--ts-border-width) solid var(--ts-sidebar-border);
   border-radius: var(--ts-radius-sm);
+  box-shadow: var(--ts-shadow-popover);
+  font-size: var(--ts-font-size-xs);
+  line-height: var(--ts-line-height-xs);
+  font-weight: var(--ts-font-weight-medium);
   white-space: nowrap;
+  pointer-events: none;
 }
 .ts-sidebar__item:hover .ts-sidebar__tooltip,
 .ts-sidebar__item:focus-visible .ts-sidebar__tooltip {
   display: block;
+}
+/* Tooltips overflow the rail, so the collapsed nav must not clip horizontally. */
+.ts-sidebar--collapsed .ts-sidebar__nav {
+  overflow: visible;
+}
+.ts-sidebar__footer {
+  padding: var(--ts-space-3) var(--ts-space-3) var(--ts-space-4);
+}
+
+/* AI assistant card */
+.ts-sidebar-assistant {
+  display: flex;
+  align-items: center;
+  gap: var(--ts-space-3);
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--ts-space-3) var(--ts-space-4);
+  border: var(--ts-border-width) solid var(--ts-sidebar-border);
+  border-radius: var(--ts-radius-lg);
+  background: linear-gradient(135deg, rgb(78 130 255 / 14%), rgb(93 221 193 / 6%)), var(--ts-sidebar-hover-bg);
+  color: var(--ts-sidebar-text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.ts-sidebar-assistant[aria-disabled="true"] {
+  cursor: default;
+}
+.ts-sidebar-assistant:not([aria-disabled="true"]):hover {
+  border-color: var(--ts-navy-700);
+}
+.ts-sidebar--collapsed .ts-sidebar-assistant {
+  justify-content: center;
+  padding: var(--ts-space-2);
+}
+.ts-sidebar--collapsed .ts-sidebar-assistant__text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.ts-sidebar--collapsed .ts-sidebar-assistant__chevron {
+  display: none;
+}
+.ts-sidebar-assistant__icon {
+  color: var(--ts-primary-300);
+}
+.ts-sidebar-assistant__text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+.ts-sidebar-assistant__title {
+  color: var(--ts-sidebar-text-active);
+  font-size: var(--ts-font-size-sm);
+  line-height: var(--ts-line-height-sm);
+  font-weight: var(--ts-font-weight-semibold);
+}
+.ts-sidebar-assistant__description {
+  color: var(--ts-sidebar-text);
+  font-size: var(--ts-font-size-xs);
+  line-height: var(--ts-line-height-xs);
+}
+.ts-sidebar-assistant__chevron {
+  color: var(--ts-sidebar-text-muted);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ts-sidebar,
+  .ts-sidebar__item {
+    transition: none;
+  }
 }

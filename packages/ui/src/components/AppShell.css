@@ -1,0 +1,131 @@
+/* App shell: sticky full-height sidebar, 64 px navbar, content max 1600 px with 24/16 px page margins.
+   `--ts-shell-height` lets previews frame the shell; the app uses the viewport. */
+.ts-app-shell {
+  --ts-shell-height: 100dvh;
+  position: relative;
+  display: flex;
+  min-height: var(--ts-shell-height);
+  background: var(--ts-bg);
+  color: var(--ts-text);
+}
+.ts-app-shell__sidebar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  flex: none;
+  height: var(--ts-shell-height);
+}
+.ts-app-shell__sidebar[hidden] {
+  display: none;
+}
+.ts-app-shell__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+.ts-app-shell__body > .ts-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.ts-app-shell__main {
+  flex: 1;
+  padding: var(--ts-space-6);
+}
+.ts-app-shell__main:focus {
+  outline: none;
+}
+.ts-app-shell__content {
+  max-width: var(--ts-content-max-width);
+  margin-inline: auto;
+}
+.ts-app-shell__skip {
+  position: absolute;
+  top: var(--ts-space-2);
+  inset-inline-start: var(--ts-space-2);
+  z-index: 60;
+  padding: var(--ts-space-2) var(--ts-space-4);
+  border-radius: var(--ts-radius-md);
+  background: var(--ts-surface-raised);
+  color: var(--ts-primary-text);
+  font: var(--ts-font-label);
+  box-shadow: var(--ts-shadow-popover);
+  transform: translateY(-200%);
+}
+.ts-app-shell__skip:focus {
+  transform: none;
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: var(--ts-focus-ring-offset);
+}
+
+/* Mobile (<768 px): overlay drawer with scrim; the rest of the page is inert while open. */
+.ts-app-shell--mobile .ts-app-shell__sidebar {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-start: 0;
+  z-index: 50;
+  width: min(var(--ts-sidebar-width), calc(100vw - var(--ts-space-12)));
+  height: auto;
+  box-shadow: var(--ts-shadow-modal);
+}
+.ts-app-shell--mobile .ts-sidebar {
+  width: 100%;
+}
+.ts-app-shell__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: rgb(8 23 39 / 56%);
+}
+.ts-app-shell__close.ts-navbar-button {
+  color: var(--ts-sidebar-text);
+}
+.ts-app-shell__close.ts-navbar-button:hover {
+  background: var(--ts-sidebar-hover-bg);
+  color: var(--ts-sidebar-text-active);
+}
+.ts-app-shell__close.ts-navbar-button:focus-visible {
+  outline-color: var(--ts-focus-ring-color-on-dark);
+}
+.ts-app-shell--mobile .ts-app-shell__main {
+  padding: var(--ts-space-4);
+}
+
+/* Page header: H1 30/38 + subtitle, actions right-aligned */
+.ts-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ts-space-4);
+  margin-bottom: var(--ts-space-6);
+}
+.ts-page-header__text {
+  min-width: 0;
+}
+.ts-page-header__title {
+  margin: 0;
+  font: var(--ts-font-page-title);
+  color: var(--ts-text);
+}
+/* The H1 only receives programmatic focus after navigation (tabindex=-1); it is not a control. */
+.ts-page-header__title:focus {
+  outline: none;
+}
+.ts-page-header__subtitle {
+  margin: var(--ts-space-1) 0 0;
+  color: var(--ts-text-muted);
+  font: var(--ts-font-body);
+}
+.ts-page-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ts-space-3);
+}
+@media (max-width: 767px) {
+  .ts-page-header__title {
+    font: var(--ts-font-section-title);
+  }
+}

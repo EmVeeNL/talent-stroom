@@ -46,6 +46,8 @@
 @import "./components/Kbd.css";
 @import "./components/Breadcrumb.css";
 @import "./components/Header.css";
+@import "./components/AppShell.css";
+@import "./components/ShellPopup.css";
 @import "./components/ThemeToggle.css";
 /* TalentStroom component styles. Plain CSS on top of tokens.css; no runtime. */
 
