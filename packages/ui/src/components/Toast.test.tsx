@@ -19,7 +19,7 @@ it.each(["info", "success", "warning", "danger"] as const)(
     expect(dismiss).not.toHaveBeenCalled();
     await userEvent.unhover(notice);
     await waitFor(() => expect(dismiss).toHaveBeenCalled());
-    await userEvent.click(screen.getByText("Sluiten"));
+    await userEvent.click(screen.getByRole("button", { name: "Sluiten" }));
   },
 );
 it("pauses on keyboard focus independently of hover", async () => {

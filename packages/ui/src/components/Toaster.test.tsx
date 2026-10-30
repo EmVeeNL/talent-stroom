@@ -18,7 +18,7 @@ it("queues beyond its visible limit and promotes a queued notification after dis
   await userEvent.click(screen.getByText("Toevoegen"));
   expect(screen.getAllByRole("status")).toHaveLength(2);
   expect(await axeViolations(container)).toEqual([]);
-  const close = screen.getAllByText("Sluiten").at(0);
+  const close = screen.getAllByRole("button", { name: "Sluiten" }).at(0);
   if (!close) throw new Error("Missing close button");
   await userEvent.click(close);
   expect(screen.getAllByRole("status")).toHaveLength(2);

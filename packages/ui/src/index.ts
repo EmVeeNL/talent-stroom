@@ -173,3 +173,6 @@ export { ContextMenu } from "./components/ContextMenu.tsx";
 export type { ContextMenuProps, ContextMenuItem } from "./components/ContextMenu.tsx";
 export { EmptyState } from "./components/EmptyState.tsx";
 export type { EmptyStateProps } from "./components/EmptyState.tsx";
+
+export { DatePicker } from "./components/DatePicker.tsx";
+export type { DatePickerProps } from "./components/DatePicker.tsx";

@@ -122,3 +122,11 @@
   outline: none;
   border: 0;
 }
+
+.ts-combobox__option {
+  min-height: 44px;
+  border-radius: var(--ts-radius-sm);
+}
+.ts-combobox__popup {
+  margin-top: var(--ts-space-1);
+}
