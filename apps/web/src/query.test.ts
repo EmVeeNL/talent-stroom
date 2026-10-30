@@ -243,3 +243,22 @@ it("retries only one network/5xx failure, never aborts or 4xx", () => {
   expect(retryQuery(1, new RequestError(500))).toBe(false);
   expect(retryQuery(0, new TypeError("Network"))).toBe(true);
 });
+
+describe("auth form mutation privacy", () => {
+  it("keeps request values out of keys and variables, removes the mutation, and rejects late results", async () => {
+    const { layer, transport } = setup();
+    const pendingResponse = Promise.withResolvers<unknown>();
+    const auth = vi.spyOn(transport, "auth").mockImplementation(() => pendingResponse.promise);
+    const pending = layer.authSubmit(transport, "request-password-reset", { email: "synthetic@example.test" });
+    const entries = layer.client.getMutationCache().getAll();
+    expect(entries).toHaveLength(1);
+    expect(entries[0]?.options.mutationKey).toEqual(["session", "auth-submit"]);
+    expect(entries[0]?.state.variables).toBeUndefined();
+    expect(layer.client.getQueryCache().getAll()).toEqual([]);
+    await layer.reset();
+    pendingResponse.resolve({ status: true });
+    await expect(pending).rejects.toMatchObject({ name: "AbortError" });
+    expect(auth).toHaveBeenCalledTimes(1);
+    expect(layer.client.getMutationCache().getAll()).toEqual([]);
+  });
+});

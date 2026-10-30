@@ -1,6 +1,8 @@
 import { useId } from "react";
 import { cx } from "../classnames.ts";
 export interface RadioGroupProps {
+  id?: string;
+  onBlur?: () => void;
   label: string;
   options: RadioOption[];
   value?: string;
@@ -21,6 +23,8 @@ export interface RadioOption {
   disabled?: boolean;
 }
 export function RadioGroup({
+  id: idProp,
+  onBlur,
   label,
   options,
   value,
@@ -32,10 +36,13 @@ export function RadioGroup({
   readOnly,
   disabled,
 }: RadioGroupProps) {
-  const id = useId(),
+  const uid = useId(),
+    id = idProp ?? uid,
     groupName = name ?? id;
   return (
     <fieldset
+      id={id}
+      onBlur={onBlur}
       className={cx("ts-choice-group", error && "ts-field--invalid")}
       aria-describedby={
         [hint ? `${id}-hint` : undefined, error ? `${id}-error` : undefined].filter(Boolean).join(" ") || undefined

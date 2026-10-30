@@ -1,5 +1,15 @@
 /** Source catalog. Keys are stable identifiers; never store translated labels in the database. */
 export const nlNL = {
+  "form.contact.general": "Algemene vraag",
+  "form.contact.subscription": "Abonnement",
+  "form.contact.support": "Ondersteuning",
+  "form.profile.job": "Functie",
+  "form.profile.notifications": "E-mailmeldingen ontvangen",
+  "form.invalid": "Vul dit veld correct in.",
+  "form.email": "Vul een geldig e-mailadres in.",
+  "form.tooLong": "Deze waarde is te lang.",
+  "form.password": "Kies een wachtwoord van 12 tot 128 tekens.",
+  "form.summary": "Controleer de volgende velden",
   "gallery.forms.kit.buttons": "Knoppen — varianten en toestanden",
   "gallery.forms.kit.fields": "Formuliervelden — toestanden",
   "gallery.forms.kit.selections": "Selecties en toggles",

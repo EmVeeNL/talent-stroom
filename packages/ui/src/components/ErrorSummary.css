@@ -1,0 +1,12 @@
+.ts-error-summary {
+  border-inline-start: 3px solid var(--ts-danger);
+  padding: var(--ts-space-4);
+  margin-block-end: var(--ts-space-4);
+}
+.ts-error-summary h2 {
+  font-size: inherit;
+}
+.ts-error-summary a {
+  color: inherit;
+  text-decoration: underline;
+}

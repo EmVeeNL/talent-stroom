@@ -2,6 +2,16 @@ import type { MessageKey } from "./nl-NL.ts";
 
 // Typed against the Dutch source: a missing or extra key fails the typecheck.
 export const enGB = {
+  "form.contact.general": "General question",
+  "form.contact.subscription": "Subscription",
+  "form.contact.support": "Support",
+  "form.profile.job": "Job title",
+  "form.profile.notifications": "Receive email notifications",
+  "form.invalid": "Enter a valid value.",
+  "form.email": "Enter a valid email address.",
+  "form.tooLong": "This value is too long.",
+  "form.password": "Choose a password with 12 to 128 characters.",
+  "form.summary": "Check the following fields",
   "gallery.forms.kit.buttons": "Buttons — variants and states",
   "gallery.forms.kit.fields": "Form fields — states",
   "gallery.forms.kit.selections": "Selections and toggles",
