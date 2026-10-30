@@ -4,20 +4,34 @@ import type { Locale, MessageKey } from "@talentstroom/i18n";
 import { Button, Icon, Logo, Select, ThemeToggle } from "@talentstroom/ui";
 import { createTransport, errorKey, isAborted, listOrganizations, RequestError } from "./auth.ts";
 import type { OrganizationList } from "./auth.ts";
-import { AuthScreens, publicRoutes, titles } from "./AuthScreens.tsx";
-import { OrganizationPicker } from "./OrganizationPicker.tsx";
+import { publicRoutes, titles } from "./pages/auth/AuthFlow.tsx";
+import { ForgotPassword } from "./pages/auth/ForgotPassword.tsx";
+import { Login } from "./pages/auth/Login.tsx";
+import { OrganizationPicker } from "./pages/auth/OrganizationPicker.tsx";
+import { Register } from "./pages/auth/Register.tsx";
+import { ResetPassword } from "./pages/auth/ResetPassword.tsx";
+import { VerifyEmail } from "./pages/auth/VerifyEmail.tsx";
 import { Workspace } from "./Workspace.tsx";
 import type { SessionUser } from "./Workspace.tsx";
 import { AuthLayout } from "./layouts/AuthLayout.tsx";
-import { authRouteTitles, findRoute, knownTitles, routes } from "./routes.ts";
+import { AuthHero } from "./layouts/AuthHero.tsx";
+import { authRouteTitles, demoAuthRoutes, demoPagesEnabled, findRoute, knownTitles, routes } from "./routes.ts";
 import { Skeleton } from "@talentstroom/ui";
 import "./auth.css";
+
+const authScreenByPath = {
+  "/inloggen": Login,
+  "/registreren": Register,
+  "/wachtwoord-vergeten": ForgotPassword,
+  "/wachtwoord-herstellen": ResetPassword,
+  "/e-mail-bevestigen": VerifyEmail,
+};
 
 // Dev-only component showcase: ?gallery. Tree-shaken from production builds.
 const ComponentGallery = import.meta.env.DEV
   ? lazy(() => import("./gallery/Gallery.tsx").then((m) => ({ default: m.Gallery })))
   : null;
-const LazyPages = new Map(routes.map((route) => [route.path, lazy(route.load)]));
+const LazyPages = new Map([...routes, ...demoAuthRoutes].map((route) => [route.path, lazy(route.load)]));
 const LazyNotFound = lazy(() => import("./pages/errors/NotFound.tsx"));
 function RouteView({ path, locale }: { path: string; locale: Locale }) {
   const Page = LazyPages.get(path);
@@ -35,7 +49,19 @@ export function App() {
   if (import.meta.env.DEV && new URLSearchParams(window.location.search).get("preview") === "dashboard") {
     return <DashboardPreview />;
   }
+  const demoAuthRoute = demoAuthRoutes.find((route) => route.path === window.location.pathname);
+  if (demoAuthRoute && demoPagesEnabled) return <DemoAuthPreview path={demoAuthRoute.path} />;
   return <AuthApp />;
+}
+
+function DemoAuthPreview({ path }: { path: string }) {
+  const [locale] = useState<Locale>(DEFAULT_LOCALE);
+  const Page = LazyPages.get(path);
+  useEffect(() => {
+    const theme = new URLSearchParams(window.location.search).get("theme");
+    if (theme === "light" || theme === "dark") document.documentElement.dataset["theme"] = theme;
+  }, []);
+  return <Suspense fallback={null}>{Page ? React.createElement(Page, { locale }) : null}</Suspense>;
 }
 
 function DashboardPreview() {
@@ -103,8 +129,15 @@ function readUser(session: object): SessionUser {
 function AuthApp() {
   const [location, setLocation] = useState(readLocation);
   const [locale, setLocale] = useState<Locale>(DEFAULT_LOCALE);
-  const [transport, setTransport] = useState(createTransport);
-  const [context, setContext] = useState<Context>({ kind: "loading" });
+  const [transport, setTransport] = useState(() => {
+    const current = createTransport();
+    if (import.meta.env.DEV && new URLSearchParams(window.location.search).get("preview") === "guest") {
+      current.auth = async () => null;
+    }
+    return current;
+  });
+  const guestPreview = import.meta.env.DEV && new URLSearchParams(window.location.search).get("preview") === "guest";
+  const [context, setContext] = useState<Context>(guestPreview ? { kind: "guest" } : { kind: "loading" });
   const [signOutBusy, setSignOutBusy] = useState(false);
   const [actionError, setActionError] = useState<MessageKey>();
   const heading = useRef<HTMLHeadingElement>(null);
@@ -130,6 +163,9 @@ function AuthApp() {
   }, [location]);
   useEffect(() => {
     document.documentElement.lang = locale;
+    const theme = new URLSearchParams(window.location.search).get("theme");
+    if (import.meta.env.DEV && (theme === "light" || theme === "dark"))
+      document.documentElement.dataset["theme"] = theme;
   }, [locale]);
   useEffect(() => {
     const signal = transport.signal;
@@ -312,6 +348,7 @@ function AuthApp() {
       controls={controls}
       hero={
         <>
+          <AuthHero />
           <a href="/inloggen" className="auth-wordmark" aria-label={tr("app.name")}>
             <Logo tone="dark" size="lg" />
           </a>
@@ -360,14 +397,16 @@ function AuthApp() {
                   </Button>
                 </>
               ) : publicRoutes.includes(path) ? (
-                <AuthScreens
-                  key={location.path + location.query}
-                  path={path}
-                  query={location.query}
-                  locale={locale}
-                  transport={transport}
-                  onSignedIn={refresh}
-                />
+                React.createElement(
+                  Object.entries(authScreenByPath).find(([screenPath]) => screenPath === path)?.[1] ?? Login,
+                  {
+                    key: location.path + location.query,
+                    query: location.query,
+                    locale,
+                    transport,
+                    onSignedIn: refresh,
+                  },
+                )
               ) : (
                 <>
                   {picker}
