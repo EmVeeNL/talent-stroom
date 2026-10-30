@@ -3,7 +3,17 @@ export type { IconName } from "./icons.ts";
 export * from "./tokens.ts";
 export { contrastRatio } from "./contrast.ts";
 export { Badge, StatusPill } from "./components/Badge.tsx";
-export type { BadgeProps, BadgeTone } from "./components/Badge.tsx";
+export { StageBadge } from "./components/Badge.tsx";
+export type { BadgeProps, BadgeTone, BadgeVariant, StageBadgeProps } from "./components/Badge.tsx";
+export { FilterChip } from "./components/FilterChip.tsx";
+export type {
+  FilterChipProps,
+  ToggleFilterChipProps,
+  RemovableFilterChipProps,
+  ActionFilterChipProps,
+} from "./components/FilterChip.tsx";
+export { RECRUITMENT_STAGE_IDS, RECRUITMENT_STAGES, CUSTOM_LABEL_TONE } from "./recruitment-stages.ts";
+export type { RecruitmentStageId, RecruitmentStageTone } from "./recruitment-stages.ts";
 export { Button } from "./components/Button.tsx";
 export type { ButtonProps, ButtonSize, ButtonVariant } from "./components/Button.tsx";
 export { Card } from "./components/Card.tsx";
