@@ -147,7 +147,13 @@ export function Candidates({ locale }: { locale: Locale }) {
     },
     { id: "date", label: tr(locale, "demo.dashboard.date-short"), cell: (r) => r.date },
   ];
-  cols.push({ id: "actions", label: tr(locale, "demo.dashboard.actions"), cell: candidateActionsCell });
+  cols.push({
+    id: "actions",
+    label: tr(locale, "demo.dashboard.actions"),
+    hideLabel: true,
+    width: 48,
+    cell: candidateActionsCell,
+  });
   return (
     <Panel title={tr(locale, "demo.dashboard.recent-candidates")}>
       <DataTable

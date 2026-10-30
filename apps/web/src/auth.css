@@ -2,8 +2,7 @@ body {
   margin: 0;
   background: var(--ts-bg);
   color: var(--ts-text);
-  font-family: var(--font-ui);
-  line-height: var(--ts-line-height-body);
+  font: var(--ts-font-body);
 }
 .auth-shell {
   position: relative;
@@ -190,21 +189,50 @@ body {
   margin: 0;
   padding: 0;
 }
+/* Frosted card over the photo. Built on theme tokens (not on [data-theme]) so light, dark
+   and "system" (prefers-color-scheme) always get a matching surface, fields and text. */
 .auth-card {
-  padding: clamp(2rem, 3vw, 2.5rem);
-  color: #102038;
-  background: rgb(255 255 255 / 78%);
-  border: 1px solid rgb(255 255 255 / 58%);
+  padding: var(--ts-space-6);
+  color: var(--ts-text);
+  --auth-glass: 80%;
+  background: color-mix(in srgb, var(--ts-surface) var(--auth-glass), transparent);
+  border: var(--ts-border-width) solid color-mix(in srgb, var(--ts-border) 60%, rgb(255 255 255 / 30%));
   border-radius: var(--ts-radius-xl);
-  box-shadow: 0 24px 72px rgb(3 16 34 / 28%);
-  backdrop-filter: blur(20px) saturate(140%);
+  box-shadow: 0 24px 64px rgb(3 16 34 / 30%);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+}
+.auth-card .ts-field__input,
+.auth-card .ts-field__control {
+  background: color-mix(in srgb, var(--ts-surface-muted, var(--ts-surface)) 72%, transparent);
+}
+/* Same selectors as the dark tokens: explicit dark theme, or system dark unless forced light. */
+:root[data-theme="dark"] .auth-card {
+  --auth-glass: 62%;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .auth-card {
+    --auth-glass: 62%;
+  }
+}
+.auth-card .ts-tabs__list,
+.auth-card [role="tablist"] {
+  background: transparent;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .auth-card {
+    background: var(--ts-surface);
+  }
+  .auth-card .ts-field__input,
+  .auth-card .ts-field__control {
+    background: var(--ts-surface-muted, var(--ts-surface));
+  }
 }
 .auth-card-logo {
   margin-bottom: var(--ts-space-6);
 }
 .auth-content h1 {
-  font-size: var(--ts-font-size-2xl);
-  line-height: var(--ts-line-height-heading);
+  font: var(--ts-font-page-title);
   text-wrap: balance;
   margin: 0 0 var(--ts-space-2);
 }
@@ -220,7 +248,7 @@ body {
 .auth-fields {
   display: flex;
   flex-direction: column;
-  gap: var(--ts-space-5);
+  gap: var(--ts-space-4);
   border: 0;
   padding: 0;
   margin: var(--ts-space-5) 0 0;
@@ -385,19 +413,6 @@ body {
   }
   .auth-card {
     padding: 1.5rem;
-  }
-}
-[data-theme="dark"] .auth-card {
-  color: #f3f7fc;
-  background: rgb(8 23 39 / 72%);
-  border-color: rgb(197 209 224 / 24%);
-}
-@supports not (backdrop-filter: blur(1px)) {
-  .auth-card {
-    background: #fff;
-  }
-  [data-theme="dark"] .auth-card {
-    background: #10243b;
   }
 }
 @media (min-width: 1024px) {

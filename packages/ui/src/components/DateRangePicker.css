@@ -33,7 +33,7 @@
 }
 .ts-date-range td button {
   width: 100%;
-  min-height: 44px;
+  min-height: var(--ts-control-height-sm);
   border: var(--ts-border-width) solid transparent;
   border-radius: var(--ts-radius-sm);
   background: transparent;

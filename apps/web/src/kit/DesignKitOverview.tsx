@@ -322,7 +322,7 @@ export function DesignKitOverview({ locale }: { locale: Locale }) {
       <Panel className="dk-status" title={tr("demo.kit.statusLabels")}>
         <div className="dk-row">
           {RECRUITMENT_STAGE_IDS.map((stage) => (
-            <StageBadge key={stage} stage={stage}>
+            <StageBadge icon={false} key={stage} stage={stage}>
               {t(locale, `recruitment.stage.${stage}`)}
             </StageBadge>
           ))}
@@ -494,7 +494,9 @@ export function DesignKitOverview({ locale }: { locale: Locale }) {
                 <th scope="col">{t(locale, "demo.elements.overview.location")}</th>
                 <th scope="col">{t(locale, "demo.elements.overview.status")}</th>
                 <th scope="col">{tr("demo.kit.colDate")}</th>
-                <th scope="col">{tr("demo.kit.colActions")}</th>
+                <th scope="col" className="dk-table__actions">
+                  <span className="ts-visually-hidden">{tr("demo.kit.colActions")}</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -512,7 +514,9 @@ export function DesignKitOverview({ locale }: { locale: Locale }) {
                   <td>{row.role}</td>
                   <td>{row.city}</td>
                   <td>
-                    <StageBadge stage={row.stage}>{t(locale, `recruitment.stage.${row.stage}`)}</StageBadge>
+                    <StageBadge icon={false} stage={row.stage}>
+                      {t(locale, `recruitment.stage.${row.stage}`)}
+                    </StageBadge>
                   </td>
                   <td>{row.date}</td>
                   <td>

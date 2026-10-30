@@ -11,7 +11,7 @@ export type BadgeVariant = "subtle" | "solid";
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   tone?: BadgeTone;
   variant?: BadgeVariant;
-  icon?: IconName;
+  icon?: IconName | false;
   dot?: boolean;
 }
 
@@ -47,7 +47,7 @@ const toneIcons: Record<BadgeTone, IconName> = {
   custom: "star",
 };
 
-/** Status indicator: tone is conveyed by text and a per-tone icon, never by colour alone. */
+/** Status indicator: text conveys status; the per-tone icon can optionally be omitted. */
 export function StatusPill({ tone = "neutral", className, children, icon, ...rest }: BadgeProps) {
   return (
     <Badge {...rest} tone={tone} icon={icon ?? toneIcons[tone]} className={cx("ts-badge--pill", className)}>
@@ -58,10 +58,12 @@ export function StatusPill({ tone = "neutral", className, children, icon, ...res
 
 export interface StageBadgeProps extends Omit<BadgeProps, "tone" | "icon"> {
   stage: RecruitmentStageId;
+  /** Set false for a plain pill; the stage icon remains the default. */
+  icon?: IconName | false;
 }
 
 /** Stage label content is supplied by the caller using the exported i18n label key. */
-export function StageBadge({ stage, ...props }: StageBadgeProps) {
+export function StageBadge({ stage, icon, ...props }: StageBadgeProps) {
   const definition = RECRUITMENT_STAGES[stage];
-  return <StatusPill {...props} tone={definition.tone} icon={definition.icon} />;
+  return <StatusPill {...props} tone={definition.tone} icon={icon ?? definition.icon} />;
 }

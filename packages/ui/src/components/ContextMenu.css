@@ -2,8 +2,13 @@
   display: inline-flex;
 }
 .ts-context-menu-anchor > .ts-button {
-  min-width: 44px;
-  padding: var(--ts-space-2);
+  width: var(--ts-control-height-sm);
+  min-width: var(--ts-control-height-sm);
+  min-height: var(--ts-control-height-sm);
+  padding: 0;
+  border-color: var(--ts-border);
+  border-radius: var(--ts-radius-lg);
+  color: var(--ts-text-muted);
 }
 .ts-context-menu {
   position: fixed;
@@ -12,11 +17,11 @@
   margin: 0;
   box-sizing: border-box;
   width: max-content;
-  min-width: 220px;
+  min-width: 200px;
   max-width: calc(100vw - 16px);
   padding: var(--ts-space-1);
   border: 1px solid var(--ts-border);
-  border-radius: var(--ts-radius-md);
+  border-radius: var(--ts-radius-lg);
   background: var(--ts-surface-raised);
   color: var(--ts-text);
   box-shadow: var(--ts-shadow-popover);
@@ -24,12 +29,13 @@
 .ts-context-menu button {
   display: flex;
   align-items: center;
-  gap: var(--ts-space-3);
+  gap: var(--ts-space-2);
   width: 100%;
-  min-height: 44px;
+  min-height: var(--ts-control-height-sm);
+  box-sizing: border-box;
   border: 0;
   border-radius: var(--ts-radius-sm);
-  padding: var(--ts-space-2) var(--ts-space-3);
+  padding: var(--ts-space-1) var(--ts-space-2);
   background: transparent;
   color: inherit;
   font: var(--ts-font-compact);

@@ -19,7 +19,7 @@ export function QueryProvider({
   return (
     <QueryClientProvider client={layer.client}>
       <DataContext value={layer}>{children}</DataContext>
-      {Devtools && synthetic && (
+      {Devtools && synthetic && !navigator.webdriver && !new URLSearchParams(window.location.search).has("preview") && (
         <Suspense fallback={null}>
           <Devtools initialIsOpen={false} />
         </Suspense>

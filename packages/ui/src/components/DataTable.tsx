@@ -19,6 +19,8 @@ import { Pagination } from "./Pagination.tsx";
 export interface DataColumn<Row> {
   id: string;
   label: string;
+  hideLabel?: boolean;
+  width?: number;
   cell: (row: Row) => ReactNode;
   sortValue?: (row: Row) => string | number;
 }
@@ -218,7 +220,13 @@ export function DataTable<Row>({
                   if (!column) return null;
                   const active = sort?.id === column.id;
                   return (
-                    <th key={column.id} scope="col" aria-sort={active ? sort.direction : undefined}>
+                    <th
+                      key={column.id}
+                      scope="col"
+                      data-column={column.id}
+                      style={column.width ? { width: column.width } : undefined}
+                      aria-sort={active ? sort.direction : undefined}
+                    >
                       {column.sortValue ? (
                         <button
                           type="button"
@@ -237,7 +245,7 @@ export function DataTable<Row>({
                           />
                         </button>
                       ) : (
-                        column.label
+                        <span className={column.hideLabel ? "ts-visually-hidden" : undefined}>{column.label}</span>
                       )}
                     </th>
                   );
@@ -254,7 +262,7 @@ export function DataTable<Row>({
                         </td>
                       )}
                       {visibleColumns.map((column) => (
-                        <td key={column.id}>
+                        <td key={column.id} data-column={column.id}>
                           <Skeleton shape="text" />
                         </td>
                       ))}
@@ -275,7 +283,7 @@ export function DataTable<Row>({
                           </td>
                         )}
                         {visibleColumns.map((column) => (
-                          <td key={column.id}>
+                          <td key={column.id} data-column={column.id}>
                             {columns.find((item) => item.id === column.id)?.cell(row.original.value)}
                           </td>
                         ))}

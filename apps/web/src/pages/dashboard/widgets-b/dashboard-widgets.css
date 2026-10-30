@@ -8,13 +8,13 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 16px;
-  margin-top: 20px;
+  margin-top: var(--ts-space-4);
 }
 .demo-b-panel {
   min-width: 0;
 }
 .demo-b-panel .ts-card__body {
-  padding: var(--ts-space-4) var(--ts-space-5) var(--ts-space-5);
+  padding: var(--ts-space-4);
 }
 .demo-b-deals-bottom {
   display: grid;
@@ -45,7 +45,7 @@
 .demo-b-calendar-legend span {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--ts-space-2);
 }
 .demo-b-calendar-legend i {
   width: 12px;
@@ -78,7 +78,9 @@
 }
 .demo-b-table th,
 .demo-b-table td {
-  padding: 10px 12px;
+  box-sizing: border-box;
+  height: 40px;
+  padding: 0 var(--ts-space-3);
   border-bottom: 1px solid var(--ts-border, var(--ts-line));
   white-space: nowrap;
 }
@@ -195,18 +197,18 @@
 @media (max-width: 599px) {
   .demo-b-grid {
     grid-template-columns: minmax(0, 1fr);
-    gap: 12px;
+    gap: var(--ts-space-4);
   }
   .demo-b-kpis {
     grid-template-columns: minmax(0, 1fr);
-    gap: 12px;
+    gap: var(--ts-space-4);
   }
   .demo-b-panel--wide {
     grid-column: auto;
   }
   .demo-b-deals-bottom {
     grid-template-columns: minmax(0, 1fr);
-    gap: 12px;
+    gap: var(--ts-space-4);
   }
   .demo-b-table {
     min-width: 560px;

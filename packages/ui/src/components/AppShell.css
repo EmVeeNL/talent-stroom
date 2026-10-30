@@ -1,4 +1,4 @@
-/* App shell: sticky full-height sidebar, 64 px navbar, content max 1600 px with 24/16 px page margins.
+/* App shell: sticky full-height sidebar, 56 px navbar, content max 1600 px with 24/16 px page margins.
    `--ts-shell-height` lets previews frame the shell; the app uses the viewport. */
 .ts-app-shell {
   --ts-shell-height: 100dvh;
@@ -92,14 +92,14 @@
   padding: var(--ts-space-4);
 }
 
-/* Page header: H1 30/38 + subtitle, actions right-aligned */
+/* Page header: H1 24/32 + subtitle, actions right-aligned */
 .ts-page-header {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--ts-space-4);
-  margin-bottom: var(--ts-space-6);
+  margin-bottom: var(--ts-space-4);
 }
 .ts-page-header__text {
   min-width: 0;
@@ -123,9 +123,4 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--ts-space-3);
-}
-@media (max-width: 767px) {
-  .ts-page-header__title {
-    font: var(--ts-font-section-title);
-  }
 }

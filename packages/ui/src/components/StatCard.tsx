@@ -49,17 +49,17 @@ export function StatCard({
       <div className="ts-stat-card__layout">
         {icon && (
           <span aria-hidden="true" className="ts-stat-card__icon">
-            <Icon name={icon} size={32} />
+            <Icon name={icon} size={24} />
           </span>
         )}
         <div aria-hidden="true" className="ts-stat-card__content">
           <span className="ts-stat-card__label">{label}</span>
           <strong className="ts-stat-card__value">{formatted}</strong>
           {trend && (
-            <>
+            <span className="ts-stat-card__trend">
               <TrendIndicator {...trend} compact />
               <span className="ts-stat-card__description">{trend.comparisonLabel}</span>
-            </>
+            </span>
           )}
           {description && <span className="ts-stat-card__description">{description}</span>}
         </div>

@@ -199,7 +199,7 @@ function SectionView({
             active={item.active ?? activeId === item.id}
             collapsed={collapsed}
             soonLabel={soonLabel}
-            hideIcon={section.nested ?? false}
+            hideIcon={(section.nested ?? false) && !collapsed}
           />
         ))}
       </ul>
@@ -207,7 +207,7 @@ function SectionView({
   );
 }
 
-/** Navy application sidebar (252 px, 68 px collapsed) with grouped sections. */
+/** Navy application sidebar (240 px, 68 px collapsed) with grouped sections. */
 export function Sidebar({
   label,
   sections,

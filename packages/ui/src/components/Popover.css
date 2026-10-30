@@ -10,7 +10,7 @@
   min-width: min(16rem, calc(100vw - 16px));
   padding: var(--ts-space-4);
   border: var(--ts-border-width) solid var(--ts-border);
-  border-radius: var(--ts-radius-md);
+  border-radius: var(--ts-radius-lg);
   background: var(--ts-surface-raised);
   color: var(--ts-text);
   font: var(--ts-font-body);

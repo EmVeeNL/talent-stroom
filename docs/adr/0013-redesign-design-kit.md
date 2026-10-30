@@ -93,3 +93,38 @@ Disabled controls are exempt (1.4.3) and keep the kit's low-contrast look.
 ## Rollback
 
 Tokens are values in two mirrored files; reverting this change restores the previous palette. Moving to Tailwind later would mean importing `tokens.css` variables into a `@theme inline` block, not redefining colours.
+
+## v2 refinement, 2026-10-30
+
+Issue #439 (epic #369) refines the accepted kit using the four references in
+`docs/images/redesign/v2/`. The owner's written dimensions take precedence over
+AI-generated text and decorative effects. Public component APIs and real localized copy stay intact.
+The original table above records v1; these values supersede it:
+
+| Role                                             | v2                                                                       |
+| ------------------------------------------------ | ------------------------------------------------------------------------ |
+| Control / panel / dialog radius                  | 4 / 6 / 8 px; pills remain fully rounded                                 |
+| Spacing                                          | 4 px scale; the public legacy `space-0-5` name aliases 4 px              |
+| Page / card title                                | Asap Sharp 600 24/32 / 600 14/20                                         |
+| Body / label / section label                     | 400 14/20 / 600 12/16 / 600 11/16, uppercase with 0.08em tracking        |
+| Sidebar / collapsed / navbar                     | 240 / 68 / 56 px                                                         |
+| Controls / nav entries / menu items / table rows | 32–36 / 36 / 32 / 40 px                                                  |
+| Card body / page padding / section and grid gaps | 16 / 24 (16 mobile) / 16 px                                              |
+| Decorative light / dark border                   | `#E4E8F0` / `#303B4E` (opaque equivalent of a low-alpha slate-blue line) |
+| Dark canvas / surface / muted and raised surface | `#101725` / `#182131` / `#202B3C`                                        |
+| Sidebar canvas / active background / accent      | `#0E1625` / `#1B2E49` / `#4E82FF`                                        |
+| Elevation                                        | Subtle neutral shadows in light; border only in dark                     |
+
+Card headers have a divider and group title/description opposite caller-provided
+actions. Their three-dot menus use a framed 32 px trigger with a 6 px radius.
+The sidebar active state has a 2 px left accent; nested entries omit icons.
+Form boundaries retain `border-strong` for WCAG 1.4.11 rather than copying the
+low-contrast reference literally. Text, status, focus and control contrast pairs
+remain covered in both themes. The auth form uses the same opaque semantic panel
+and elevation tokens while preserving its existing photo backdrop. No motion or
+dependencies were added.
+
+Verification: token mirror, grouped-export and contrast tests plus component and
+application tests. Browser screenshot review at 1440 and 390 px in both themes
+belongs to the orchestrator (`pnpm visual`); the implementation worktree does not
+run Chromium.
