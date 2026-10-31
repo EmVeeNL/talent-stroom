@@ -82,6 +82,19 @@ async function fillLogin() {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("authentication routing", () => {
+  it("opens notification preferences from profile settings and restores focus", async () => {
+    setup("/apps/agenda", true, org.organizationId);
+    const profile = await screen.findByRole("button", { name: /Gebruikersmenu:/ });
+    await userEvent.click(profile);
+    await userEvent.click(screen.getByRole("menuitem", { name: "Instellingen" }));
+    const preferences = screen.getByRole("dialog", { name: "Meldingsvoorkeuren" });
+    expect(preferences.contains(document.activeElement)).toBe(true);
+    await userEvent.click(within(preferences).getByRole("checkbox", { name: "Vermeldingen" }));
+    await userEvent.click(within(preferences).getByRole("button", { name: "Sluiten" }));
+    expect(document.activeElement).toBe(profile);
+    await userEvent.click(screen.getByRole("button", { name: "Meldingen: 4 ongelezen" }));
+    expect(screen.queryByRole("link", { name: "Je bent vermeld in een demonotitie" })).toBeNull();
+  });
   it("redirects guests and focuses the page heading", async () => {
     setup("/");
     const heading = await screen.findByRole("heading", { level: 1, name: "Welkom terug" });

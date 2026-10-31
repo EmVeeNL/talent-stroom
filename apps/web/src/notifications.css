@@ -1,0 +1,66 @@
+.notification-centre {
+  display: grid;
+  gap: var(--ts-space-4);
+  min-width: 0;
+}
+.notification-centre p {
+  margin: 0;
+  color: var(--ts-text-muted);
+}
+.notification-centre__bell {
+  position: relative;
+  display: inline-flex;
+}
+.notification-centre__count {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  pointer-events: none;
+  padding-inline: var(--ts-space-1);
+  border-radius: var(--ts-radius-sm);
+  background: var(--ts-text);
+  color: var(--ts-surface);
+  font: var(--ts-font-label);
+  font-variant-numeric: tabular-nums;
+}
+.notification-centre__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ts-space-2);
+}
+.notification-centre__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.notification-centre__item {
+  display: grid;
+  justify-items: start;
+  gap: var(--ts-space-2);
+  padding-block: var(--ts-space-4);
+  border-block-end: var(--ts-border-width) solid var(--ts-border);
+  overflow-wrap: anywhere;
+}
+.notification-centre__item a {
+  color: var(--ts-text);
+  text-underline-offset: 0.2em;
+  font-weight: 600;
+}
+.notification-centre__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ts-space-3);
+  color: var(--ts-text-muted);
+  font: var(--ts-font-label);
+}
+.notification-centre__preferences {
+  display: grid;
+  gap: var(--ts-space-3);
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.notification-centre__preferences legend {
+  margin-block-end: var(--ts-space-3);
+  font-weight: 600;
+}
