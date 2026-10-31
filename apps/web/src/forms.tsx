@@ -22,8 +22,8 @@ export function issueMessage(locale: Locale, errors: readonly unknown[], name: s
   else if (code === "invalid_format" && name === "email") key = "form.email";
   else if (code === "too_big") key = "form.tooLong";
   else if (name === "title" && code === "too_small") key = "demo.apps.agenda.error.title";
-  else if (name === "date" && code === "invalid_format") key = "demo.apps.agenda.error.date";
-  else if (name === "end" && code === "custom") key = "demo.apps.agenda.error.time";
+  else if ((name === "date" || name === "endDate") && code === "invalid_format") key = "demo.apps.agenda.error.date";
+  else if (["start", "end", "endDate"].includes(name) && code === "custom") key = "demo.apps.agenda.error.time";
   return t(locale, key);
 }
 
