@@ -7,3 +7,18 @@
   display: grid;
   gap: var(--ts-space-3);
 }
+/* Collapsed stack: older toasts peek out behind the newest; hover or focus expands it. */
+.ts-toaster[data-expanded="false"] > * > .ts-toast:not(:last-child),
+.ts-toaster[data-expanded="false"] > .ts-toast:not(:last-child) {
+  margin-bottom: calc(-1 * var(--ts-space-8));
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+.ts-toaster[data-expanded="false"] > .ts-toast:not(:last-child) > * {
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ts-toaster[data-expanded="false"] > .ts-toast:not(:last-child) {
+    transform: none;
+  }
+}

@@ -10,6 +10,8 @@ export interface ToastNotification {
   title?: string;
   action?: ReactNode;
   duration?: number;
+  persistent?: boolean;
+  icon?: boolean;
 }
 interface ToastContextValue {
   toast: (notification: ToastNotification) => number;
@@ -29,6 +31,7 @@ export interface ToasterProps {
 }
 export function Toaster({ children, label, closeLabel, maxVisible = 3 }: ToasterProps) {
   const [queue, setQueue] = useState<(ToastNotification & { id: number })[]>([]);
+  const [expanded, setExpanded] = useState(false);
   const next = useRef(0);
   const toast = useCallback((notification: ToastNotification) => {
     const id = ++next.current;
@@ -40,7 +43,17 @@ export function Toaster({ children, label, closeLabel, maxVisible = 3 }: Toaster
   return (
     <ToastContext value={value}>
       {children}
-      <section aria-label={label} className="ts-toaster">
+      <section
+        aria-label={label}
+        className="ts-toaster"
+        data-expanded={expanded ? "true" : "false"}
+        onMouseEnter={() => setExpanded(true)}
+        onMouseLeave={() => setExpanded(false)}
+        onFocus={() => setExpanded(true)}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) setExpanded(false);
+        }}
+      >
         <MotionLayout>
           <MotionPresence>
             {queue.slice(0, Math.max(1, maxVisible)).map((item) => (
@@ -50,6 +63,9 @@ export function Toaster({ children, label, closeLabel, maxVisible = 3 }: Toaster
                 {...(item.title ? { title: item.title } : {})}
                 action={item.action}
                 duration={item.duration ?? 6000}
+                persistent={item.persistent ?? false}
+                icon={item.icon ?? true}
+                paused={expanded}
                 layout
                 closeLabel={closeLabel}
                 onDismiss={() => dismiss(item.id)}
