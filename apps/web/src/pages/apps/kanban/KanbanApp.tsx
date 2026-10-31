@@ -1,12 +1,13 @@
 /* oxlint-disable react/no-unstable-nested-components -- render props of ui components (Dialog footer, DataTable cells) */
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import type { MouseEvent } from "react";
-import { Avatar, Button, KanbanBoard, SearchInput, Select, Sheet, StageBadge, StatusPill } from "@talentstroom/ui";
+import { Avatar, KanbanBoard, SearchInput, Select, DetailDrawer, StageBadge, StatusPill } from "@talentstroom/ui";
 import type { KanbanCardData, KanbanColumnData, KanbanLabels } from "@talentstroom/ui";
 import { t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
 import { PIPELINE_CANDIDATES, PIPELINE_RECRUITERS, PIPELINE_VACANCY } from "../../../demo/apps.ts";
 import type { PipelineCandidate, PipelineStage } from "../../../demo/apps.ts";
+import { RecordFormDialog } from "../RecordFormDialog.tsx";
 import { matchesFilters, moveInFullBoard } from "./pipeline.ts";
 import "./kanban.css";
 
@@ -44,7 +45,8 @@ export function kanbanLabels(locale: Locale): KanbanLabels {
 
 export function KanbanApp({ locale }: { locale: Locale }) {
   const tr = (key: MessageKey, values?: Record<string, string | number>) => t(locale, key, values);
-  const byId = useMemo(() => new Map(PIPELINE_CANDIDATES.map((candidate) => [candidate.id, candidate])), []);
+  const [byId, setById] = useState(() => new Map(PIPELINE_CANDIDATES.map((candidate) => [candidate.id, candidate])));
+  const [editing, setEditing] = useState(false);
   const [columns, setColumns] = useState<readonly KanbanColumnData[]>(() =>
     STAGES.map(({ id, tone }) => ({
       id,
@@ -138,7 +140,7 @@ export function KanbanApp({ locale }: { locale: Locale }) {
         />
       </div>
 
-      <Sheet
+      <DetailDrawer
         title={selected?.name ?? ""}
         triggerLabel={tr("demo.apps.kanban.open_details")}
         closeLabel={tr("demo.apps.kanban.close")}
@@ -148,14 +150,41 @@ export function KanbanApp({ locale }: { locale: Locale }) {
           setOpen(next);
           if (!next) opener.current?.focus();
         }}
-        footer={(close) => (
-          <Button variant="outline" onClick={close}>
-            {tr("demo.apps.kanban.close")}
-          </Button>
-        )}
+        editLabel={tr("patterns.edit")}
+        onEdit={() => setEditing(true)}
       >
         {selected && <CandidateDetails candidate={selected} stage={selectedStage ?? selected.stage} locale={locale} />}
-      </Sheet>
+      </DetailDrawer>
+      {editing && selected && (
+        <RecordFormDialog
+          locale={locale}
+          initial={{ name: selected.name, role: selected.role, note: selected.note }}
+          fields={[
+            { name: "name", label: "patterns.name", required: true },
+            { name: "role", label: "demo.apps.crm.col.function" },
+            { name: "note", label: "demo.apps.kanban.detail.note", area: true },
+          ]}
+          onClose={() => setEditing(false)}
+          onSave={(value) => {
+            const updated = {
+              ...selected,
+              name: value["name"] ?? selected.name,
+              role: value["role"] ?? selected.role,
+              note: value["note"] ?? selected.note,
+            };
+            setById((current) => new Map(current).set(selected.id, updated));
+            setColumns((current) =>
+              current.map((column) => ({
+                ...column,
+                cards: column.cards.map((card) =>
+                  card.id === selected.id ? { ...card, name: updated.name, role: updated.role } : card,
+                ),
+              })),
+            );
+            setEditing(false);
+          }}
+        />
+      )}
     </div>
   );
 }

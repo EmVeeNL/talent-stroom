@@ -6,12 +6,12 @@ import {
   Checkbox,
   CheckboxGroup,
   ContextMenu,
-  Dialog,
+  FormDialog,
   Icon,
   LayoutGroup,
   MotionLayout,
   Select,
-  Sheet,
+  DetailDrawer,
   m,
   useReducedMotion,
   ViewSwitcher,
@@ -657,7 +657,8 @@ export function Calendar({ locale }: { locale: Locale }) {
           <output className="ts-visually-hidden" aria-live="polite">
             {status}
           </output>
-          <Sheet
+          <DetailDrawer
+            footer={null}
             hideTrigger
             open={modal?.mode === "detail"}
             onOpenChange={(value) => {
@@ -731,8 +732,8 @@ export function Calendar({ locale }: { locale: Locale }) {
                 </div>
               )}
             </div>
-          </Sheet>
-          <Dialog
+          </DetailDrawer>
+          <FormDialog
             hideTrigger
             open={modal !== null && modal.mode !== "detail"}
             onOpenChange={(value) => {
@@ -802,7 +803,7 @@ export function Calendar({ locale }: { locale: Locale }) {
                 ) : null)
               )}
             </div>
-          </Dialog>
+          </FormDialog>
         </div>
       </LayoutGroup>
     </MotionLayout>

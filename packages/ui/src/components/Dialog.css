@@ -106,3 +106,8 @@
   transition-duration: 0ms;
   animation: none !important;
 }
+
+.ts-form-dialog__fields {
+  display: grid;
+  gap: var(--ts-space-4);
+}
