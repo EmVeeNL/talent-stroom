@@ -1,6 +1,6 @@
 import { useDataLayer } from "../QueryProvider.tsx";
 import { useRouterState } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { ReactNode, Ref } from "react";
 import { LOCALES, t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
@@ -20,6 +20,8 @@ import { errorKey, isAborted, RequestError } from "../auth.ts";
 import type { OrganizationList, Transport } from "../auth.ts";
 import { navigationSections } from "../navigation.ts";
 import type { IconName, SidebarSection } from "@talentstroom/ui";
+import { NotificationCentre } from "../notifications.tsx";
+import { demoPagesEnabled } from "../routes.ts";
 import { ProductTour, PRODUCT_TOUR } from "../tour.tsx";
 
 export interface SessionUser {
@@ -128,6 +130,8 @@ export function DashboardLayout({
   const layer = useDataLayer();
   const matchedRoute = useRouterState({ select: (state) => state.matches.at(-1)?.id ?? "/" });
   const tr = (key: MessageKey) => t(locale, key);
+  const [notificationSettings, setNotificationSettings] = useState(false);
+  const settingsOpener = useRef<HTMLElement | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<MessageKey>();
   const active = data.organizations.find((org) => org.organizationId === data.activeOrganizationId);
@@ -231,11 +235,15 @@ export function DashboardLayout({
         ),
         notifications: (
           <>
-            <NavbarIconButton
-              icon="notifications"
-              label={`${tr("shell.notifications")} (${tr("shell.soon")})`}
-              aria-disabled
-              className="ts-navbar-button--optional"
+            <NotificationCentre
+              key={`${user.id ?? "session"}:${data.activeOrganizationId}`}
+              locale={locale}
+              demo={demoPagesEnabled}
+              settingsOpen={notificationSettings}
+              onSettingsClose={() => {
+                setNotificationSettings(false);
+                settingsOpener.current?.focus();
+              }}
             />
             <NavbarIconButton
               icon="help"
@@ -263,6 +271,10 @@ export function DashboardLayout({
             }}
             languageName={languageName}
             onLanguageChange={() => changeLocale(locale === "nl-NL" ? "en-GB" : "nl-NL")}
+            onSettings={() => {
+              settingsOpener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+              setNotificationSettings(true);
+            }}
             onSignOut={onSignOut}
             signOutBusy={signOutBusy}
           />
