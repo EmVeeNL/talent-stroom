@@ -1492,6 +1492,23 @@ export const nlNL = {
   "demo.dashboard.vacancies": "Vacatures",
   "demo.dashboard.vacancy-status": "Vacatures per status",
   "demo.dashboard.vs-month": "t.o.v. vorige maand",
+  "tour.dialog": "Rondleiding",
+  "tour.progress": "Voortgang rondleiding",
+  "tour.step": "Stap {current} van {total}",
+  "tour.skip": "Overslaan",
+  "tour.back": "Vorige",
+  "tour.next": "Volgende",
+  "tour.finish": "Afronden",
+  "tour.sidebar.title": "Navigatie",
+  "tour.sidebar.text": "Open hier de onderdelen van je recruitmentwerkplek.",
+  "tour.search.title": "Zoeken",
+  "tour.search.text": "Vind snel onderdelen en acties in de werkplek.",
+  "tour.kpi.title": "Je resultaten in één oogopslag",
+  "tour.kpi.text": "Deze kengetallen geven een overzicht van kandidaten, vacatures en plaatsingen.",
+  "tour.pipeline.title": "De recruitmentpipeline",
+  "tour.pipeline.text": "Volg hier kandidaten door de verschillende fases.",
+  "tour.newCandidate.title": "Voeg een kandidaat toe",
+  "tour.newCandidate.text": "Gebruik deze actie om een kandidaat aan je werkplek toe te voegen.",
 } as const;
 
 export type MessageKey = keyof typeof nlNL;
