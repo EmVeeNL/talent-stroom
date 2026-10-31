@@ -38,7 +38,7 @@ describe("Agenda", () => {
   it("switches to the week view", async () => {
     render(<AgendaPage locale="nl-NL" />);
     await userEvent.click(screen.getByRole("radio", { name: "Week" }));
-    expect(within(screen.getByRole("grid")).getAllByRole("gridcell")).toHaveLength(7);
+    expect(within(screen.getByRole("grid")).getAllByRole("gridcell")).toHaveLength(7 * 97);
   });
 
   it("adds a new appointment to local state", async () => {

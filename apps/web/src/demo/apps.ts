@@ -19,7 +19,22 @@ export interface AgendaEvent {
   end?: string;
   type: AgendaEventType;
   who?: string;
+  endDate?: string;
+  allDay?: boolean;
+  description?: string;
+  location?: string;
+  online?: boolean;
+  link?: string;
+  organiser?: string;
+  attendees?: { userId: string; required: boolean }[];
 }
+
+/** Fictional colleagues belonging to the single demo organization. */
+export const AGENDA_USERS = [
+  { id: "u-eva", name: "Eva Kuipers", organizationId: "demo-agency" },
+  { id: "u-ruben", name: "Ruben de Wit", organizationId: "demo-agency" },
+  { id: "u-marloes", name: "Marloes Peeters", organizationId: "demo-agency" },
+] as const;
 
 export const AGENDA_EVENTS: readonly AgendaEvent[] = [
   {

@@ -19,6 +19,8 @@ import type { Locale, MessageKey } from "@talentstroom/i18n";
 import { candidates, initialPipeline } from "../../../demo/dashboard.ts";
 import type { Candidate } from "../../../demo/dashboard.ts";
 import "./dashboard-widgets.css";
+import { demoStore, useDemoStore } from "../../../demo/store.ts";
+import { DEMO_TODAY } from "../../../demo/apps.ts";
 export const tr = (
   locale: Locale,
   key: Extract<MessageKey, `demo.dashboard.${string}`>,
@@ -200,28 +202,19 @@ export function Candidates({ locale }: { locale: Locale }) {
   );
 }
 export function TaskList({ locale }: { locale: Locale }) {
-  const [checked, setChecked] = useState([true, false, false, false]);
-  const tasks = [
-    "demo.dashboard.task1",
-    "demo.dashboard.task2",
-    "demo.dashboard.task3",
-    "demo.dashboard.task4",
-  ] as const;
+  const { tasks: allTasks } = useDemoStore();
+  const tasks = allTasks.filter((task) => task.due.slice(0, 10) === DEMO_TODAY && task.assignee === "u-eva");
   return (
     <Panel title={tr(locale, "demo.dashboard.tasks-today")}>
       <ul className="demo-task-list">
         <MotionCollection reorder={false}>
-          {tasks.map((key, i) => (
-            <MotionListItem key={key}>
+          {tasks.map((task) => (
+            <MotionListItem key={task.id}>
               <label>
-                <input
-                  type="checkbox"
-                  checked={checked[i]}
-                  onChange={() => setChecked(checked.map((v, j) => (j === i ? !v : v)))}
-                />
-                <span>{tr(locale, key)}</span>
+                <input type="checkbox" checked={task.done} onChange={() => demoStore.toggleTask(task.id)} />
+                <span>{task.titleKey ? t(locale, task.titleKey) : task.title}</span>
               </label>
-              <time>{["09:00", "10:30", "13:00", "15:00"][i]}</time>
+              <time dateTime={task.due}>{task.due.slice(11)}</time>
             </MotionListItem>
           ))}
         </MotionCollection>
