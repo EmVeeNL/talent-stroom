@@ -92,6 +92,8 @@ export function NotificationCentre({
     bell.current?.focus();
   };
   const closePreferences = () => {
+    // Escape and the native close event both report closing; handle it once.
+    if (!preferencesOpen && !settingsOpen) return;
     setPreferencesOpen(false);
     if (settingsOpen) onSettingsClose?.();
     else bell.current?.focus();

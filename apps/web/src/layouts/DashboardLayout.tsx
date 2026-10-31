@@ -272,7 +272,10 @@ export function DashboardLayout({
             languageName={languageName}
             onLanguageChange={() => changeLocale(locale === "nl-NL" ? "en-GB" : "nl-NL")}
             onSettings={() => {
-              settingsOpener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+              // The menu item unmounts when the menu closes; return focus to the menu trigger instead.
+              settingsOpener.current =
+                document.activeElement?.closest(".ts-shell-anchor")?.querySelector<HTMLElement>(".ts-user-trigger") ??
+                document.querySelector<HTMLElement>(".ts-user-trigger");
               setNotificationSettings(true);
             }}
             onSignOut={onSignOut}
