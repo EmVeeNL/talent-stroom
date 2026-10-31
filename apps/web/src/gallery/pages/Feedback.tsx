@@ -43,6 +43,57 @@ function FeedbackExamples() {
           )}
         </div>
       </Section>
+      <Section title={tr("gallery.toast.variants")}>
+        <p>{tr("gallery.toast.variantsHint")}</p>
+        <div className="gallery-feedback-board">
+          <Toast
+            tone="success"
+            title={tr("gallery.toast.title")}
+            duration={0}
+            closeLabel={tr("gallery.close")}
+            onDismiss={() => {}}
+          >
+            {tr("gallery.toast.titleAndMessage")}
+          </Toast>
+          <Toast tone="info" duration={0} closeLabel={tr("gallery.close")} onDismiss={() => {}}>
+            {tr("gallery.toast.messageOnly")}
+          </Toast>
+          <Toast tone="warning" icon={false} duration={0} closeLabel={tr("gallery.close")} onDismiss={() => {}}>
+            {tr("gallery.toast.noIcon")}
+          </Toast>
+          <Toast
+            tone="danger"
+            duration={0}
+            closeLabel={tr("gallery.close")}
+            onDismiss={() => {}}
+            action={<Button variant="ghost">{tr("gallery.toast.undo")}</Button>}
+          >
+            {tr("gallery.toast.withAction")}
+          </Toast>
+          <Toast tone="info" persistent closeLabel={tr("gallery.close")} onDismiss={() => {}}>
+            {tr("gallery.toast.persistent")}
+          </Toast>
+        </div>
+        <div className="gallery-feedback-board">
+          <Button onClick={() => toast({ tone: "info", message: tr("gallery.toast.timed"), duration: 8000 })}>
+            {tr("gallery.toast.timed")}
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => toast({ tone: "warning", message: tr("gallery.toast.persistent"), persistent: true })}
+          >
+            {tr("gallery.toast.persistent")}
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              for (const tone of tones) toast({ tone, icon: tone !== "info", message: tr(`gallery.overlays.${tone}`) });
+            }}
+          >
+            {tr("gallery.toast.stack")}
+          </Button>
+        </div>
+      </Section>
       <Section title={tr("gallery.empty.title")}>
         {(["records", "results", "error"] as const).map((kind) => (
           <EmptyState
