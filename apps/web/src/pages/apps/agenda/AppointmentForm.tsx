@@ -14,6 +14,7 @@ export function AppointmentForm({
   events,
   onSave,
   onCancel,
+  onTarget,
 }: {
   locale: Locale;
   initial: AppointmentDraft;
@@ -21,6 +22,8 @@ export function AppointmentForm({
   events: readonly Appointment[];
   onSave: (event: Appointment) => void;
   onCancel: () => void;
+  /** Reports the chosen date/time while moving, so the calendar can highlight that target. */
+  onTarget?: (target: { date: string; start: string; allDay: boolean } | null) => void;
 }) {
   const id = useId();
   useEffect(() => {
@@ -44,6 +47,11 @@ export function AppointmentForm({
   ] as const;
   return (
     <form.AppForm>
+      {onTarget && (
+        <form.Subscribe selector={(state) => state.values}>
+          {(value) => <TargetReporter value={value} onTarget={onTarget} />}
+        </form.Subscribe>
+      )}
       <form
         className="ag-form"
         noValidate
@@ -162,6 +170,11 @@ export function AppointmentForm({
             </field.Choice>
           )}
         </form.AppField>
+        <form.AppField name="private">
+          {(field) => (
+            <Switch label={tr("demo.apps.agenda.private")} checked={field.state.value} onChange={field.handleChange} />
+          )}
+        </form.AppField>
         <form.AppField name="location">
           {(field) => <field.Text locale={locale} id={`${id}-location`} label={tr("demo.apps.agenda.location")} />}
         </form.AppField>
@@ -196,4 +209,19 @@ export function AppointmentForm({
       </form>
     </form.AppForm>
   );
+}
+
+function TargetReporter({
+  value,
+  onTarget,
+}: {
+  value: AppointmentDraft;
+  onTarget: (target: { date: string; start: string; allDay: boolean } | null) => void;
+}) {
+  const { date, start, allDay } = value;
+  useEffect(() => {
+    onTarget(date ? { date, start, allDay } : null);
+  }, [date, start, allDay, onTarget]);
+  useEffect(() => () => onTarget(null), [onTarget]);
+  return null;
 }

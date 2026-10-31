@@ -81,7 +81,7 @@ function readUser(session: object): SessionUser {
       user && typeof user === "object" ? Object.getOwnPropertyDescriptor(user, key)?.value : undefined;
     return typeof value === "string" ? value : "";
   };
-  return { name: field("name"), email: field("email") };
+  return { id: field("id"), name: field("name"), email: field("email") };
 }
 function AuthApp() {
   // Capture one-use callback data before Router can parse/cache the URL. Keep it only in memory.

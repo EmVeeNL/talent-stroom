@@ -29,7 +29,11 @@ export default function RecruitmentPage({ locale }: { locale: Locale }) {
         }
         title={tr(locale, "demo.dashboard.greeting")}
         subtitle={tr(locale, "demo.dashboard.recruitment-subtitle")}
-        actions={<Button onClick={() => setCandidateAdded(true)}>{tr(locale, "demo.dashboard.new-candidate")}</Button>}
+        actions={
+          <div data-tour="new-candidate">
+            <Button onClick={() => setCandidateAdded(true)}>{tr(locale, "demo.dashboard.new-candidate")}</Button>
+          </div>
+        }
       >
         <Stats
           locale={locale}
@@ -46,7 +50,9 @@ export default function RecruitmentPage({ locale }: { locale: Locale }) {
             { label: tr(locale, "demo.dashboard.clients"), value: 48, icon: "handshake", trend: 5, tone: "accent" },
           ]}
         />
-        <Pipeline locale={locale} />
+        <div data-tour="pipeline">
+          <Pipeline locale={locale} />
+        </div>
         {candidateAdded && (
           <output className="demo-dashboard__toast">{tr(locale, "demo.dashboard.candidate-added")}</output>
         )}

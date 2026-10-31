@@ -16,6 +16,12 @@ export interface ToastProps {
   onDismiss: () => void;
   duration?: number;
   layout?: boolean;
+  /** Never auto-closes and shows no countdown; only the close button (or Escape) dismisses it. */
+  persistent?: boolean;
+  /** Set false for a text-only toast. */
+  icon?: boolean;
+  /** Parent-controlled hold, e.g. while a whole stack is hovered. */
+  paused?: boolean;
 }
 export function Toast({
   children,
@@ -26,25 +32,30 @@ export function Toast({
   onDismiss,
   duration = 6000,
   layout,
+  persistent = false,
+  icon = true,
+  paused = false,
 }: ToastProps) {
   const reduced = useReducedMotion();
   const feedbackTone = tone === "error" ? "danger" : tone;
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
+  const timed = !persistent && duration > 0;
+  const hold = hovered || focused || paused;
   const remaining = useRef(duration);
   const dismiss = useRef(onDismiss);
   useEffect(() => {
     dismiss.current = onDismiss;
   }, [onDismiss]);
   useEffect(() => {
-    if (hovered || focused || duration <= 0) return undefined;
+    if (hold || !timed) return undefined;
     const started = Date.now();
     const timer = setTimeout(() => dismiss.current(), remaining.current);
     return () => {
       clearTimeout(timer);
       remaining.current = Math.max(0, remaining.current - (Date.now() - started));
     };
-  }, [hovered, focused, duration]);
+  }, [hold, timed, duration]);
   return (
     <MotionPanel
       className={cx("ts-toast", `ts-toast--${feedbackTone}`)}
@@ -55,13 +66,19 @@ export function Toast({
       preset="toast"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      data-persistent={timed ? "false" : "true"}
+      onKeyDown={(event) => {
+        if (event.key !== "Escape") return;
+        event.stopPropagation();
+        onDismiss();
+      }}
       onFocus={() => setFocused(true)}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false);
       }}
     >
       <div role={feedbackTone === "danger" ? "alert" : "status"} aria-atomic="true" className="ts-toast__message">
-        <Icon name={feedbackIcons[feedbackTone]} />
+        {icon && <Icon name={feedbackIcons[feedbackTone]} />}
         <div className="ts-toast__content">
           {title && <strong>{title}</strong>}
           <div>{children}</div>
@@ -69,6 +86,14 @@ export function Toast({
       </div>
       {action && <div className="ts-toast__action">{action}</div>}
       <Button variant="ghost" icon="close" aria-label={closeLabel} onClick={onDismiss} />
+      {timed && (
+        <span
+          aria-hidden="true"
+          className="ts-toast__countdown"
+          data-paused={hold ? "true" : "false"}
+          style={{ animationDuration: `${duration}ms` }}
+        />
+      )}
     </MotionPanel>
   );
 }
