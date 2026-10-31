@@ -26,6 +26,7 @@ export interface AgendaEvent {
   online?: boolean;
   link?: string;
   organiser?: string;
+  private?: boolean;
   attendees?: { userId: string; required: boolean }[];
 }
 
@@ -45,7 +46,19 @@ export const AGENDA_EVENTS: readonly AgendaEvent[] = [
     end: "10:45",
     type: "gesprek",
   },
-  { id: "ev-02", title: "Intake Brouwer Logistiek", date: "2026-10-27", start: "14:00", end: "15:00", type: "intake" },
+  {
+    id: "ev-02",
+    title: "Intake Brouwer Logistiek",
+    date: "2026-10-27",
+    start: "14:00",
+    end: "15:00",
+    type: "intake",
+    organiser: "u-ruben",
+    attendees: [
+      { userId: "u-ruben", required: true },
+      { userId: "u-eva", required: true },
+    ],
+  },
   {
     id: "ev-03",
     title: "Gesprek Joris van den Berg",
@@ -53,13 +66,50 @@ export const AGENDA_EVENTS: readonly AgendaEvent[] = [
     start: "11:30",
     end: "12:30",
     type: "gesprek",
+    organiser: "u-ruben",
+    attendees: [{ userId: "u-ruben", required: true }],
+    private: true,
   },
   { id: "ev-04", title: "Shortlist Vermeulen Techniek", date: "2026-10-29", type: "deadline" },
   { id: "ev-05", title: "Intake Dekker & Zonen", date: "2026-10-30", start: "09:00", end: "10:00", type: "intake" },
-  { id: "ev-06", title: "Gesprek Lotte Hendriks", date: "2026-10-30", start: "13:30", end: "14:30", type: "gesprek" },
+  {
+    id: "ev-06",
+    title: "Gesprek Lotte Hendriks",
+    date: "2026-10-30",
+    start: "13:30",
+    end: "14:30",
+    type: "gesprek",
+    organiser: "u-marloes",
+    attendees: [
+      { userId: "u-marloes", required: true },
+      { userId: "u-eva", required: true },
+    ],
+  },
   { id: "ev-07", title: "Aanbod Pieter Jansen versturen", date: "2026-10-30", type: "deadline" },
-  { id: "ev-08", title: "Gesprek Noor Bakker", date: "2026-11-02", start: "10:30", end: "11:30", type: "gesprek" },
-  { id: "ev-09", title: "Intake Smit Installatie", date: "2026-11-03", start: "15:00", end: "16:00", type: "intake" },
+  {
+    id: "ev-08",
+    title: "Gesprek Noor Bakker",
+    date: "2026-11-02",
+    start: "10:30",
+    end: "11:30",
+    type: "gesprek",
+    organiser: "u-marloes",
+    attendees: [{ userId: "u-marloes", required: true }],
+    private: true,
+  },
+  {
+    id: "ev-09",
+    title: "Intake Smit Installatie",
+    date: "2026-11-03",
+    start: "15:00",
+    end: "16:00",
+    type: "intake",
+    organiser: "u-ruben",
+    attendees: [
+      { userId: "u-ruben", required: true },
+      { userId: "u-marloes", required: true },
+    ],
+  },
   {
     id: "ev-10",
     title: "Tweede gesprek Thijs Mulder",
@@ -69,7 +119,16 @@ export const AGENDA_EVENTS: readonly AgendaEvent[] = [
     type: "gesprek",
   },
   { id: "ev-11", title: "Vacaturetekst Planner goedkeuren", date: "2026-11-04", type: "deadline" },
-  { id: "ev-12", title: "Intake Hoekstra Retail", date: "2026-11-05", start: "13:00", end: "14:00", type: "intake" },
+  {
+    id: "ev-12",
+    title: "Intake Hoekstra Retail",
+    date: "2026-11-05",
+    start: "13:00",
+    end: "14:00",
+    type: "intake",
+    organiser: "u-marloes",
+    attendees: [{ userId: "u-marloes", required: true }],
+  },
   { id: "ev-13", title: "Gesprek Fatima El Amrani", date: "2026-11-05", start: "16:00", end: "17:00", type: "gesprek" },
   { id: "ev-14", title: "Contract Daan Visser", date: "2026-11-06", type: "deadline" },
   { id: "ev-15", title: "Gesprek Emma de Boer", date: "2026-11-09", start: "11:00", end: "12:00", type: "gesprek" },

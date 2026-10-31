@@ -95,6 +95,19 @@
 .ag__cell[aria-selected="true"] {
   background: var(--ts-primary-subtle);
 }
+.ag__cell[data-today] {
+  background: var(--ts-accent-subtle);
+}
+.ag__cell[data-today][aria-selected="true"] {
+  background: var(--ts-primary-subtle);
+}
+.ag__cell[data-drop-target],
+.ag__time-cell[data-drop-target] {
+  background: var(--ts-primary-subtle);
+  outline: 2px dashed var(--ts-primary);
+  outline-offset: -2px;
+  z-index: 2;
+}
 .ag__cell:focus-visible {
   outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
   outline-offset: calc(var(--ts-focus-ring-width) * -1);
@@ -297,8 +310,11 @@
   text-overflow: ellipsis;
 }
 .ag-entry__open:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  border-radius: var(--ts-radius-sm);
+}
+span.ag-entry__open {
+  cursor: default;
 }
 .ag-entry__open:focus-visible,
 .ag-entry__resize:focus-visible {
@@ -540,4 +556,45 @@
   .ag-form .ts-combobox {
     min-width: 0;
   }
+}
+
+/* Busy blocks and per-person colours in the shared agenda. Colour is paired with initials and a hidden name. */
+.ag-entry--busy {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--ts-surface-muted),
+    var(--ts-surface-muted) 6px,
+    var(--ts-surface) 6px,
+    var(--ts-surface) 12px
+  );
+  color: var(--ts-text-muted);
+}
+.ag-person--0 {
+  --ag-person: var(--ts-primary);
+}
+.ag-person--1 {
+  --ag-person: var(--ts-success);
+}
+.ag-person--2 {
+  --ag-person: var(--ts-violet);
+}
+.ag-entry[class*="ag-person--"] {
+  border-inline-start: 4px solid var(--ag-person);
+}
+.ag-entry__who {
+  margin-inline-start: var(--ts-space-1);
+  font: var(--ts-font-caption);
+  font-weight: var(--ts-font-weight-semibold);
+}
+.ag-person-check {
+  border-inline-start: 4px solid var(--ag-person);
+  padding-inline-start: var(--ts-space-2);
+}
+.ag__people .ts-choice-group__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ts-space-3);
+}
+.ag__selector {
+  min-width: 12rem;
 }
