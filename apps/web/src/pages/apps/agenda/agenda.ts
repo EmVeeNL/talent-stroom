@@ -14,6 +14,7 @@ export const appointmentSchema = z
     start: z.string(),
     end: z.string(),
     allDay: z.boolean(),
+    private: z.boolean(),
     location: z.string().max(500),
     online: z.boolean(),
     link: z.string(),
@@ -56,6 +57,7 @@ export function draftFor(date: string, start = "09:00"): AppointmentDraft {
     endDate: end.date,
     end: end.time,
     allDay: false,
+    private: false,
     location: "",
     online: false,
     link: "",
@@ -73,6 +75,54 @@ export function normalizeEvent(event: AgendaEvent): Appointment {
     end: event.end ?? "09:30",
     attendees: event.attendees ?? [{ userId: "u-eva", required: true }],
   };
+}
+export const CURRENT_USER = "u-eva";
+export type AgendaScope = { kind: "me" } | { kind: "member"; id: string } | { kind: "shared" };
+export type ScopedAppointment = Appointment & { busy: boolean };
+export const involves = (event: Appointment, userId: string) =>
+  event.organiser === userId || event.attendees.some((guest) => guest.userId === userId);
+/** The URL carries a member ID (or "shared"), never a display name. */
+export function parseScope(search: string): AgendaScope {
+  const value = new URLSearchParams(search).get("agenda");
+  if (value === "shared") return { kind: "shared" };
+  const member = AGENDA_USERS.find((user) => user.id === value);
+  return member && member.id !== CURRENT_USER ? { kind: "member", id: member.id } : { kind: "me" };
+}
+export function scopeSearch(scope: AgendaScope, search: string): string {
+  const params = new URLSearchParams(search);
+  params.delete("agenda");
+  if (scope.kind === "shared") params.set("agenda", "shared");
+  if (scope.kind === "member") params.set("agenda", scope.id);
+  const next = params.toString();
+  return next ? `?${next}` : "";
+}
+/** Private appointments of others are reduced to a busy block; nothing else survives. */
+export function scopedEvents(
+  events: readonly Appointment[],
+  scope: AgendaScope,
+  people: readonly string[],
+  busyLabel: string,
+): ScopedAppointment[] {
+  const owners = scope.kind === "me" ? [CURRENT_USER] : scope.kind === "member" ? [scope.id] : people;
+  const result: ScopedAppointment[] = [];
+  for (const event of events) {
+    if (!owners.some((id) => involves(event, id))) continue;
+    result.push(
+      event.private && !involves(event, CURRENT_USER)
+        ? {
+            ...event,
+            busy: true,
+            title: busyLabel,
+            description: "",
+            location: "",
+            online: false,
+            link: "",
+            attendees: [],
+          }
+        : { ...event, busy: false },
+    );
+  }
+  return result;
 }
 export const eventFromDraft = (draft: AppointmentDraft, id: string): Appointment => ({ ...draft, id });
 export function range(event: Appointment): [string, string] {
@@ -119,7 +169,7 @@ export function resizeEvent(event: Appointment, date: string, minute: number): A
 }
 
 /** Partition connected overlapping intervals into stable, non-overlapping columns. */
-export function layoutDay(events: readonly Appointment[], date: string) {
+export function layoutDay<T extends Appointment>(events: readonly T[], date: string) {
   const segments = events
     .filter((event) => !event.allDay && occursOn(event, date))
     .map((event) => ({

@@ -2,6 +2,14 @@ import type { MessageKey } from "./nl-NL.ts";
 
 // Typed against the Dutch source: a missing or extra key fails the typecheck.
 export const enGB = {
+  "demo.apps.agenda.selector": "Agenda",
+  "demo.apps.agenda.mine": "My agenda",
+  "demo.apps.agenda.shared": "Shared agenda",
+  "demo.apps.agenda.agenda_of": "{name}'s agenda",
+  "demo.apps.agenda.busy": "Busy",
+  "demo.apps.agenda.people": "Show colleagues",
+  "demo.apps.agenda.private": "Private: others only see Busy",
+  "demo.apps.agenda.drop_target": "Move target",
   "demo.apps.agenda.view_day": "Day",
   "demo.apps.agenda.details": "Appointment details",
   "demo.apps.agenda.edit": "Edit",

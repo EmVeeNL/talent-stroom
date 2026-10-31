@@ -1,5 +1,13 @@
 /** Source catalog. Keys are stable identifiers; never store translated labels in the database. */
 export const nlNL = {
+  "demo.apps.agenda.selector": "Agenda",
+  "demo.apps.agenda.mine": "Mijn agenda",
+  "demo.apps.agenda.shared": "Gedeelde agenda",
+  "demo.apps.agenda.agenda_of": "Agenda van {name}",
+  "demo.apps.agenda.busy": "Bezet",
+  "demo.apps.agenda.people": "Collega's tonen",
+  "demo.apps.agenda.private": "Privé: anderen zien alleen Bezet",
+  "demo.apps.agenda.drop_target": "Doel voor verplaatsen",
   "demo.apps.agenda.view_day": "Dag",
   "demo.apps.agenda.details": "Afspraakdetails",
   "demo.apps.agenda.edit": "Bewerken",
