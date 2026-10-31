@@ -181,7 +181,7 @@ export const CHAT_CONVERSATIONS: readonly ChatConversation[] = [
 
 /* ------------------------------------------------------------------ Kanban */
 
-export type PipelineStage = "nieuw" | "in_behandeling" | "gesprek" | "aanbod" | "geplaatst";
+export type PipelineStage = "nieuw" | "in_behandeling" | "gesprek" | "aanbod" | "geplaatst" | "afgewezen";
 
 export interface PipelineCandidate {
   id: string;

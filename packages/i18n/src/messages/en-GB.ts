@@ -242,6 +242,7 @@ export const enGB = {
   "recruitment.stage.in_behandeling": "In progress",
   "recruitment.stage.gesprek": "Interview",
   "recruitment.stage.aanbod": "Offer",
+  "recruitment.stage.afgewezen": "Rejected",
   "recruitment.stage.geplaatst": "Placed",
   "recruitment.stage.niet_geschikt": "Not suitable",
   "recruitment.stage.talentpool": "Talent pool",

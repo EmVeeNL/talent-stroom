@@ -6,13 +6,14 @@ import type { Locale, MessageKey } from "@talentstroom/i18n";
 import { useGallery } from "../context.ts";
 import { Section } from "../Section.tsx";
 
-type StageId = "nieuw" | "in_behandeling" | "gesprek" | "aanbod" | "geplaatst";
+type StageId = "nieuw" | "in_behandeling" | "gesprek" | "aanbod" | "geplaatst" | "afgewezen";
 const STAGES: readonly { id: StageId; tone: KanbanColumnData["tone"] }[] = [
   { id: "nieuw", tone: "info" },
   { id: "in_behandeling", tone: "warning" },
   { id: "gesprek", tone: "violet" },
   { id: "aanbod", tone: "accent" },
   { id: "geplaatst", tone: "success" },
+  { id: "afgewezen", tone: "danger" },
 ];
 interface Person {
   name: string;
@@ -50,6 +51,7 @@ const PEOPLE: Record<StageId, readonly Person[]> = {
     { name: "Pieter Jansen", role: "Technical Lead", days: 2, source: "Referral", tags: ["Architectuur", "Scrum"] },
   ],
   geplaatst: [],
+  afgewezen: [],
 };
 
 function createColumns(locale: Locale): KanbanColumnData[] {

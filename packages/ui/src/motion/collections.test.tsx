@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { useEffect } from "react";
 import { afterEach, describe, expect, it } from "vitest";
 import { loadDomMax } from "./dom-max.tsx";
 import { MotionGlobalConfig, MotionProvider } from "./provider.tsx";
@@ -93,4 +94,15 @@ describe("collection and content motion", () => {
     expect(screen.getByRole<HTMLInputElement>("textbox").value).toBe("immediate");
     expect(screen.queryByText("first")).toBeNull();
   });
+});
+
+it("keeps router and provider descendants mounted when content identity changes", () => {
+  let mounts = 0;
+  function ProviderProbe() {
+    useEffect(() => { mounts += 1; }, []);
+    return <span>provider</span>;
+  }
+  const view = render(<MotionContent identity="first"><ProviderProbe /></MotionContent>);
+  view.rerender(<MotionContent identity="second"><ProviderProbe /></MotionContent>);
+  expect(mounts).toBe(1);
 });

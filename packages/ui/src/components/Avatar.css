@@ -23,3 +23,9 @@
   height: 56px;
   font-size: var(--ts-font-size-lg);
 }
+
+/* Keep breathing room even in compact and caller-owned demo tables. */
+td .ts-avatar {
+  margin-block: var(--ts-space-2);
+  vertical-align: middle;
+}

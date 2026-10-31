@@ -16,6 +16,7 @@ const STAGES: readonly { id: PipelineStage; tone: KanbanColumnData["tone"] }[] =
   { id: "gesprek", tone: "violet" },
   { id: "aanbod", tone: "accent" },
   { id: "geplaatst", tone: "success" },
+  { id: "afgewezen", tone: "danger" },
 ];
 
 export function kanbanLabels(locale: Locale): KanbanLabels {

@@ -160,3 +160,8 @@ Existing literal `ease` / `ease-out` usages move to these tokens in #398. Distan
 - Chrome for Developers, [What's new in view transitions (2025)](https://developer.chrome.com/blog/view-transitions-in-2025).
 - Bramus, [Keeping the page interactive while a View Transition is running](https://bram.us/2025/01/29/view-transitions-page-interactivity) (2025-01-29); CSSWG issue [#11596](https://github.com/w3c/csswg-drafts/issues/11596).
 - React 19.3.1 / @types/react 19.3.0 in this repository: stable `ViewTransition` and `addTransitionType` exports.
+
+## Addendum (#453): runtime verification
+
+- Route components use React `lazy` (not TanStack `lazyRouteComponent`) so the `use()` suspend and unmounted-update warnings no longer appear; `apps/web/visual/motion.visual.ts` fails on those console messages.
+- A preset must actually animate when motion is allowed: covered by `packages/ui/src/motion/provider.test.tsx`, `apps/web/src/motion-runtime.test.tsx` (StrictMode, `skipAnimations = false`) and the Playwright probe in `apps/web/visual/motion.visual.ts` (`getAnimations()` after replay).

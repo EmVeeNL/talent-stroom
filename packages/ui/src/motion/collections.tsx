@@ -1,8 +1,8 @@
-import { createContext, useContext, useEffect, useRef } from "react";
+import { createContext, useContext, useLayoutEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import { useIsPresent } from "motion/react";
 import type { HTMLMotionProps } from "motion/react";
-import { AnimatePresence, m } from "./provider.tsx";
+import { AnimatePresence, animate, m } from "./provider.tsx";
 import { MotionLayout } from "./dom-max.tsx";
 import { getMotionPreset } from "./presets.ts";
 import { useReducedMotion } from "./reduced-motion.ts";
@@ -50,21 +50,26 @@ export function MotionTableRow(props: HTMLMotionProps<"tr">) {
   return <m.tr {...props} {...motion} />;
 }
 
-/** Enter-only replacement: never retain a previous route or organization's interactive content. */
+/** Enter-only feedback; never remount providers or retain a previous route's interactive content. */
 export function MotionContent({ identity, children }: { identity: string; children: ReactNode }) {
   const reduced = useReducedMotion();
-  const mounted = useRef(false);
-  useEffect(() => {
-    mounted.current = true;
-  }, []);
-  return (
-    <m.div
-      key={identity}
-      {...getMotionPreset("slideUp", reduced)}
-      initial={mounted.current ? "initial" : false}
-      animate="animate"
-    >
-      {children}
-    </m.div>
-  );
+  const node = useRef<HTMLDivElement>(null);
+  const previous = useRef(identity);
+  useLayoutEffect(() => {
+    const element = node.current;
+    const changed = previous.current !== identity;
+    previous.current = identity;
+    if (!element) return undefined;
+    if (reduced) {
+      element.style.opacity = "1";
+      element.style.transform = "none";
+      return undefined;
+    }
+    if (!changed) return undefined;
+    // A keyed wrapper remounted RouterProvider during its own match publication,
+    // leaving Transitioner with a state setter for a discarded Matches instance.
+    const animation = animate(element, { opacity: [0, 1], y: [8, 0] }, getMotionPreset("slideUp").transition);
+    return () => animation.stop();
+  }, [identity, reduced]);
+  return <div ref={node}>{children}</div>;
 }

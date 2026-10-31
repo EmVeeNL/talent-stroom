@@ -243,6 +243,7 @@ export const nlNL = {
   "recruitment.stage.in_behandeling": "In behandeling",
   "recruitment.stage.gesprek": "Gesprek",
   "recruitment.stage.aanbod": "Aanbod",
+  "recruitment.stage.afgewezen": "Afgewezen",
   "recruitment.stage.geplaatst": "Geplaatst",
   "recruitment.stage.niet_geschikt": "Niet geschikt",
   "recruitment.stage.talentpool": "Talentpool",

@@ -72,6 +72,7 @@ export const initialPipeline: KanbanColumnData[] = [
     tone: "success",
     cards: [{ id: "c5", name: "Mark Scholten", role: "UX Researcher", meta: "Innovatech", age: "2d" }],
   },
+  { id: "afgewezen", title: "Afgewezen", tone: "danger", cards: [] },
   {
     id: "placed",
     title: "Geplaatst",

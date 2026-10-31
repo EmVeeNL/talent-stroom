@@ -1,4 +1,4 @@
-import { createElement, useState } from "react";
+import { createElement, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import {
   Avatar,
@@ -52,12 +52,25 @@ export function Frame({
   );
 }
 export function DashboardBreadcrumbs({ locale, children }: { locale: Locale; children: ReactNode }) {
+  // Only the development preview injects a deterministic clock/timezone.
+  const preview = import.meta.env.DEV && new URLSearchParams(window.location.search).get("preview") === "dashboard";
+  const [now, setNow] = useState(() => new Date(preview ? "2026-10-30T13:32:00Z" : Date.now()));
+  useEffect(() => {
+    if (preview) return undefined;
+    const timer = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(timer);
+  }, [preview]);
+  const formatted = new Intl.DateTimeFormat(locale, {
+    dateStyle: "full",
+    timeStyle: "short",
+    ...(preview ? { timeZone: "Europe/Amsterdam" } : {}),
+  }).format(now);
   return (
     <div className="demo-dashboard__breadcrumbs">
       {children}
-      <time dateTime="2026-10-30T14:32:00+01:00">
+      <time dateTime={now.toISOString()}>
         <Icon name="calendar_month" size={16} />
-        {tr(locale, "demo.dashboard.date")}, 14:32
+        {formatted}
       </time>
     </div>
   );
@@ -122,7 +135,13 @@ export function Pipeline({ locale }: { locale: Locale }) {
   };
   return (
     <Panel title={tr(locale, "demo.dashboard.pipeline")}>
-      <KanbanBoard columns={board} labels={labels} onMove={(move) => setBoard(moveKanbanCard(board, move))} />
+      <KanbanBoard
+        columns={board.map((column) =>
+          column.id === "afgewezen" ? { ...column, title: t(locale, "recruitment.stage.afgewezen") } : column,
+        )}
+        labels={labels}
+        onMove={(move) => setBoard(moveKanbanCard(board, move))}
+      />
     </Panel>
   );
 }

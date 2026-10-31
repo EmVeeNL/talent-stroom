@@ -198,16 +198,17 @@ const KANBAN = [
       ["QA Engineer", "QualityFirst", "1w", "Anouk Vos"],
     ],
   },
+  { id: "afgewezen", tone: "danger", title: "Afgewezen", count: 0, cards: [] },
 ] as const;
 
-function Kanban({ tr }: { tr: Tr }) {
+function Kanban({ tr, locale }: { tr: Tr; locale: Locale }) {
   return (
     <section className="dk-kanban" aria-label={tr("demo.kit.kanban")}>
       {KANBAN.map((col) => (
         <section key={col.id} className={`dk-kanban__col dk-kanban__col--${col.tone}`}>
           <header>
             <h3>
-              {col.title} ({col.count})
+              {t(locale, `recruitment.stage.${col.id}`)} ({col.count})
             </h3>
             <span aria-hidden="true">
               <Icon name="add" size={16} />
@@ -530,7 +531,7 @@ export function DesignKitOverview({ locale }: { locale: Locale }) {
       </Panel>
 
       <Panel className="dk-kanban-panel" title={tr("demo.kit.kanban")}>
-        <Kanban tr={tr} />
+        <Kanban tr={tr} locale={locale} />
       </Panel>
 
       <Panel className="dk-date" title={tr("demo.kit.datePicker")}>
