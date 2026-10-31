@@ -115,7 +115,9 @@ export function ContactsApp({ locale }: { locale: Locale }) {
           // Renaming can move the row to another letter group, which remounts the opener.
           // Only recover focus that was lost; never steal it from where the user moved it.
           requestAnimationFrame(() => {
-            if (document.activeElement && document.activeElement !== document.body) return;
+            const current = document.activeElement;
+            const lost = !current || current === document.body || current.closest("dialog:not([open])");
+            if (!lost) return;
             list.current?.querySelector<HTMLElement>(`[data-contact-id="${CSS.escape(activeId)}"]`)?.focus();
           });
         }}
