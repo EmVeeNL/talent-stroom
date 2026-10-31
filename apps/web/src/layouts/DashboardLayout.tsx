@@ -20,8 +20,10 @@ import { errorKey, isAborted, RequestError } from "../auth.ts";
 import type { OrganizationList, Transport } from "../auth.ts";
 import { navigationSections } from "../navigation.ts";
 import type { IconName, SidebarSection } from "@talentstroom/ui";
+import { ProductTour, PRODUCT_TOUR } from "../tour.tsx";
 
 export interface SessionUser {
+  id?: string;
   name: string;
   email: string;
 }
@@ -185,21 +187,23 @@ export function DashboardLayout({
       }}
       header={{
         search: (
-          <CommandPalette
-            label={tr("shell.searchTitle")}
-            triggerLabel={tr("shell.searchTitle")}
-            closeLabel={tr("shell.close")}
-            emptyLabel={tr("shell.noResults")}
-            actions={[
-              {
-                id: "dashboard",
-                label: tr("shell.nav.dashboard"),
-                group: tr("shell.pages"),
-                onSelect: () => document.querySelector<HTMLElement>("main h1")?.focus(),
-              },
-            ]}
-            renderTrigger={(props) => <NavbarSearch {...props} placeholder={tr("shell.search")} />}
-          />
+          <div data-tour="search">
+            <CommandPalette
+              label={tr("shell.searchTitle")}
+              triggerLabel={tr("shell.searchTitle")}
+              closeLabel={tr("shell.close")}
+              emptyLabel={tr("shell.noResults")}
+              actions={[
+                {
+                  id: "dashboard",
+                  label: tr("shell.nav.dashboard"),
+                  group: tr("shell.pages"),
+                  onSelect: () => document.querySelector<HTMLElement>("main h1")?.focus(),
+                },
+              ]}
+              renderTrigger={(props) => <NavbarSearch {...props} placeholder={tr("shell.search")} />}
+            />
+          </div>
         ),
         children: (
           <>
@@ -266,6 +270,7 @@ export function DashboardLayout({
       }}
     >
       <MotionContent identity={`${data.activeOrganizationId}:${matchedRoute}`}>
+        {currentPath === "/" && user.id ? <ProductTour userId={user.id} steps={PRODUCT_TOUR} locale={locale} /> : null}
         {currentPath === "/" ? (
           <h1 ref={headingRef} tabIndex={-1} className="ts-visually-hidden">
             {tr("auth.home")}

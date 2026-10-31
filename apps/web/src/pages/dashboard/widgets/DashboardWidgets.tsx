@@ -91,7 +91,7 @@ export function Stats({
   }>;
 }) {
   return (
-    <div className="demo-stats">
+    <div className="demo-stats" data-tour="kpi">
       {items.map((x) => (
         <StatCard
           key={x.label}
