@@ -1,9 +1,10 @@
 import { useId, useState } from "react";
-import { Avatar, Button, EmptyState, FilterChip, Icon, SearchInput } from "@talentstroom/ui";
+import { Avatar, Button, EmptyState, FilterChip, Icon, SearchInput, DetailDrawer } from "@talentstroom/ui";
 import { t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
 import { DEMO_CONTACTS } from "../../../demo/apps.ts";
 import type { DemoContact } from "../../../demo/apps.ts";
+import { RecordFormDialog } from "../RecordFormDialog.tsx";
 import { fromIso } from "../agenda/dates.ts";
 import { filterContacts, groupContacts } from "./groups.ts";
 import "./contacts.css";
@@ -15,6 +16,7 @@ export function ContactsApp({ locale }: { locale: Locale }) {
   const [favouritesOnly, setFavouritesOnly] = useState(false);
   const [activeId, setActiveId] = useState("k08");
   const [view, setView] = useState<"list" | "detail">("list");
+  const [editing, setEditing] = useState(false);
   const uid = useId();
 
   const groups = groupContacts(filterContacts(contacts, query, favouritesOnly));
@@ -27,7 +29,7 @@ export function ContactsApp({ locale }: { locale: Locale }) {
     );
 
   return (
-    <div className="contacts" data-view={view}>
+    <div className="contacts">
       <section className="contacts__list" aria-labelledby={`${uid}-list`}>
         <h2 id={`${uid}-list`} className="ts-visually-hidden">
           {tr("demo.apps.contacts.list")}
@@ -99,19 +101,22 @@ export function ContactsApp({ locale }: { locale: Locale }) {
         )}
       </section>
 
-      <section
-        className="contacts__detail"
-        aria-label={active ? tr("demo.apps.contacts.detail", { name: active.name }) : undefined}
+      <DetailDrawer
+        title={active?.name ?? tr("patterns.details")}
+        triggerLabel={tr("patterns.details")}
+        closeLabel={tr("patterns.close")}
+        hideTrigger
+        open={view === "detail"}
+        onOpenChange={(next) => setView(next ? "detail" : "list")}
+        editLabel={tr("patterns.edit")}
+        onEdit={() => setEditing(true)}
       >
         {active ? (
-          <div className="contact-card">
-            <Button className="contacts__back" variant="ghost" leadingIcon="arrow_back" onClick={() => setView("list")}>
-              {tr("demo.apps.contacts.back")}
-            </Button>
+          <article className="contact-card">
             <header className="contact-card__head">
               <Avatar name={active.name} size="lg" />
               <div>
-                <h2>{active.name}</h2>
+                <p>{active.name}</p>
                 <p>
                   {active.function} · {active.company}
                 </p>
@@ -162,7 +167,7 @@ export function ContactsApp({ locale }: { locale: Locale }) {
                 </li>
               ))}
             </ul>
-          </div>
+          </article>
         ) : (
           <EmptyState
             icon="contacts"
@@ -170,7 +175,36 @@ export function ContactsApp({ locale }: { locale: Locale }) {
             body={tr("demo.apps.contacts.empty_body")}
           />
         )}
-      </section>
+      </DetailDrawer>
+      {editing && active && (
+        <RecordFormDialog
+          locale={locale}
+          initial={{ name: active.name, function: active.function, company: active.company, city: active.city }}
+          fields={[
+            { name: "name", label: "patterns.name", required: true },
+            { name: "function", label: "demo.apps.crm.col.function" },
+            { name: "company", label: "demo.apps.crm.col.company" },
+            { name: "city", label: "demo.apps.contacts.city" },
+          ]}
+          onClose={() => setEditing(false)}
+          onSave={(value) => {
+            setContacts((current) =>
+              current.map((entry) =>
+                entry.id === active.id
+                  ? {
+                      ...entry,
+                      name: value["name"] ?? entry.name,
+                      function: value["function"] ?? entry.function,
+                      company: value["company"] ?? entry.company,
+                      city: value["city"] ?? entry.city,
+                    }
+                  : entry,
+              ),
+            );
+            setEditing(false);
+          }}
+        />
+      )}
     </div>
   );
 }
