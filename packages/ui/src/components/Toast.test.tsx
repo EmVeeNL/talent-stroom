@@ -64,3 +64,75 @@ it("pauses on keyboard focus independently of hover", () => {
   advance(250);
   expect(dismiss).toHaveBeenCalledOnce();
 });
+
+it("shows a countdown bar for timed toasts that pauses on hover and focus", () => {
+  vi.useFakeTimers();
+  const { container } = render(
+    <>
+      <Toast duration={5000} closeLabel="Sluiten" onDismiss={() => {}}>
+        Opgeslagen
+      </Toast>
+      <button>Volgende</button>
+    </>,
+  );
+  const bar = container.querySelector(".ts-toast__countdown");
+  if (!bar) throw new Error("Missing countdown bar");
+  expect(bar.getAttribute("aria-hidden")).toBe("true");
+  expect(bar.getAttribute("data-paused")).toBe("false");
+  const notice = screen.getByRole("status");
+  fireEvent.mouseEnter(notice);
+  expect(bar.getAttribute("data-paused")).toBe("true");
+  fireEvent.mouseLeave(notice);
+  expect(bar.getAttribute("data-paused")).toBe("false");
+  act(() => screen.getByRole("button", { name: "Sluiten" }).focus());
+  expect(bar.getAttribute("data-paused")).toBe("true");
+});
+
+it("never auto-closes a persistent toast and shows no countdown", () => {
+  vi.useFakeTimers();
+  const dismiss = vi.fn<() => void>();
+  const { container } = render(
+    <Toast persistent duration={100} closeLabel="Sluiten" onDismiss={dismiss}>
+      Blijft staan
+    </Toast>,
+  );
+  advance(60_000);
+  expect(dismiss).not.toHaveBeenCalled();
+  expect(container.querySelector(".ts-toast__countdown")).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: "Sluiten" }));
+  expect(dismiss).toHaveBeenCalledOnce();
+});
+
+it("can omit the icon and dismisses with Escape from inside the toast", () => {
+  const dismiss = vi.fn<() => void>();
+  const { container } = render(
+    <Toast icon={false} duration={0} closeLabel="Sluiten" onDismiss={dismiss}>
+      Alleen tekst
+    </Toast>,
+  );
+  expect(container.querySelector(".ts-toast__message > .ts-icon")).toBeNull();
+  const close = screen.getByRole("button", { name: "Sluiten" });
+  fireEvent.keyDown(document.body, { key: "Escape" });
+  expect(dismiss).not.toHaveBeenCalled();
+  fireEvent.keyDown(close, { key: "Escape" });
+  expect(dismiss).toHaveBeenCalledOnce();
+});
+
+it("stays paused while the parent holds it", () => {
+  vi.useFakeTimers();
+  const dismiss = vi.fn<() => void>();
+  const { rerender } = render(
+    <Toast paused duration={200} closeLabel="Sluiten" onDismiss={dismiss}>
+      Opgeslagen
+    </Toast>,
+  );
+  advance(1000);
+  expect(dismiss).not.toHaveBeenCalled();
+  rerender(
+    <Toast duration={200} closeLabel="Sluiten" onDismiss={dismiss}>
+      Opgeslagen
+    </Toast>,
+  );
+  advance(250);
+  expect(dismiss).toHaveBeenCalledOnce();
+});
