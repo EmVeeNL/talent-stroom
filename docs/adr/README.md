@@ -23,3 +23,4 @@ One file per significant decision: `NNNN-short-title.md`, numbered sequentially.
 | [0013](0013-redesign-design-kit.md)            | Applying the redesign design kit                           | Accepted (approved by merging PR)         |
 | [0014](0014-motion-and-animation.md)           | Motion and animation                                       | Accepted (amended: Motion broadly)        |
 | [0015](0015-tanstack-web-data-layer.md)        | TanStack web data layer                                    | Accepted                                  |
+| [0016](0016-calendar-sync-microsoft-google.md) | Calendar sync with Microsoft 365 and Google Calendar       | Proposed                                  |
