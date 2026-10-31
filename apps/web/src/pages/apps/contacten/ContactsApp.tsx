@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { Avatar, Button, EmptyState, FilterChip, Icon, SearchInput, DetailDrawer } from "@talentstroom/ui";
 import { t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
@@ -18,6 +18,7 @@ export function ContactsApp({ locale }: { locale: Locale }) {
   const [view, setView] = useState<"list" | "detail">("list");
   const [editing, setEditing] = useState(false);
   const uid = useId();
+  const list = useRef<HTMLDivElement>(null);
 
   const groups = groupContacts(filterContacts(contacts, query, favouritesOnly));
   const active = contacts.find((contact) => contact.id === activeId);
@@ -58,7 +59,7 @@ export function ContactsApp({ locale }: { locale: Locale }) {
             body={tr("demo.apps.contacts.no_results_body")}
           />
         ) : (
-          <div className="contacts__groups">
+          <div ref={list} className="contacts__groups">
             {groups.map((group) => (
               <section key={group.letter} aria-labelledby={`${uid}-letter-${group.letter}`}>
                 <h3 id={`${uid}-letter-${group.letter}`} className="contacts__letter">
@@ -70,6 +71,7 @@ export function ContactsApp({ locale }: { locale: Locale }) {
                       <button
                         type="button"
                         className="contact-row"
+                        data-contact-id={contact.id}
                         aria-current={contact.id === activeId ? "true" : undefined}
                         onClick={() => {
                           setActiveId(contact.id);
@@ -107,7 +109,16 @@ export function ContactsApp({ locale }: { locale: Locale }) {
         closeLabel={tr("patterns.close")}
         hideTrigger
         open={view === "detail"}
-        onOpenChange={(next) => setView(next ? "detail" : "list")}
+        onOpenChange={(next) => {
+          setView(next ? "detail" : "list");
+          if (next) return;
+          // Renaming can move the row to another letter group, which remounts the opener.
+          // Only recover focus that was lost; never steal it from where the user moved it.
+          requestAnimationFrame(() => {
+            if (document.activeElement && document.activeElement !== document.body) return;
+            list.current?.querySelector<HTMLElement>(`[data-contact-id="${CSS.escape(activeId)}"]`)?.focus();
+          });
+        }}
         editLabel={tr("patterns.edit")}
         onEdit={() => setEditing(true)}
       >

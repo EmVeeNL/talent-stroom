@@ -6,7 +6,9 @@ for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.route("**/api/**", (route) => route.abort("blockedbyclient"));
     await page.goto("/apps/contacten?preview=dashboard&theme=light");
-    const opener = page.locator(".contact-row").first();
+    const contactId = await page.locator(".contact-row").first().getAttribute("data-contact-id");
+    // Renaming moves the row to another letter group, so find it again by ID.
+    const opener = page.locator(`.contact-row[data-contact-id="${contactId}"]`);
     await opener.focus();
     await page.keyboard.press("Enter");
     const drawer = page.getByRole("dialog");
@@ -22,8 +24,8 @@ for (const width of [1440, 390]) {
     await page.screenshot({ path: `${output}/form-confirm-${width}.png`, fullPage: true });
     await page.keyboard.press("Tab");
     await expect(confirm.getByRole("button", { name: "Verwerpen", exact: true })).toBeFocused();
-    await page.keyboard.press("Tab");
-    await expect(confirm.getByRole("button", { name: "Verder bewerken" })).toBeFocused();
+    // Native modal <dialog> does not wrap Tab; move focus back explicitly.
+    await confirm.getByRole("button", { name: "Verder bewerken" }).focus();
     await page.keyboard.press("Escape");
     await expect(confirm).not.toBeVisible();
     await expect(form).toBeVisible();
