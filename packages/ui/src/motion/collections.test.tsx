@@ -99,10 +99,20 @@ describe("collection and content motion", () => {
 it("keeps router and provider descendants mounted when content identity changes", () => {
   let mounts = 0;
   function ProviderProbe() {
-    useEffect(() => { mounts += 1; }, []);
+    useEffect(() => {
+      mounts += 1;
+    }, []);
     return <span>provider</span>;
   }
-  const view = render(<MotionContent identity="first"><ProviderProbe /></MotionContent>);
-  view.rerender(<MotionContent identity="second"><ProviderProbe /></MotionContent>);
+  const view = render(
+    <MotionContent identity="first">
+      <ProviderProbe />
+    </MotionContent>,
+  );
+  view.rerender(
+    <MotionContent identity="second">
+      <ProviderProbe />
+    </MotionContent>,
+  );
   expect(mounts).toBe(1);
 });

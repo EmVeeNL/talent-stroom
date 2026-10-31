@@ -62,7 +62,7 @@ export function MotionContent({ identity, children }: { identity: string; childr
     if (!element) return undefined;
     if (reduced) {
       element.style.opacity = "1";
-      element.style.transform = "none";
+      element.style.removeProperty("transform");
       return undefined;
     }
     if (!changed) return undefined;

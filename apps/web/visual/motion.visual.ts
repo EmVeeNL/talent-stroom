@@ -54,6 +54,9 @@ test("replay and Dialog open animate without React suspension warnings", async (
   const dialog = page.getByRole("button", { name: "Dialoogformaten: klein, middel en groot" });
   expect(await animationAfterClick(page, dialog, "dialog[open]")).toBe(true);
   await expect(page.getByRole("dialog")).toBeVisible();
+  await page.goto("/?preview=dashboard");
+  await expect(page.locator(".demo-dashboard__breadcrumbs time")).toBeVisible();
+  await expect(page.locator(".ts-kanban")).toBeVisible();
   expect(errors).toEqual([]);
 });
 

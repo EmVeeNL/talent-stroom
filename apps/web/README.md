@@ -45,6 +45,19 @@ is matched, including 404 for unknown/disabled routes. Entry precedence remains
 gallery, dashboard preview, enabled demo auth, then normal/guest-preview auth.
 Production ignores both preview modes, including demo-enabled production builds.
 
+The dashboard header uses a live browser-local clock with `Intl.DateTimeFormat` for the
+active locale. Only `?preview=dashboard` injects the fixed 30 October 2026, 14:32 Amsterdam
+clock. Recruitment stage demos include the localized `afgewezen` stage with a subtle danger tone.
+
+The separate `visual/motion.visual.ts` spec enables normal motion, observes a replay and
+Dialog entrance within 100 ms, rejects React suspension/mount warnings, and checks reduced
+motion and table-avatar spacing. Screenshot specs retain their deterministic settings.
+Run it on an isolated worktree port with:
+
+```sh
+PLAYWRIGHT_PORT=5205 pnpm --filter @talentstroom/web visual motion.visual.ts
+```
+
 ### Elements, data and forms demo kit
 
 The development sidebar includes component reference pages under `/elementen/*`, data examples

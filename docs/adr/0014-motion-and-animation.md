@@ -163,5 +163,7 @@ Existing literal `ease` / `ease-out` usages move to these tokens in #398. Distan
 
 ## Addendum (#453): runtime verification
 
-- Route components use React `lazy` (not TanStack `lazyRouteComponent`) so the `use()` suspend and unmounted-update warnings no longer appear; `apps/web/visual/motion.visual.ts` fails on those console messages.
+- `MotionPresence` no longer sets `initial={false}`: that presence context suppressed descendant initial animations for the lifetime of a Card body, including newly keyed replay samples. The original asynchronous feature loader remains; an isolated provider animated correctly and the routed/Card regression tests reproduce the actual suppression.
+- Route components use React `lazy` because TanStack `lazyRouteComponent` conditionally calls `use()` only while loading in the pinned version. Pending/error feedback is synchronous so fallbacks cannot suspend themselves.
+- `MotionContent` animates its existing DOM node on identity changes instead of keying the wrapper around `RouterProvider`. Remounting it during match publication left `Transitioner` updating a discarded `Matches` instance. A regression test verifies descendant providers stay mounted; the browser spec rejects both warning messages.
 - A preset must actually animate when motion is allowed: covered by `packages/ui/src/motion/provider.test.tsx`, `apps/web/src/motion-runtime.test.tsx` (StrictMode, `skipAnimations = false`) and the Playwright probe in `apps/web/visual/motion.visual.ts` (`getAnimations()` after replay).
