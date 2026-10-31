@@ -1,13 +1,17 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type { DragEvent, KeyboardEvent, MouseEvent } from "react";
 import {
   Badge,
   Button,
+  Checkbox,
+  CheckboxGroup,
   ContextMenu,
   Dialog,
   Icon,
   LayoutGroup,
   MotionLayout,
+  Select,
+  Sheet,
   m,
   useReducedMotion,
   ViewSwitcher,
@@ -18,8 +22,19 @@ import { AGENDA_USERS, DEMO_TODAY } from "../../../demo/apps.ts";
 import type { AgendaEvent } from "../../../demo/apps.ts";
 import { demoStore, useDemoStore } from "../../../demo/store.ts";
 import { addDays, addMonths, fromIso, monthWeeks, sameMonth, toIso, weekDays } from "./dates.ts";
-import { clock, draftFor, minutes, occursOn, layoutDay, resizeEvent, shiftEvent } from "./agenda.ts";
-import type { Appointment, AppointmentDraft } from "./agenda.ts";
+import {
+  clock,
+  draftFor,
+  minutes,
+  occursOn,
+  layoutDay,
+  parseScope,
+  resizeEvent,
+  scopeSearch,
+  scopedEvents,
+  shiftEvent,
+} from "./agenda.ts";
+import type { AgendaScope, Appointment, AppointmentDraft, ScopedAppointment } from "./agenda.ts";
 import { AppointmentForm } from "./AppointmentForm.tsx";
 import "./calendar.css";
 
@@ -31,6 +46,15 @@ interface Modal {
 }
 export const sortEvents = (events: readonly AgendaEvent[]) =>
   events.toSorted((a, b) => (a.start ?? "").localeCompare(b.start ?? "") || a.title.localeCompare(b.title));
+const slotFor = (start: string, allDay: boolean, timed: boolean) =>
+  timed && !allDay ? Math.floor(minutes(start) / 15) : -1;
+const targetKey = (date: string, slot: number) => `${date}|${slot}`;
+const personIndex = (event: Appointment) => AGENDA_USERS.findIndex((user) => user.id === event.organiser);
+const initials = (name: string) =>
+  name
+    .split(" ")
+    .map((part) => part.charAt(0))
+    .join("");
 const TYPE_KEYS = {
   gesprek: "demo.apps.agenda.type.gesprek",
   intake: "demo.apps.agenda.type.intake",
@@ -40,6 +64,10 @@ const TYPE_KEYS = {
 export function Calendar({ locale }: { locale: Locale }) {
   const tr = (key: MessageKey, values?: Record<string, string | number>) => t(locale, key, values);
   const { events, tasks } = useDemoStore();
+  const [scope, setScopeState] = useState<AgendaScope>(() => parseScope(window.location.search));
+  const [people, setPeople] = useState<string[]>(() => AGENDA_USERS.map((user) => user.id));
+  const [dropTarget, setDropTarget] = useState<string | null>(null);
+  const visible = scopedEvents(events, scope, people, tr("demo.apps.agenda.busy"));
   const [view, setView] = useState<CalendarView>("month");
   const [focus, setFocus] = useState(DEMO_TODAY);
   const [slot, setSlot] = useState(-1);
@@ -50,6 +78,9 @@ export function Calendar({ locale }: { locale: Locale }) {
   const scroll = useRef<HTMLDivElement>(null);
   const opener = useRef<HTMLElement | null>(null);
   const modalBody = useRef<HTMLDivElement>(null);
+  const sheetBody = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<Modal | null>(null);
+  const targetTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const moveFocus = useRef(false);
   const drag = useRef<{ id: string; resize: boolean } | null>(null);
   const reduced = useReducedMotion();
@@ -60,7 +91,7 @@ export function Calendar({ locale }: { locale: Locale }) {
   ) => new Intl.DateTimeFormat(locale, options).format(fromIso(iso));
   const days = view === "day" ? [focus] : weekDays(focus);
   const weeks = view === "month" ? monthWeeks(focus) : [days];
-  const segmentsByDay = new Map(days.map((date) => [date, layoutDay(events, date)]));
+  const segmentsByDay = new Map(days.map((date) => [date, layoutDay(visible, date)]));
   const period =
     view === "month"
       ? fmt(focus, { month: "long", year: "numeric" })
@@ -68,7 +99,7 @@ export function Calendar({ locale }: { locale: Locale }) {
         ? fmt(focus)
         : `${fmt(days[0] ?? focus, { day: "numeric", month: "short" })} – ${fmt(days[6] ?? focus, { day: "numeric", month: "short", year: "numeric" })}`;
   const on = (date: string) =>
-    events
+    visible
       .filter((event) => occursOn(event, date))
       .toSorted((a, b) => Number(b.allDay) - Number(a.allDay) || a.start.localeCompare(b.start));
   const timeLabel = (event: Appointment) =>
@@ -91,9 +122,13 @@ export function Calendar({ locale }: { locale: Locale }) {
     }
     // oxlint-disable-next-line react/exhaustive-effect-dependencies -- focus only follows date/slot navigation
   }, [focus, slot]);
+  useLayoutEffect(() => {
+    modalRef.current = modal;
+  }, [modal]);
+  useEffect(() => () => clearTimeout(targetTimer.current), []);
   useEffect(() => {
     if (!modal) return;
-    const dialog = modalBody.current?.closest("dialog");
+    const dialog = (modal.mode === "detail" ? sheetBody : modalBody).current?.closest("dialog");
     if (!dialog) return;
     if (modal.mode === "detail") {
       const heading = dialog.querySelector("h2");
@@ -107,6 +142,11 @@ export function Calendar({ locale }: { locale: Locale }) {
         ?.focus();
     }
   }, [modal]);
+  const previewTarget = useCallback(
+    (target: { date: string; start: string; allDay: boolean } | null) =>
+      setDropTarget(target ? targetKey(target.date, slotFor(target.start, target.allDay, view !== "month")) : null),
+    [view],
+  );
   const close = () => {
     setModal(null);
     requestAnimationFrame(() => {
@@ -125,8 +165,13 @@ export function Calendar({ locale }: { locale: Locale }) {
       },
     });
   };
-  const announceMove = (event: Appointment) => {
+  const announceMove = (event: Appointment, keyboard = false) => {
     demoStore.save(event);
+    if (keyboard) {
+      setDropTarget(targetKey(event.date, slotFor(event.start, event.allDay, view !== "month")));
+      clearTimeout(targetTimer.current);
+      targetTimer.current = setTimeout(() => setDropTarget(null), 1500);
+    }
     setFocus(event.date);
     requestAnimationFrame(() => {
       const targets = document.querySelectorAll<HTMLButtonElement>(`[data-event-id="${event.id}"]`);
@@ -146,12 +191,14 @@ export function Calendar({ locale }: { locale: Locale }) {
         key.key === "ArrowLeft" ? -1 : key.key === "ArrowRight" ? 1 : 0,
         key.key === "ArrowUp" ? -15 : key.key === "ArrowDown" ? 15 : 0,
       ),
+      true,
     );
   };
   const drop = (event: DragEvent<HTMLTableCellElement>, date: string, minute?: number) => {
     event.preventDefault();
     const dragged = drag.current;
     drag.current = null;
+    setDropTarget(null);
     const item = events.find((entry) => entry.id === dragged?.id);
     if (!item || !dragged) return;
     if (dragged.resize && minute !== undefined) {
@@ -192,71 +239,105 @@ export function Calendar({ locale }: { locale: Locale }) {
     setSlot(nextSlot);
   };
   const item = (
-    event: Appointment,
+    event: ScopedAppointment,
     context: string,
     style?: { height?: number; width?: string; left?: string; top?: number },
     resize = false,
-  ) => (
-    <m.div
-      key={event.id}
-      layout={!reduced}
-      {...(!reduced ? { layoutId: `${id}-${context === event.date ? "calendar" : context}-${event.id}` } : {})}
-      transition={{ duration: reduced ? 0 : 0.18 }}
-      className={`ag-entry ag-chip--${event.type}${style ? " ag-entry--positioned" : ""}`}
-      {...(style ? { style } : {})}
-    >
-      <button
-        type="button"
-        className="ag-entry__open"
-        data-event-id={event.id}
-        draggable
-        aria-describedby={`${id}-hint`}
-        onDragStart={(e) => {
-          drag.current = { id: event.id, resize: false };
-          e.dataTransfer.setData("text/plain", event.id);
-          e.dataTransfer.effectAllowed = "move";
-        }}
-        onDragEnd={() => {
-          drag.current = null;
-        }}
-        onClick={(e) => {
-          e.stopPropagation();
-          open(event);
-        }}
-        onDoubleClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => moveKey(e, event)}
+  ) =>
+    event.busy ? (
+      <m.div
+        key={event.id}
+        className={`ag-entry ag-entry--busy${personClass(event)}${style ? " ag-entry--positioned" : ""}`}
+        {...(style ? { style } : {})}
       >
-        <span className="ag-entry__time">{timeLabel(event)} </span>
-        <span>{event.title}</span>
-      </button>
-      <ContextMenu
-        triggerLabel={tr("demo.apps.agenda.actions", { title: event.title })}
-        items={[
-          { id: "edit", label: tr("demo.apps.agenda.edit"), onSelect: () => open(event, "edit") },
-          { id: "move", label: tr("demo.apps.agenda.move"), onSelect: () => open(event, "move") },
-          { id: "task", label: tr("demo.apps.agenda.task"), onSelect: () => makeTask(event) },
-          { id: "delete", label: tr("demo.apps.agenda.delete"), tone: "danger", onSelect: () => open(event, "delete") },
-        ]}
-      />
-      {resize && (
+        <span className="ag-entry__open">
+          <span className="ag-entry__time">{timeLabel(event)} </span>
+          <span>{event.title}</span>
+          {who(event)}
+        </span>
+      </m.div>
+    ) : (
+      <m.div
+        key={event.id}
+        layout={!reduced}
+        {...(!reduced ? { layoutId: `${id}-${context === event.date ? "calendar" : context}-${event.id}` } : {})}
+        transition={{ duration: reduced ? 0 : 0.18 }}
+        className={`ag-entry ag-chip--${event.type}${personClass(event)}${style ? " ag-entry--positioned" : ""}`}
+        {...(style ? { style } : {})}
+      >
         <button
           type="button"
+          className="ag-entry__open"
+          data-event-id={event.id}
           draggable
-          className="ag-entry__resize"
-          aria-label={tr("demo.apps.agenda.resize", { title: event.title })}
-          onClick={() => open(event, "edit")}
+          aria-describedby={`${id}-hint`}
           onDragStart={(e) => {
-            e.stopPropagation();
-            drag.current = { id: event.id, resize: true };
+            drag.current = { id: event.id, resize: false };
             e.dataTransfer.setData("text/plain", event.id);
+            e.dataTransfer.effectAllowed = "move";
           }}
           onDragEnd={() => {
             drag.current = null;
+            setDropTarget(null);
           }}
+          onClick={(e) => {
+            e.stopPropagation();
+            open(event);
+          }}
+          onDoubleClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => moveKey(e, event)}
+        >
+          <span className="ag-entry__time">{timeLabel(event)} </span>
+          <span>{event.title}</span>
+          {who(event)}
+        </button>
+        <ContextMenu
+          triggerLabel={tr("demo.apps.agenda.actions", { title: event.title })}
+          items={[
+            { id: "edit", label: tr("demo.apps.agenda.edit"), onSelect: () => open(event, "edit") },
+            { id: "move", label: tr("demo.apps.agenda.move"), onSelect: () => open(event, "move") },
+            { id: "task", label: tr("demo.apps.agenda.task"), onSelect: () => makeTask(event) },
+            {
+              id: "delete",
+              label: tr("demo.apps.agenda.delete"),
+              tone: "danger",
+              onSelect: () => open(event, "delete"),
+            },
+          ]}
         />
-      )}
-    </m.div>
-  );
+        {resize && (
+          <button
+            type="button"
+            draggable
+            className="ag-entry__resize"
+            aria-label={tr("demo.apps.agenda.resize", { title: event.title })}
+            onClick={() => open(event, "edit")}
+            onDragStart={(e) => {
+              e.stopPropagation();
+              drag.current = { id: event.id, resize: true };
+              e.dataTransfer.setData("text/plain", event.id);
+            }}
+            onDragEnd={() => {
+              drag.current = null;
+              setDropTarget(null);
+            }}
+          />
+        )}
+      </m.div>
+    );
+  const personClass = (event: Appointment) =>
+    scope.kind === "shared" && personIndex(event) >= 0 ? ` ag-person--${personIndex(event)}` : "";
+  const who = (event: Appointment) => {
+    const name = AGENDA_USERS[personIndex(event)]?.name;
+    return scope.kind === "shared" && name ? (
+      <>
+        <span className="ag-entry__who" aria-hidden="true">
+          {initials(name)}
+        </span>
+        <span className="ts-visually-hidden"> ({name})</span>
+      </>
+    ) : null;
+  };
   const makeTask = (event: Appointment) => {
     demoStore.taskFrom(event, tr("demo.apps.agenda.task_title", { title: event.title }));
     setStatus(tr("demo.apps.agenda.task_added"));
@@ -267,6 +348,8 @@ export function Calendar({ locale }: { locale: Locale }) {
     "data-date": date,
     "data-slot": index,
     "aria-selected": date === focus && index === slot,
+    "aria-describedby": dropTarget === targetKey(date, index) ? `${id}-drop` : `${id}-hint`,
+    "data-drop-target": dropTarget === targetKey(date, index) ? "" : undefined,
     onKeyDown: (event: KeyboardEvent<HTMLTableCellElement>) => gridKey(event, date, index),
     onClick: () => {
       setFocus(date);
@@ -276,7 +359,19 @@ export function Calendar({ locale }: { locale: Locale }) {
       if (!(event.target instanceof Element) || event.target.closest("button")) return;
       open(undefined, "new", date, index < 0 ? (view === "month" ? undefined : -1) : index * 15);
     },
-    onDragOver: (event: DragEvent<HTMLTableCellElement>) => event.preventDefault(),
+    onDragEnter: (event: DragEvent<HTMLTableCellElement>) => {
+      if (!drag.current) return;
+      event.preventDefault();
+      setDropTarget(targetKey(date, index));
+    },
+    onDragOver: (event: DragEvent<HTMLTableCellElement>) => {
+      event.preventDefault();
+      if (drag.current) setDropTarget(targetKey(date, index));
+    },
+    onDragLeave: (event: DragEvent<HTMLTableCellElement>) => {
+      if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) return;
+      setDropTarget((current) => (current === targetKey(date, index) ? null : current));
+    },
     onDrop: (event: DragEvent<HTMLTableCellElement>) => drop(event, date, index < 0 ? undefined : index * 15),
   });
   return (
@@ -321,6 +416,34 @@ export function Calendar({ locale }: { locale: Locale }) {
               </h2>
             </div>
             <div className="ag__actions">
+              <Select
+                className="ag__selector"
+                label={tr("demo.apps.agenda.selector")}
+                value={scope.kind === "member" ? scope.id : scope.kind}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  const next: AgendaScope =
+                    value === "shared"
+                      ? { kind: "shared" }
+                      : AGENDA_USERS.some((user) => user.id === value && value !== "u-eva")
+                        ? { kind: "member", id: value }
+                        : { kind: "me" };
+                  setScopeState(next);
+                  window.history.replaceState(
+                    window.history.state,
+                    "",
+                    `${window.location.pathname}${scopeSearch(next, window.location.search)}${window.location.hash}`,
+                  );
+                }}
+              >
+                <option value="me">{tr("demo.apps.agenda.mine")}</option>
+                {AGENDA_USERS.filter((user) => user.id !== "u-eva").map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {tr("demo.apps.agenda.agenda_of", { name: user.name })}
+                  </option>
+                ))}
+                <option value="shared">{tr("demo.apps.agenda.shared")}</option>
+              </Select>
               <ViewSwitcher
                 label={tr("demo.apps.agenda.view")}
                 value={view}
@@ -350,6 +473,23 @@ export function Calendar({ locale }: { locale: Locale }) {
               </li>
             ))}
           </ul>
+          {scope.kind === "shared" && (
+            <CheckboxGroup legend={tr("demo.apps.agenda.people")} className="ag__people">
+              {AGENDA_USERS.map((user, index) => (
+                <Checkbox
+                  key={user.id}
+                  className={`ag-person-check ag-person--${index}`}
+                  label={user.name}
+                  checked={people.includes(user.id)}
+                  onChange={(event) =>
+                    setPeople((current) =>
+                      event.target.checked ? [...current, user.id] : current.filter((value) => value !== user.id),
+                    )
+                  }
+                />
+              ))}
+            </CheckboxGroup>
+          )}
           <p className="ts-visually-hidden" id={`${id}-hint`}>
             {tr("demo.apps.agenda.interaction_hint")}
           </p>
@@ -511,14 +651,92 @@ export function Calendar({ locale }: { locale: Locale }) {
               )}
             </aside>
           </div>
+          <p className="ts-visually-hidden" id={`${id}-drop`}>
+            {tr("demo.apps.agenda.drop_target")}
+          </p>
           <output className="ts-visually-hidden" aria-live="polite">
             {status}
           </output>
+          <Sheet
+            hideTrigger
+            open={modal?.mode === "detail"}
+            onOpenChange={(value) => {
+              if (!value && modalRef.current?.mode === "detail") close();
+            }}
+            title={selected?.title ?? tr("demo.apps.agenda.details")}
+            triggerLabel={tr("demo.apps.agenda.details")}
+            closeLabel={tr("demo.apps.agenda.form.close")}
+          >
+            <div ref={sheetBody}>
+              {modal?.mode === "detail" && selected && (
+                <div className="ag-detail">
+                  <p className="ag-detail__time">
+                    <Icon name="schedule" />
+                    {rangeLabel(selected)}
+                  </p>
+                  <p>{selected.location || tr("demo.apps.agenda.no_location")}</p>
+                  {selected.online && (
+                    <p>
+                      <a href={selected.link} target="_blank" rel="noreferrer">
+                        {tr("demo.apps.agenda.link")}
+                      </a>
+                    </p>
+                  )}
+                  {selected.description && <p className="ag-detail__description">{selected.description}</p>}
+                  <h3>{tr("demo.apps.agenda.attendees")}</h3>
+                  <ul className="ag-detail__guests">
+                    {selected.attendees.map((guest) => (
+                      <li key={guest.userId}>
+                        {AGENDA_USERS.find((user) => user.id === guest.userId)?.name}
+                        <Badge>{tr(guest.required ? "demo.apps.agenda.required" : "demo.apps.agenda.optional")}</Badge>
+                      </li>
+                    ))}
+                  </ul>
+                  <p>
+                    {tr("demo.apps.agenda.organiser")}:{" "}
+                    {AGENDA_USERS.find((user) => user.id === selected.organiser)?.name}
+                  </p>
+                  {tasks.some((task) => task.appointmentId === selected.id) && (
+                    <>
+                      <h3>{tr("demo.apps.agenda.linked_tasks")}</h3>
+                      <ul>
+                        {tasks
+                          .filter((task) => task.appointmentId === selected.id)
+                          .map((task) => (
+                            <li key={task.id}>{task.title}</li>
+                          ))}
+                      </ul>
+                    </>
+                  )}
+                  <div className="ag-form__footer">
+                    <Button
+                      variant="outline"
+                      onClick={() => setModal({ mode: "edit", id: selected.id, draft: selected })}
+                    >
+                      {tr("demo.apps.agenda.edit")}
+                    </Button>
+                    <Button variant="outline" onClick={() => makeTask(selected)}>
+                      {tr("demo.apps.agenda.task")}
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={() => setModal({ mode: "delete", id: selected.id, draft: selected })}
+                    >
+                      {tr("demo.apps.agenda.delete")}
+                    </Button>
+                    <Button variant="outline" onClick={close}>
+                      {tr("demo.apps.agenda.form.close")}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Sheet>
           <Dialog
             hideTrigger
-            open={modal !== null}
+            open={modal !== null && modal.mode !== "detail"}
             onOpenChange={(value) => {
-              if (!value) close();
+              if (!value && modalRef.current && modalRef.current.mode !== "detail") close();
             }}
             title={
               modal?.mode === "new"
@@ -529,7 +747,7 @@ export function Calendar({ locale }: { locale: Locale }) {
                     ? tr("demo.apps.agenda.move")
                     : modal?.mode === "delete"
                       ? tr("demo.apps.agenda.delete")
-                      : (selected?.title ?? tr("demo.apps.agenda.details"))
+                      : tr("demo.apps.agenda.details")
             }
             triggerLabel={tr("demo.apps.agenda.new")}
             closeLabel={tr("demo.apps.agenda.form.close")}
@@ -539,6 +757,7 @@ export function Calendar({ locale }: { locale: Locale }) {
               {modal && ["new", "edit", "move"].includes(modal.mode) ? (
                 <AppointmentForm
                   key={`${modal.id}-${modal.mode}`}
+                  {...(modal.mode === "move" ? { onTarget: previewTarget } : {})}
                   locale={locale}
                   initial={modal.draft}
                   eventId={modal.id}
@@ -580,70 +799,7 @@ export function Calendar({ locale }: { locale: Locale }) {
                       </Button>
                     </div>
                   </div>
-                ) : (
-                  <div className="ag-detail">
-                    <p className="ag-detail__time">
-                      <Icon name="schedule" />
-                      {rangeLabel(selected)}
-                    </p>
-                    <p>{selected.location || tr("demo.apps.agenda.no_location")}</p>
-                    {selected.online && (
-                      <p>
-                        <a href={selected.link} target="_blank" rel="noreferrer">
-                          {tr("demo.apps.agenda.link")}
-                        </a>
-                      </p>
-                    )}
-                    {selected.description && <p className="ag-detail__description">{selected.description}</p>}
-                    <h3>{tr("demo.apps.agenda.attendees")}</h3>
-                    <ul className="ag-detail__guests">
-                      {selected.attendees.map((guest) => (
-                        <li key={guest.userId}>
-                          {AGENDA_USERS.find((user) => user.id === guest.userId)?.name}
-                          <Badge>
-                            {tr(guest.required ? "demo.apps.agenda.required" : "demo.apps.agenda.optional")}
-                          </Badge>
-                        </li>
-                      ))}
-                    </ul>
-                    <p>
-                      {tr("demo.apps.agenda.organiser")}:{" "}
-                      {AGENDA_USERS.find((user) => user.id === selected.organiser)?.name}
-                    </p>
-                    {tasks.some((task) => task.appointmentId === selected.id) && (
-                      <>
-                        <h3>{tr("demo.apps.agenda.linked_tasks")}</h3>
-                        <ul>
-                          {tasks
-                            .filter((task) => task.appointmentId === selected.id)
-                            .map((task) => (
-                              <li key={task.id}>{task.title}</li>
-                            ))}
-                        </ul>
-                      </>
-                    )}
-                    <div className="ag-form__footer">
-                      <Button
-                        variant="outline"
-                        onClick={() => setModal({ mode: "edit", id: selected.id, draft: selected })}
-                      >
-                        {tr("demo.apps.agenda.edit")}
-                      </Button>
-                      <Button variant="outline" onClick={() => makeTask(selected)}>
-                        {tr("demo.apps.agenda.task")}
-                      </Button>
-                      <Button
-                        variant="danger"
-                        onClick={() => setModal({ mode: "delete", id: selected.id, draft: selected })}
-                      >
-                        {tr("demo.apps.agenda.delete")}
-                      </Button>
-                      <Button variant="outline" onClick={close}>
-                        {tr("demo.apps.agenda.form.close")}
-                      </Button>
-                    </div>
-                  </div>
-                ))
+                ) : null)
               )}
             </div>
           </Dialog>

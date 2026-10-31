@@ -2,10 +2,15 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import axe from "axe-core";
 import userEvent from "@testing-library/user-event";
+import css from "./calendar.css?raw";
 import { Calendar } from "./Calendar.tsx";
 import { demoStore } from "../../../demo/store.ts";
 import { TaskList } from "../../dashboard/widgets/DashboardWidgets.tsx";
-beforeEach(() => demoStore.reset());
+const cell = (name: RegExp) => screen.getByRole("gridcell", { name, hidden: true });
+beforeEach(() => {
+  demoStore.reset();
+  window.history.replaceState(null, "", "/");
+});
 describe("appointment interactions", () => {
   it("opens details, edits in the same modal, creates a shared linked task and confirms deletion", async () => {
     render(
@@ -17,21 +22,25 @@ describe("appointment interactions", () => {
     const intake = screen.getAllByRole("button", { name: /Intake Dekker & Zonen/ })[0];
     if (!intake) throw new Error("Expected intake appointment");
     await userEvent.click(intake);
-    const dialog = screen.getByRole("dialog");
-    expect(within(dialog).getByText("Eva Kuipers")).toBeDefined();
-    await userEvent.click(within(dialog).getByRole("button", { name: "Taak maken" }));
+    const sheet = screen.getByRole("dialog");
+    expect(sheet.classList.contains("ts-sheet")).toBe(true);
+    expect(sheet.contains(document.activeElement)).toBe(true);
+    expect(within(sheet).getByText("Eva Kuipers")).toBeDefined();
+    await userEvent.click(within(sheet).getByRole("button", { name: "Taak maken" }));
     expect(screen.getAllByText("Voorbereiden: Intake Dekker & Zonen")).toHaveLength(2);
-    await userEvent.click(within(dialog).getByRole("button", { name: "Bewerken" }));
+    await userEvent.click(within(sheet).getByRole("button", { name: "Bewerken" }));
+    const dialog = screen.getByRole("dialog");
+    expect(dialog.classList.contains("ts-sheet")).toBe(false);
     const title = within(dialog).getByLabelText(/Titel/);
     await userEvent.clear(title);
     await userEvent.type(title, "Synthetic edit");
     await userEvent.click(within(dialog).getByRole("button", { name: "Opslaan" }));
-    expect(screen.getByRole("dialog")).toBe(dialog);
-    expect(document.activeElement).toBe(within(dialog).getByRole("heading", { name: "Synthetic edit" }));
-    expect(within(dialog).getByRole("heading", { name: "Synthetic edit" })).toBeDefined();
-    await userEvent.click(within(dialog).getByRole("button", { name: "Verwijderen" }));
+    const reopened = screen.getByRole("dialog");
+    expect(reopened.classList.contains("ts-sheet")).toBe(true);
+    expect(document.activeElement).toBe(within(reopened).getByRole("heading", { name: "Synthetic edit" }));
+    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Verwijderen" }));
     expect(demoStore.getSnapshot().events.some((event) => event.id === "ev-05")).toBe(true);
-    await userEvent.click(within(dialog).getByRole("button", { name: "Verwijderen bevestigen" }));
+    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Verwijderen bevestigen" }));
     expect(demoStore.getSnapshot().events.some((event) => event.id === "ev-05")).toBe(false);
   });
   it("creates from an empty slot with Enter and prefills the date/time for 30 minutes", async () => {
@@ -125,4 +134,127 @@ it("keeps the day grid and form accessible with a single roving slot", async () 
   expect(results.violations.map((violation) => violation.id)).toEqual([]);
   await userEvent.click(within(dialog).getByRole("button", { name: "Save" }));
   expect(within(dialog).getByRole("region", { name: "Check the following fields" })).toBe(document.activeElement);
+});
+
+describe("agenda refinements", () => {
+  it("returns focus to the appointment when the details sheet closes", async () => {
+    render(<Calendar locale="nl-NL" />);
+    const intake = screen.getAllByRole("button", { name: /Intake Dekker & Zonen/ })[0];
+    if (!intake) throw new Error("Expected intake appointment");
+    intake.focus();
+    await userEvent.click(intake);
+    const [closeButton] = within(screen.getByRole("dialog")).getAllByRole("button", { name: "Sluiten" });
+    if (!closeButton) throw new Error("Expected close button");
+    await userEvent.click(closeButton);
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    expect(document.activeElement).toBe(intake);
+  });
+  it("never underlines appointments or days", () => {
+    expect(css).not.toMatch(/text-decoration:\s*underline/);
+  });
+  it("highlights the drop target during drag and clears it on leave, drop and cancel", () => {
+    render(<Calendar locale="nl-NL" />);
+    const dataTransfer = { setData: () => {}, effectAllowed: "move" };
+    const item = screen.getAllByRole("button", { name: /09:00.*Intake Dekker & Zonen/ })[0];
+    if (!item) throw new Error("Expected appointment");
+    const target = screen.getByRole("gridcell", { name: /donderdag 29 oktober 2026/ });
+    const other = screen.getByRole("gridcell", { name: /zaterdag 31 oktober 2026/ });
+    fireEvent.dragStart(item, { dataTransfer });
+    fireEvent.dragEnter(target, { dataTransfer });
+    expect(target.hasAttribute("data-drop-target")).toBe(true);
+    expect(target.getAttribute("aria-describedby")).not.toBe(item.getAttribute("aria-describedby"));
+    fireEvent.dragEnter(other, { dataTransfer });
+    expect(target.hasAttribute("data-drop-target")).toBe(false);
+    expect(other.hasAttribute("data-drop-target")).toBe(true);
+    fireEvent.dragLeave(other, { dataTransfer, relatedTarget: document.body });
+    expect(other.hasAttribute("data-drop-target")).toBe(false);
+    fireEvent.dragEnter(target, { dataTransfer });
+    fireEvent.dragEnd(item, { dataTransfer });
+    expect(document.querySelector("[data-drop-target]")).toBeNull();
+    fireEvent.dragStart(item, { dataTransfer });
+    fireEvent.dragOver(target, { dataTransfer });
+    fireEvent.drop(target, { dataTransfer });
+    expect(document.querySelector("[data-drop-target]")).toBeNull();
+  });
+  it("highlights the chosen target for the keyboard move and the move form", async () => {
+    render(<Calendar locale="nl-NL" />);
+    const item = screen.getAllByRole("button", { name: /Intake Dekker & Zonen/ })[0];
+    if (!item) throw new Error("Expected appointment");
+    fireEvent.keyDown(item, { key: "ArrowRight", altKey: true });
+    expect(screen.getByRole("gridcell", { name: /zaterdag 31 oktober 2026/ }).hasAttribute("data-drop-target")).toBe(
+      true,
+    );
+    expect(screen.getByRole("status").textContent).toContain("31 oktober");
+  });
+  it("shows the chosen target of the move form in the grid", async () => {
+    render(<Calendar locale="nl-NL" />);
+    const actions = screen.getAllByRole("button", { name: "Acties voor Intake Dekker & Zonen" })[0];
+    if (!actions) throw new Error("Expected actions menu");
+    await userEvent.click(actions);
+    await userEvent.click(screen.getByRole("menuitem", { name: "Verplaatsen" }));
+    expect(cell(/vrijdag 30 oktober 2026/).hasAttribute("data-drop-target")).toBe(true);
+    const date = within(screen.getByRole("dialog")).getByLabelText(/Startdatum/);
+    fireEvent.change(date, { target: { value: "2026-10-29" } });
+    expect(cell(/donderdag 29 oktober 2026/).hasAttribute("data-drop-target")).toBe(true);
+    expect(cell(/vrijdag 30 oktober 2026/).hasAttribute("data-drop-target")).toBe(false);
+  });
+  it("switches between own, colleague and shared agendas and stores a member id in the URL", async () => {
+    render(<Calendar locale="nl-NL" />);
+    const selector = screen.getByRole("combobox", { name: "Agenda" });
+    expect(screen.queryByText("Gesprek Joris van den Berg")).toBeNull();
+    await userEvent.selectOptions(selector, "u-ruben");
+    expect(window.location.search).toBe("?agenda=u-ruben");
+    expect(window.location.search).not.toMatch(/Ruben/);
+    expect(screen.queryByText("Intake Dekker & Zonen")).toBeNull();
+    await userEvent.selectOptions(selector, "shared");
+    expect(window.location.search).toBe("?agenda=shared");
+    expect(screen.getAllByText("Intake Dekker & Zonen").length).toBeGreaterThan(0);
+    const people = screen.getByRole("group", { name: "Collega's tonen" });
+    await userEvent.click(within(people).getByRole("checkbox", { name: "Eva Kuipers" }));
+    expect(screen.queryByText("Intake Dekker & Zonen")).toBeNull();
+    await userEvent.selectOptions(selector, "me");
+    expect(window.location.search).toBe("");
+    expect(screen.getAllByText("Intake Dekker & Zonen").length).toBeGreaterThan(0);
+  });
+  it("restores a colleague agenda from the URL in every view", async () => {
+    window.history.replaceState(null, "", "/?agenda=u-ruben");
+    render(<Calendar locale="nl-NL" />);
+    expect(screen.getByRole<HTMLSelectElement>("combobox", { name: "Agenda" }).value).toBe("u-ruben");
+    await userEvent.click(screen.getByRole("radio", { name: "Week" }));
+    expect(screen.getAllByText("Bezet").length).toBeGreaterThan(0);
+    await userEvent.click(screen.getByRole("radio", { name: "Dag" }));
+    expect(screen.getByRole("grid")).toBeDefined();
+  });
+  it("renders private appointments of others as busy only, without title or details in the DOM", async () => {
+    const template = demoStore.getSnapshot().events.find((event) => event.id === "ev-05");
+    if (!template) throw new Error("Expected template appointment");
+    demoStore.save({
+      ...template,
+      id: "secret",
+      title: "Synthetic secret",
+      description: "Synthetic secret details",
+      location: "Synthetic secret place",
+      date: "2026-10-30",
+      start: "16:00",
+      end: "17:00",
+      organiser: "u-ruben",
+      attendees: [{ userId: "u-ruben", required: true }],
+      private: true,
+    });
+    const { container } = render(<Calendar locale="nl-NL" />);
+    await userEvent.selectOptions(screen.getByRole("combobox", { name: "Agenda" }), "u-ruben");
+    expect(screen.getAllByText("Bezet").length).toBeGreaterThan(0);
+    expect(container.innerHTML).not.toContain("Synthetic secret");
+    const busy = screen.getAllByText("Bezet")[0];
+    if (!busy) throw new Error("Expected busy block");
+    await userEvent.click(busy);
+    expect(screen.queryByRole("dialog")).toBeNull();
+    await userEvent.selectOptions(screen.getByRole("combobox", { name: "Agenda" }), "shared");
+    expect(container.innerHTML).not.toContain("Synthetic secret");
+  });
+  it("labels the agenda selector and legend in English", async () => {
+    render(<Calendar locale="en-GB" />);
+    await userEvent.selectOptions(screen.getByRole("combobox", { name: "Agenda" }), "shared");
+    expect(screen.getByRole("group", { name: "Show colleagues" })).toBeDefined();
+  });
 });
