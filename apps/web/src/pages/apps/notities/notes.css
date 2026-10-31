@@ -107,10 +107,6 @@
   display: flex;
   gap: var(--ts-space-1);
 }
-.notes-form {
-  display: grid;
-  gap: var(--ts-space-4);
-}
 @media (max-width: 767px) {
   .notes__filters,
   .notes__filters .ts-search,
@@ -123,4 +119,18 @@
 /* Keep presence mounted for the final exit without leaving an empty grid gap. */
 .notes section:has(> .notes__grid:empty) {
   display: none;
+}
+
+.note__title {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.note__title:focus-visible {
+  outline: var(--ts-focus-ring-width) solid var(--ts-focus-ring-color);
+  outline-offset: var(--ts-focus-ring-offset);
 }

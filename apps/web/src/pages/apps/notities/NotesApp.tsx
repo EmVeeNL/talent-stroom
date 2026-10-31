@@ -1,25 +1,21 @@
 /* oxlint-disable react/no-unstable-nested-components -- render props of ui components (Dialog footer, DataTable cells) */
 import { useId, useRef, useState } from "react";
-import type { FormEvent } from "react";
 import {
   Badge,
+  DetailDrawer,
   MotionCollection,
   MotionListItem,
   Button,
-  Checkbox,
-  Dialog,
   EmptyState,
-  RadioGroup,
   SearchInput,
   Select,
-  TextField,
-  Textarea,
   ViewSwitcher,
 } from "@talentstroom/ui";
 import { t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
 import { DEMO_NOTES, DEMO_TODAY, NOTE_COLORS } from "../../../demo/apps.ts";
 import type { DemoNote, NoteColor } from "../../../demo/apps.ts";
+import { RecordFormDialog } from "../RecordFormDialog.tsx";
 import { fromIso } from "../agenda/dates.ts";
 import { allTags, filterNotes, parseTags, sortNotes } from "./notes.ts";
 import "./notes.css";
@@ -52,7 +48,8 @@ export function NotesApp({ locale }: { locale: Locale }) {
   const [archived, setArchived] = useState(false);
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
-  const [error, setError] = useState(false);
+  const [selectedId, setSelectedId] = useState<string>();
+  const selected = notes.find((note) => note.id === selectedId);
   const [status, setStatus] = useState("");
   const opener = useRef<HTMLElement | null>(null);
   const formId = useId();
@@ -81,20 +78,18 @@ export function NotesApp({ locale }: { locale: Locale }) {
           }
         : emptyDraft,
     );
-    setError(false);
     setOpen(true);
   };
 
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    const title = draft.title.trim();
-    if (!title) return setError(true);
+  const submit = (value: Record<string, string>) => {
+    const title = value["title"]?.trim() ?? "";
+    if (!title) return;
     const values = {
       title,
-      body: draft.body.trim(),
-      color: draft.color,
-      pinned: draft.pinned,
-      tags: parseTags(draft.tags),
+      body: value["body"]?.trim() ?? "",
+      color: NOTE_COLORS.find((color) => color === value["color"]) ?? "geel",
+      pinned: value["pinned"] === "true",
+      tags: parseTags(value["tags"] ?? ""),
       updated: DEMO_TODAY,
     };
     if (draft.id) {
@@ -110,7 +105,11 @@ export function NotesApp({ locale }: { locale: Locale }) {
     <MotionListItem key={note.id}>
       <article className="note" data-color={note.color} aria-labelledby={`${formId}-${note.id}`}>
         <header className="note__head">
-          <h3 id={`${formId}-${note.id}`}>{note.title}</h3>
+          <h3 id={`${formId}-${note.id}`}>
+            <button type="button" className="note__title" onClick={() => setSelectedId(note.id)}>
+              {note.title}
+            </button>
+          </h3>
           <Button
             variant={note.pinned ? "secondary" : "ghost"}
             size="sm"
@@ -231,60 +230,63 @@ export function NotesApp({ locale }: { locale: Locale }) {
         {status}
       </output>
 
-      <Dialog
-        title={tr(draft.id ? "demo.apps.notes.form.edit" : "demo.apps.notes.form.new")}
-        triggerLabel={tr("demo.apps.notes.new")}
-        closeLabel={tr("demo.apps.notes.form.close")}
+      <DetailDrawer
+        title={selected?.title ?? tr("patterns.details")}
+        triggerLabel={tr("patterns.details")}
+        closeLabel={tr("patterns.close")}
         hideTrigger
-        open={open}
+        open={selectedId !== undefined}
         onOpenChange={(next) => {
-          setOpen(next);
-          if (!next) opener.current?.focus();
+          if (!next) setSelectedId(undefined);
         }}
-        footer={(close) => (
+        editLabel={tr("patterns.edit")}
+        onEdit={() => {
+          if (selected) edit(selected, document.activeElement instanceof HTMLElement ? document.activeElement : null);
+        }}
+      >
+        {selected && (
           <>
-            <Button variant="outline" onClick={close}>
-              {tr("demo.apps.notes.form.cancel")}
-            </Button>
-            <Button type="submit" form={formId}>
-              {tr("demo.apps.notes.form.save")}
-            </Button>
+            <p className="note__body">{selected.body}</p>
+            <ul className="note__tags" aria-label={tr("demo.apps.notes.tags")}>
+              {selected.tags.map((entry) => (
+                <li key={entry}>
+                  <Badge>{entry}</Badge>
+                </li>
+              ))}
+            </ul>
+            <time dateTime={selected.updated}>{date.format(fromIso(selected.updated))}</time>
           </>
         )}
-      >
-        <form id={formId} className="notes-form" onSubmit={submit} noValidate>
-          <TextField
-            label={tr("demo.apps.notes.form.title")}
-            required
-            value={draft.title}
-            onChange={(event) => setDraft({ ...draft, title: event.target.value })}
-            {...(error ? { error: tr("demo.apps.notes.form.error") } : {})}
-          />
-          <Textarea
-            label={tr("demo.apps.notes.form.body")}
-            rows={4}
-            value={draft.body}
-            onChange={(event) => setDraft({ ...draft, body: event.target.value })}
-          />
-          <TextField
-            label={tr("demo.apps.notes.form.tags")}
-            hint={tr("demo.apps.notes.form.tags_hint")}
-            value={draft.tags}
-            onChange={(event) => setDraft({ ...draft, tags: event.target.value })}
-          />
-          <RadioGroup
-            label={tr("demo.apps.notes.form.color")}
-            value={draft.color}
-            onChange={(value) => setDraft({ ...draft, color: NOTE_COLORS.find((color) => color === value) ?? "geel" })}
-            options={NOTE_COLORS.map((color) => ({ value: color, label: tr(COLOR_KEYS[color]) }))}
-          />
-          <Checkbox
-            label={tr("demo.apps.notes.form.pinned")}
-            checked={draft.pinned}
-            onChange={(event) => setDraft({ ...draft, pinned: event.target.checked })}
-          />
-        </form>
-      </Dialog>
+      </DetailDrawer>
+      {open && (
+        <RecordFormDialog
+          locale={locale}
+          title={tr(draft.id ? "demo.apps.notes.form.edit" : "demo.apps.notes.form.new")}
+          initial={{
+            title: draft.title,
+            body: draft.body,
+            tags: draft.tags,
+            color: draft.color,
+            pinned: String(draft.pinned),
+          }}
+          fields={[
+            { name: "title", label: "demo.apps.notes.form.title", required: true },
+            { name: "body", label: "demo.apps.notes.form.body", area: true },
+            { name: "tags", label: "demo.apps.notes.form.tags", hint: "demo.apps.notes.form.tags_hint" },
+            {
+              name: "color",
+              label: "demo.apps.notes.form.color",
+              options: NOTE_COLORS.map((color) => ({ value: color, label: tr(COLOR_KEYS[color]) })),
+            },
+            { name: "pinned", label: "demo.apps.notes.form.pinned", checkbox: true },
+          ]}
+          onSave={submit}
+          onClose={() => {
+            setOpen(false);
+            opener.current?.focus();
+          }}
+        />
+      )}
     </div>
   );
 }

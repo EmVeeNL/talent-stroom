@@ -1,12 +1,13 @@
 /* oxlint-disable react/no-unstable-nested-components -- render props of ui components (Dialog footer, DataTable cells) */
-import { useMemo, useRef, useState } from "react";
+import { createContext, useContext, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { Avatar, Button, DataTable, SearchInput, Select, Sheet, StatCard, StatusPill, Tabs } from "@talentstroom/ui";
+import { Avatar, DataTable, SearchInput, Select, DetailDrawer, StatCard, StatusPill, Tabs } from "@talentstroom/ui";
 import type { DataColumn } from "@talentstroom/ui";
 import { t } from "@talentstroom/i18n";
 import type { Locale, MessageKey } from "@talentstroom/i18n";
 import { CRM_COMPANIES, CRM_CONTACTS, CRM_DEALS } from "../../../demo/apps.ts";
 import type { CrmCompany, CrmContact, CrmDeal, DealStage } from "../../../demo/apps.ts";
+import { RecordFormDialog } from "../RecordFormDialog.tsx";
 import { fromIso } from "../agenda/dates.ts";
 import { DEAL_TONES, formatEuro, openValue, wonValue } from "./format.ts";
 import "./crm.css";
@@ -33,13 +34,22 @@ const STATUS_KEYS = {
 const STATUS_IDS = ["actief", "prospect", "inactief"] as const;
 const STATUS_TONES = { actief: "success", prospect: "info", inactief: "neutral" } as const;
 
-const company = (id: string) => CRM_COMPANIES.find((candidate) => candidate.id === id);
-const contact = (id: string) => CRM_CONTACTS.find((candidate) => candidate.id === id);
+const CrmDataContext = createContext({ companies: CRM_COMPANIES, contacts: CRM_CONTACTS, deals: CRM_DEALS });
+function useCrmData() {
+  const data = useContext(CrmDataContext);
+  return {
+    ...data,
+    company: (id: string) => data.companies.find((entry) => entry.id === id),
+    contact: (id: string) => data.contacts.find((entry) => entry.id === id),
+  };
+}
 const includes = (text: string, query: string) =>
   text.toLocaleLowerCase("nl-NL").includes(query.trim().toLocaleLowerCase("nl-NL"));
 
 export function CrmApp({ locale }: { locale: Locale }) {
   const tr: Tr = (key, values) => t(locale, key, values);
+  const [data, setData] = useState({ companies: CRM_COMPANIES, contacts: CRM_CONTACTS, deals: CRM_DEALS });
+  const [editing, setEditing] = useState(false);
   const [detail, setDetail] = useState<Detail | undefined>();
   const [open, setOpen] = useState(false);
   const opener = useRef<HTMLElement | null>(null);
@@ -50,78 +60,107 @@ export function CrmApp({ locale }: { locale: Locale }) {
   };
 
   return (
-    <div className="crm">
-      <div className="crm__stats">
-        <StatCard
-          label={tr("demo.apps.crm.stat.open")}
-          value={openValue(CRM_DEALS)}
-          formatOptions={{ style: "currency", currency: "EUR", maximumFractionDigits: 0 }}
-          icon="euro"
+    <CrmDataContext value={data}>
+      <div className="crm">
+        <div className="crm__stats">
+          <StatCard
+            label={tr("demo.apps.crm.stat.open")}
+            value={openValue(data.deals)}
+            formatOptions={{ style: "currency", currency: "EUR", maximumFractionDigits: 0 }}
+            icon="euro"
+          />
+          <StatCard
+            label={tr("demo.apps.crm.stat.won")}
+            value={wonValue(data.deals)}
+            formatOptions={{ style: "currency", currency: "EUR", maximumFractionDigits: 0 }}
+            icon="emoji_events"
+            tone="success"
+          />
+          <StatCard
+            label={tr("demo.apps.crm.stat.active")}
+            value={data.companies.filter((entry) => entry.status === "actief").length}
+            icon="business"
+            tone="violet"
+          />
+        </div>
+        <Tabs
+          label={tr("demo.apps.crm.tabs")}
+          className="crm__tabs"
+          tabs={[
+            {
+              id: "bedrijven",
+              label: tr("demo.apps.crm.tab.companies"),
+              icon: "business",
+              panel: <CompaniesPanel tr={tr} onOpen={(id, el) => show("company", id, el)} />,
+            },
+            {
+              id: "contactpersonen",
+              label: tr("demo.apps.crm.tab.contacts"),
+              icon: "contacts",
+              panel: <ContactsPanel tr={tr} onOpen={(id, el) => show("contact", id, el)} />,
+            },
+            {
+              id: "deals",
+              label: tr("demo.apps.crm.tab.deals"),
+              icon: "handshake",
+              panel: <DealsPanel tr={tr} locale={locale} onOpen={(id, el) => show("deal", id, el)} />,
+            },
+          ]}
         />
-        <StatCard
-          label={tr("demo.apps.crm.stat.won")}
-          value={wonValue(CRM_DEALS)}
-          formatOptions={{ style: "currency", currency: "EUR", maximumFractionDigits: 0 }}
-          icon="emoji_events"
-          tone="success"
-        />
-        <StatCard
-          label={tr("demo.apps.crm.stat.active")}
-          value={CRM_COMPANIES.filter((entry) => entry.status === "actief").length}
-          icon="business"
-          tone="violet"
-        />
-      </div>
-      <Tabs
-        label={tr("demo.apps.crm.tabs")}
-        className="crm__tabs"
-        tabs={[
-          {
-            id: "bedrijven",
-            label: tr("demo.apps.crm.tab.companies"),
-            icon: "business",
-            panel: <CompaniesPanel tr={tr} onOpen={(id, el) => show("company", id, el)} />,
-          },
-          {
-            id: "contactpersonen",
-            label: tr("demo.apps.crm.tab.contacts"),
-            icon: "contacts",
-            panel: <ContactsPanel tr={tr} onOpen={(id, el) => show("contact", id, el)} />,
-          },
-          {
-            id: "deals",
-            label: tr("demo.apps.crm.tab.deals"),
-            icon: "handshake",
-            panel: <DealsPanel tr={tr} locale={locale} onOpen={(id, el) => show("deal", id, el)} />,
-          },
-        ]}
-      />
-      <Sheet
-        title={detail ? detailTitle(detail) : ""}
-        triggerLabel={tr("demo.apps.crm.open")}
-        closeLabel={tr("demo.apps.crm.close")}
-        hideTrigger
-        open={open}
-        onOpenChange={(next) => {
-          setOpen(next);
-          if (!next) opener.current?.focus();
-        }}
-        footer={(close) => (
-          <Button variant="outline" onClick={close}>
-            {tr("demo.apps.crm.close")}
-          </Button>
+        <DetailDrawer
+          title={detail ? detailTitle(detail, data) : ""}
+          triggerLabel={tr("demo.apps.crm.open")}
+          closeLabel={tr("demo.apps.crm.close")}
+          hideTrigger
+          open={open}
+          onOpenChange={(next) => {
+            setOpen(next);
+            if (!next) opener.current?.focus();
+          }}
+          editLabel={tr("patterns.edit")}
+          onEdit={() => setEditing(true)}
+        >
+          {detail && <DetailBody detail={detail} tr={tr} locale={locale} onOpen={show} />}
+        </DetailDrawer>
+        {editing && detail && (
+          <RecordFormDialog
+            locale={locale}
+            initial={{ name: detailTitle(detail, data) }}
+            fields={[{ name: "name", label: "patterns.name", required: true }]}
+            onClose={() => setEditing(false)}
+            onSave={(value) => {
+              const name = value["name"]?.trim();
+              if (!name) return;
+              setData((current) => ({
+                companies:
+                  detail.kind === "company"
+                    ? current.companies.map((entry) => (entry.id === detail.id ? { ...entry, name } : entry))
+                    : current.companies,
+                contacts:
+                  detail.kind === "contact"
+                    ? current.contacts.map((entry) => (entry.id === detail.id ? { ...entry, name } : entry))
+                    : current.contacts,
+                deals:
+                  detail.kind === "deal"
+                    ? current.deals.map((entry) => (entry.id === detail.id ? { ...entry, title: name } : entry))
+                    : current.deals,
+              }));
+              setEditing(false);
+            }}
+          />
         )}
-      >
-        {detail && <DetailBody detail={detail} tr={tr} locale={locale} onOpen={show} />}
-      </Sheet>
-    </div>
+      </div>
+    </CrmDataContext>
   );
 }
 
-function detailTitle(detail: Detail): string {
-  if (detail.kind === "company") return company(detail.id)?.name ?? "";
-  if (detail.kind === "contact") return contact(detail.id)?.name ?? "";
-  return CRM_DEALS.find((deal) => deal.id === detail.id)?.title ?? "";
+function detailTitle(
+  detail: Detail,
+  data: { companies: readonly CrmCompany[]; contacts: readonly CrmContact[]; deals: readonly CrmDeal[] },
+): string {
+  if (detail.kind === "company") return data.companies.find((entry) => entry.id === detail.id)?.name ?? "";
+  if (detail.kind === "contact") return data.contacts.find((entry) => entry.id === detail.id)?.name ?? "";
+  return data.deals.find((entry) => entry.id === detail.id)?.title ?? "";
 }
 
 function Toolbar({
@@ -167,9 +206,10 @@ function tableProps(tr: Tr) {
 }
 
 function CompaniesPanel({ tr, onOpen }: { tr: Tr; onOpen: (id: string, element: HTMLElement) => void }) {
+  const { companies } = useCrmData();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("");
-  const rows = CRM_COMPANIES.filter(
+  const rows = companies.filter(
     (entry) =>
       (!query.trim() || includes(`${entry.name} ${entry.city} ${entry.sector}`, query)) &&
       (!status || entry.status === status),
@@ -234,9 +274,10 @@ function CompaniesPanel({ tr, onOpen }: { tr: Tr; onOpen: (id: string, element: 
 }
 
 function ContactsPanel({ tr, onOpen }: { tr: Tr; onOpen: (id: string, element: HTMLElement) => void }) {
+  const { companies, contacts, company } = useCrmData();
   const [query, setQuery] = useState("");
   const [companyId, setCompanyId] = useState("");
-  const rows = CRM_CONTACTS.filter(
+  const rows = contacts.filter(
     (entry) =>
       (!query.trim() || includes(`${entry.name} ${entry.function} ${company(entry.companyId)?.name ?? ""}`, query)) &&
       (!companyId || entry.companyId === companyId),
@@ -283,7 +324,7 @@ function ContactsPanel({ tr, onOpen }: { tr: Tr; onOpen: (id: string, element: H
             onChange={(e) => setCompanyId(e.target.value)}
             placeholder={tr("demo.apps.crm.all")}
           >
-            {CRM_COMPANIES.map((entry) => (
+            {companies.map((entry) => (
               <option key={entry.id} value={entry.id}>
                 {entry.name}
               </option>
@@ -311,13 +352,14 @@ function DealsPanel({
   locale: Locale;
   onOpen: (id: string, element: HTMLElement) => void;
 }) {
+  const { deals, company } = useCrmData();
   const [query, setQuery] = useState("");
   const [stage, setStage] = useState("");
   const date = useMemo(
     () => new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric" }),
     [locale],
   );
-  const rows = CRM_DEALS.filter(
+  const rows = deals.filter(
     (entry) =>
       (!query.trim() || includes(`${entry.title} ${company(entry.companyId)?.name ?? ""}`, query)) &&
       (!stage || entry.stage === stage),
@@ -410,13 +452,14 @@ function DetailBody({
   locale: Locale;
   onOpen: (kind: Detail["kind"], id: string, element: HTMLElement) => void;
 }) {
+  const { deals, company, contact } = useCrmData();
   const date = new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", year: "numeric" });
-  const dealList = (deals: readonly CrmDeal[]) =>
-    deals.length === 0 ? (
+  const dealList = (entries: readonly CrmDeal[]) =>
+    entries.length === 0 ? (
       <p>{tr("demo.apps.crm.no_deals")}</p>
     ) : (
       <ul className="crm-detail__deals">
-        {deals.map((deal) => (
+        {entries.map((deal) => (
           <li key={deal.id}>
             <LinkButton onOpen={(el) => onOpen("deal", deal.id, el)}>{deal.title}</LinkButton>
             <span>{formatEuro(deal.amount)}</span>
@@ -454,7 +497,7 @@ function DetailBody({
           })}
         </ul>
         <h3>{tr("demo.apps.crm.tab.deals")}</h3>
-        {dealList(CRM_DEALS.filter((deal) => deal.companyId === entry.id))}
+        {dealList(deals.filter((deal) => deal.companyId === entry.id))}
       </div>
     );
   }
@@ -479,11 +522,11 @@ function DetailBody({
           <Fact label={tr("demo.apps.crm.col.phone")}>{entry.phone}</Fact>
         </dl>
         <h3>{tr("demo.apps.crm.tab.deals")}</h3>
-        {dealList(CRM_DEALS.filter((deal) => deal.contactId === entry.id))}
+        {dealList(deals.filter((deal) => deal.contactId === entry.id))}
       </div>
     );
   }
-  const entry = CRM_DEALS.find((deal) => deal.id === detail.id);
+  const entry = deals.find((deal) => deal.id === detail.id);
   if (!entry) return null;
   return (
     <div className="crm-detail">

@@ -192,3 +192,8 @@ export { ErrorSummary } from "./components/ErrorSummary.tsx";
 export type { ErrorSummaryProps } from "./components/ErrorSummary.tsx";
 
 export { TopLoadingBar } from "./components/TopLoadingBar.tsx";
+
+export { FormDialog } from "./components/FormDialog.tsx";
+export type { FormDialogProps, FormDialogLabels } from "./components/FormDialog.tsx";
+export { DetailDrawer } from "./components/DetailDrawer.tsx";
+export type { DetailDrawerProps } from "./components/DetailDrawer.tsx";

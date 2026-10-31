@@ -173,17 +173,22 @@ describe("Contacten", () => {
     const toggle = screen.getByRole("button", { name: "Favoriet", pressed: false });
     await userEvent.click(toggle);
     expect(screen.getByRole("button", { name: "Verwijderen uit favorieten", pressed: true })).toBeDefined();
+    expect(await violations(container)).toEqual([]);
+    fireEvent(screen.getByRole("dialog"), new Event("cancel", { cancelable: true }));
     await userEvent.type(screen.getByRole("searchbox", { name: "Contacten zoeken" }), "zzz");
     expect(screen.getByText("Geen contacten gevonden")).toBeDefined();
     expect(await violations(container)).toEqual([]);
   });
 
-  it("switches between list and detail on mobile", async () => {
-    const { container } = render(<ContactenPage locale="nl-NL" />);
-    expect(container.querySelector(".contacts")?.getAttribute("data-view")).toBe("list");
-    await userEvent.click(screen.getByRole("button", { name: /Bram Dekker/ }));
-    expect(container.querySelector(".contacts")?.getAttribute("data-view")).toBe("detail");
-    await userEvent.click(screen.getByRole("button", { name: "Terug naar contacten" }));
-    expect(container.querySelector(".contacts")?.getAttribute("data-view")).toBe("list");
+  it("opens drawer details from the contact list and restores focus on Escape", async () => {
+    render(<ContactenPage locale="nl-NL" />);
+    expect(screen.queryByRole("dialog")).toBeNull();
+    const opener = screen.getByRole("button", { name: /Bram Dekker/ });
+    await userEvent.click(opener);
+    const drawer = screen.getByRole("dialog", { name: "Bram Dekker" });
+    expect(drawer.classList.contains("ts-sheet")).toBe(true);
+    fireEvent(drawer, new Event("cancel", { cancelable: true }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(document.activeElement).toBe(opener);
   });
 });
