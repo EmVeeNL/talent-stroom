@@ -9,7 +9,9 @@ import { useReducedMotion } from "./reduced-motion.ts";
 /** Reduced motion removes closed surfaces in the same render, without a presence frame. */
 export function MotionPresence({ children }: { children: ReactNode }) {
   const reduced = useReducedMotion();
-  return reduced ? children : <AnimatePresence initial={false}>{children}</AnimatePresence>;
+  // initial={false} leaks through PresenceContext to nested animations (e.g. Card children),
+  // suppressing even keyed replays for the lifetime of the presence child.
+  return reduced ? children : <AnimatePresence>{children}</AnimatePresence>;
 }
 
 interface MotionPanelProps extends HTMLMotionProps<"div"> {

@@ -1,11 +1,10 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { createContext, createElement, useContext, useEffect, Suspense } from "react";
+import { createContext, createElement, useContext, useEffect, Suspense, lazy } from "react";
 import type { ReactNode } from "react";
 import {
   createRootRouteWithContext,
   createRoute,
   createRouter,
-  lazyRouteComponent,
   notFound,
   Outlet,
   redirect,
@@ -16,6 +15,7 @@ import type { Locale, MessageKey } from "@talentstroom/i18n";
 import type { OrganizationList } from "./auth.ts";
 import type { SessionUser } from "./Workspace.tsx";
 import type { AuthScreenProps } from "./pages/auth/AuthScreen.tsx";
+import Pending, { RouteError as LazyRouteError } from "./RouteFeedback.tsx";
 import { authRouteTitles, demoAuthRoutes, demoPagesEnabled, routes } from "./routes.ts";
 
 export type SessionContext =
@@ -55,8 +55,8 @@ export function activeMembership(session: SessionContext) {
 }
 const recovery = new Set(["/e-mail-bevestigen", "/wachtwoord-vergeten", "/wachtwoord-herstellen"]);
 const publicPaths = new Set(["/inloggen", "/registreren", ...recovery]);
-const Pending = lazyRouteComponent(() => import("./RouteFeedback.tsx"));
-const LazyRouteError = lazyRouteComponent(() => import("./RouteFeedback.tsx"), "RouteError");
+// React.lazy keeps suspension in React. Router 1.170.46 conditionally calls use()
+// only while a chunk is pending, which violates React 19.3's suspension contract.
 interface HarnessSearch {
   preview?: "dashboard" | "guest";
   theme?: "light" | "dark";
@@ -68,7 +68,7 @@ export function validateRouteSearch(search: Record<string, unknown>): HarnessSea
     ...(search["theme"] === "light" || search["theme"] === "dark" ? { theme: search["theme"] } : {}),
   };
 }
-const LazyNotFound = lazyRouteComponent(() => import("./pages/errors/NotFound.tsx"));
+const LazyNotFound = lazy(() => import("./pages/errors/NotFound.tsx"));
 
 // Runs inside the page Suspense boundary, once the lazy heading exists.
 function PageFocus() {
@@ -157,7 +157,7 @@ export function createAppRouter({
     demo?: boolean;
     load: () => Promise<{ default: (props: { locale: Locale }) => ReactNode }>;
   }) {
-    const Page = lazyRouteComponent(definition.load);
+    const Page = lazy(definition.load);
     return createRoute({
       getParentRoute: () => dashboard,
       path: definition.path,
@@ -188,7 +188,7 @@ export function createAppRouter({
     demo: boolean;
     load: () => Promise<{ default: (props: { locale: Locale }) => ReactNode }>;
   }) {
-    const Page = lazyRouteComponent(definition.load);
+    const Page = lazy(definition.load);
     return createRoute({
       getParentRoute: () => root,
       path: definition.path,
@@ -215,7 +215,7 @@ export function createAppRouter({
     path: P,
     load: () => Promise<{ default: (props: AuthScreenProps) => ReactNode }>,
   ) {
-    const Page = lazyRouteComponent(load);
+    const Page = lazy(load);
     return createRoute({
       getParentRoute: () => auth,
       path,

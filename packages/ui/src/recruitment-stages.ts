@@ -6,6 +6,7 @@ export const RECRUITMENT_STAGE_IDS = [
   "gesprek",
   "aanbod",
   "geplaatst",
+  "afgewezen",
   "niet_geschikt",
   "talentpool",
 ] as const;
@@ -46,6 +47,11 @@ export const RECRUITMENT_STAGES = {
     labelKey: { nl: "recruitment.stage.geplaatst", en: "recruitment.stage.geplaatst" },
     tone: "success",
     icon: "task_alt",
+  },
+  afgewezen: {
+    labelKey: { nl: "recruitment.stage.afgewezen", en: "recruitment.stage.afgewezen" },
+    tone: "danger",
+    icon: "close",
   },
   niet_geschikt: {
     labelKey: { nl: "recruitment.stage.niet_geschikt", en: "recruitment.stage.niet_geschikt" },

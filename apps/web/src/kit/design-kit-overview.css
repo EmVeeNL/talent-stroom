@@ -211,7 +211,7 @@
 }
 .dk-kanban {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--ts-space-3);
 }
 .dk-kanban__col {
@@ -221,6 +221,9 @@
   border-radius: var(--ts-radius-md);
   background: var(--ts-surface-muted);
   border-top: 2px solid var(--dk-tone);
+}
+.dk-kanban__col--danger {
+  --dk-tone: var(--ts-danger-text);
 }
 .dk-kanban__col--warning {
   --dk-tone: var(--ts-warning-text);

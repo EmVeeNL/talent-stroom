@@ -100,3 +100,9 @@
     padding: 0 var(--ts-space-4) var(--ts-space-4);
   }
 }
+
+:root[data-motion="reduce"] .ts-dialog,
+:root[data-motion="reduce"] .ts-dialog::backdrop {
+  transition-duration: 0ms;
+  animation: none !important;
+}

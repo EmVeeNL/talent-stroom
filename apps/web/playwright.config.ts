@@ -1,6 +1,8 @@
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "@playwright/test";
 
+const port = Number(process.env["PLAYWRIGHT_PORT"] ?? 5178);
+
 export default defineConfig({
   testDir: "./visual",
   testMatch: "**/*.visual.ts",
@@ -10,7 +12,7 @@ export default defineConfig({
   retries: 0,
   timeout: 120_000,
   use: {
-    baseURL: "http://127.0.0.1:5178",
+    baseURL: `http://127.0.0.1:${port}`,
     browserName: "chromium",
     locale: "nl-NL",
     timezoneId: "Europe/Amsterdam",
@@ -19,9 +21,9 @@ export default defineConfig({
     serviceWorkers: "block",
   },
   webServer: {
-    command: "pnpm exec vite --host 127.0.0.1 --port 5178 --strictPort",
+    command: `pnpm exec vite --host 127.0.0.1 --port ${port} --strictPort`,
     cwd: fileURLToPath(new URL(".", import.meta.url)),
-    url: "http://127.0.0.1:5178",
+    url: `http://127.0.0.1:${port}`,
     reuseExistingServer: false,
     timeout: 30_000,
   },

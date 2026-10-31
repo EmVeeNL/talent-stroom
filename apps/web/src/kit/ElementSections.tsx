@@ -111,6 +111,7 @@ export function ElementsBasic({ locale }: { locale: Locale }) {
               ["gesprek", "demo.elements.stage.gesprek"],
               ["aanbod", "demo.elements.stage.aanbod"],
               ["geplaatst", "demo.elements.stage.geplaatst"],
+              ["afgewezen", "recruitment.stage.afgewezen"],
             ] as const
           ).map(([stage, labelKey]) => (
             <StageBadge key={stage} stage={stage}>

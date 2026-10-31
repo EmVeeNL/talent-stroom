@@ -13,11 +13,13 @@ export interface EmptyStateProps {
 }
 export function EmptyState({ variant = "no-records", icon, title, body, action, compact = false }: EmptyStateProps) {
   const id = useId();
+  // Compact states repeat inside columns and panels, so they must not become duplicate landmarks.
+  const Root = compact ? "div" : "section";
   return (
-    <section
+    <Root
       className={`ts-empty-state ts-empty-state--${variant}${compact ? " ts-empty-state--compact" : ""}`}
       role={variant === "error" ? "alert" : undefined}
-      aria-labelledby={id}
+      aria-labelledby={compact ? undefined : id}
     >
       <span className="ts-empty-state__icon">
         <Icon
@@ -28,6 +30,6 @@ export function EmptyState({ variant = "no-records", icon, title, body, action, 
       <h3 id={id}>{title}</h3>
       <p>{body}</p>
       {action && <div className="ts-empty-state__action">{action}</div>}
-    </section>
+    </Root>
   );
 }
